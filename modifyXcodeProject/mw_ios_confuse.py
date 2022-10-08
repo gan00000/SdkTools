@@ -12,36 +12,19 @@ import chardet
 # 导入 random(随机数) 模块
 import random
 
-genest_word=["ruminaddresseur","theseable","finaleur","perioder","phanerth","flavious","culturality","tachosion","irat","ectomyical","controlition","juvenuous","establishfication","ter","born",
-             "narpeopleious","decisionory","hugehood","failkin","prettyation","nominetic","tactivity","consumerious","piececy","owneraneous","strigosohise","misce","health","androistic","fingerine","osteoty","signship","amatade","in1ics","mitial","non",
-             "theroprocess","barb","intraacious","assume","tenssure","eph","cinality","faran","opoterent","corticoise","kakor","shot","withoutatory","pteryess","traagreeory","decortwo","takeize","axilability","sputmyselfress","roadar","trigesimadministrationtic","voluntseaaceous","mentionition","gastr","by","leisome","hyofaction","probule","mergen","whileible","myfold","amph","nationar","nugacical","velocair","cortico","gelatworkeracy","pathorganizational","villality","tomy","caesability","publiceer","cardinency","transth","untilish","respondatic","lifeence","admost","penive","polemization","TV","forward","kinoity","removeon","interesting","significantatory","gubernty","boload","listening","popularsion","periodth","TVon","gramatory","privenne","suivity","skinmost","misce","examplement","sebproduction","acerbeer","degreeer","rolelike","nespeechation","thusality","radiofold","felicitine","fundency","surfaceite","dreamition","argueian","limacenne","armit","falline","sexagesimhood",
-             "fungory","acceptable","treeary","autoization","storyery","workeresque","relationshipit","plagi","directorible","sexity","trabwhileeer","aer","trachyite","lievsion","environmentlike","rhagbusinessitor","contronearlyian","inside","avision","could","clystify","awayaneity","noct","sisterence","lapssome","salvar","quisitage","pancreaticoouratory","orecticly","clos","personalfaction","hereeous","physicalitive","clystular","peculiary","centen","litheur","thalass","dayful","thermive","amount","lastsure","belliice","maintainad","newseer","theirel","probablyorium","pavise","suf",
-             "tortaneous","circ","scrupulmodern","cytoaddressress","difficultade","ticeous","primation","phyllality","tableitor","eveningity","morningeer","specificling","circfaction","icosenne","takeward","orderproof","loseeer","manthpersonture","listenee","cosmo","skillous","belliproof","ludacy","customerivity","duringade","in2oldot","articleesque","tricenosity","fascsion","omoshe","ultimwise","tradeacious","barkin","phyllette","piteacity","fallac","floor","supinee","finishing","goator","laminoilfaction","tenast","uliginivity","heliopoormost","pollinfaction","algiaistic","beyondette","travel","himive","vocate","fandal","impactfication","followitude","drawaceous","oviacle","philehood","preventacious","cameratory","stinct","skillhood","valueast","hit","mirad","weaponaneity","a","pontonty","poieard","thenel","misceity","meterosity","liquosity","judicfederalsure","quassproof","novendecose","edrecognizeee","fessadditude","granish","importantly","oncy","issue","interest","collectionlet","frontster","acusive","jejunform","ran","pollicing","phalarsexual","volunt","statementify","lotability","nicefaction","temptier","senitor","dogmcareeratic","ficidifferenceical","partyade","flamproof","is","flulet","montfic","herselffication","effectise","hardan","pubertlet","satacle","siccee","ornith","tent","siphotion","meta","audacprepareeer","crutable","houseair","manyical","owny","apert","dextrful","scriptance","Mrance","proli","intoate","publicer","uvulokin",
-             "orderible","neics","basiial","theywise","doxyetate","sculp","damnserveion","wrong","fearacity","largitude","detailion","hyoaceous","traneer","emesi","cityry","becomeetic","petrneverive","lawyerfaction","ectomyize","hiemise","peaceless","salin","synuous","earlyian","sometimes","foveth","posic","todayty","existary","systemative","tetanature","step","polic","bromoial","sessartior","manage","apertary","edization","caulstreetite","arriveuous","responseability","includingical","faciad","counter","censlike","glaciice","hemtheetic","physical","participanteer","similage","newsance","camerlistal","sumuous","heliot","noteitious","courtetic","meriteous","gestfier","quisitaster","similaror","virraceette","hyoress","focusfic","tachage","gelat","productite","tensette","ofdom","axilid","oedfic","undeneur","poseous","rhizlaughfy","fensice","officeress","givetion","quint","image","attentioneer","cordaire","howarian","platyent","magnid","jurisitive","proliess","feminress","nor","syltrue","painting","presential","issueular","boleer","cardior","pantoial","owning","pinncy","propertyible","evenence","fingerproof","heater","carcinive","otit","mitfier","standcy","cerebrofication","polliclossatic","therory","treeeous","eastie","budgetile","item","unguluous","dentorium","lystmost","ballostudent","loseality","admitlet","ovience","writeritude","superise","ontee","lecithetic","salinatic","whatty","cyclish","catenade","ander","throughtion","dinnerible","hypn","grat","relationshipia","claustrenne","dubacity","signsure","balo","foreignage","upion","sevenier","ossshoulderful","pleurtic","this","lessfication","roborious","oriite","angmost","storyally","experiuous","rugeer","soliule","opiist","hedratory","ornful","fineular","kitchen","vilmuch","claditor","visco","pungy","country","baseal","clavience","scientistic","trichoaceous","smileaneous","strong","uncper","sagittwise","everyonean","oncefaction","claustroawayaster","pathaneous","theirast","juern","macree","honorjobuous","totirightally","hoplaceous","dysify","executive","juriblackair","superward","ok","long","regionel","gonoard","raphospitalor","soonage","sol","market","momentitious","billiondom","senraiseetic","xiphbadar","newsacle","enterics","candivity","gardenenne","seiblueory","timacle","quisitard","require","sumptfier","nomiarium","hedoistic","concernon","recordsion","docible","plenette","parith","meet","catharery","sacrofindary","umbrress","lepidistic","mixtfaction","newspaperfaction","outsidement","tim","septuagesim","eph","genitial","silviine","treatmentproof","scabioing","gestose","whichness","mar","mesterety","parlly","ef","superor","ratefier","spersial","propertyent","cupacle","vag","ventrier","postulry","tortuion","individuallike","cerebro","micrie","cretet","sessfier","strigetic","generskillent","locoine","capel","operar","viscosiior","turnion","runsome","oplso","bookist","cenast","periast","fugality","famable","lacerics","pollinrealize","oncusoon","colorile","tomoling","frigitude","onize","writear","participant","pylel","epiform","scientistance","pauc","orexiabying","ofar","citizen","popular","whatatic",
-             "phanee","bag","furtate","nunciling","tropsome","bradyacity","field","tuss","sidine","expectic","percreate","rancate","machineaire","trabtherean","thalassstudentistic","deadice","genuosity","receiveuous","oedern","in2eyelike","pharmacie","dropad","fugitia","callment","tractress","genar","speretic","tonight","findior","plutform","turpety","priviuous","whileen","gamb","photet","coise","malleo","mindage","pushity","homin","fullity","oeco","todayation","tenth","hepar","whileaneous","cruous","section","operance","manysome","plecnationarium","pic","lawyerous","manyature","threefold","otherly","dorspoorency","thusmost","fatuular","texly","heatacy","billion","null","treiskaidekdifficultular","Democratid","lect","bellisingleality","trichoise","bilotheron","zygly","dealhood","dich","lacrim","whato","vect","acuold","persicice","populationship","logywriteeer","irist","cancer","patternot","strigos","motherite","coldness","sonan","regal","cultureization","anthohood","equifearless","TVing","tremive","alreadyenne","groundage","timeetic","presentably","graphproperty","minhood","fallery","plagi","clement","januose","vestfold","pteroular","anyone","rhomb","voiceet","soleninterestate","playoon","war","tachoitor","curs","commonlike","mensurhomeing","frontor","machineitious","psych","enneaate","junct","motish","current","dipsyfic","thingress","archaify","radioform","mustor","phlegward","sili","certain","causeety","emesisatory","tenacfightenne","openfold","spuful","existence","agoist","ultimorium","psychity","sinuary","gamsion","ativity","fusise","bigth","ambdom","ternling","sheel","phas","myselfitive","dictacious","armesque","magazineit","towardose","volittableuous","sceneacle","recentward","dayistic","standization","sidusoneous","plegan","juxta","hexgeneralitude","dieform","sonous","onomaseasthood","friendive","riskard","pleasdom","sinusern","monstrat","temporent","glassivity","arthrity","boardibility","scabimeasure","individualar","testier","imageward","quinqueproof","dictical","flectan","muls","throughly","ordereer","dactyliooon","insideibility","pratform","heart","pugnalwaysive","some","scaphchooseory","seiics","numberuous","rapt","stopit","managearium","awayose","sonain","microal","otherproof","biten","color","anthraular","windacious","felicitsceneice","pictureant","sizeess","kudoacy","prehensad","someress","socition","bitwise","successeer","general","salvosity","effortress","stringature","minition","somni","toxreasonature","literen","secutty","agreelet","pessimthosefaction","lepidoetic","euness","obory","tradeeur","concernar","ennade","claustro","ballesque","nucassumeosity","motherly","somn","bilain","dichoator","polyoon","nunciess","liminture","ablecy","phesuous","cephal","listen","vali","fund","flecttic","axilia","microage","suddenlyfic","archsounden","sebiism","lawyereous","docureduceia","pubertette","sectionitor","visitward","platttic","manage","spondylmost","rhabdy","describe","tellivity","windot","shoot","relateior","paleency","typoyarden","film","myit","healthative","nicearium","whoseious","multaical","naturalible","largate","basiern","optionster","throw","amongproof","scene","pacin","nuchsure","sisterable","sitous","simul","treateous","gemmable","severalist","cinct","letenne","gladiitious","etymfication","boyior","sect","professionalair","newsitor","lysern","vidcontainling","extro","upard","cupitious","temptprove","hugeent","natural","leaderet","collivity","greatistic","hypnoent","micrthousandfold","foldsee","colice","kinyearful","pel","preterize","cupability","serfaction","chrysaster","small","elseity","cracyise","pinguwait","visia","passer","hippable","plesiade","preia","method","rav","blueish","civilhood","plebature","singatic","smileship","nodo","movementorium","punhood","feelsure","vendit","defenseade","six","fancaneous","pontful","greatty","electionard","weous","paleoality","errite","perreduceive","meaneous","thyretic","identifyar","conenne","im","oligard","extroaire","fieldor","trapezment","trophitious","archeoard","why","durist","family","ratherature","odontize","ownerot","felment","challengeetic","pilfreeation","prepareative","tentile","lamnlamellatory","interestition","finallyize","cotylain","salative","traditionalia","understandier","nomency","rangeion","bitette","uvdom","preacious","stigmatorium","youraceous","osair","thousandlet","passerwise","trophtrialior","plantment","stimulian","claustreer","audienceally","sonage","factibility","biblfold","puni","genyfier","ableetic","decorrise","first","olecranage","wantlet","life","liberling","bac","extrael","dow","themselvesite","mensesque","sixster","holdery","uttic","homeacity","theoress","librsive","scensate","heartitude","negmost","perform","caudad","respondorium","parentless","crasssuffercy","insideenne","trud","functparticularlyade","digmacity","memberive","animalitive","centesimible","put","growity","vulsstayar","urgile","emetoconsumer","patrplayize","stearing","stenless","angular","holitor","scopeincludeaneous","booket","alone","log","coprorium","raphious","sacroose","herlawyerator","pogonar","cantfication","simpleeous","turbin","decadeing","crut","electroant","reachify","irasc","nigrment","ledic","either","kudoless","pangist","valless","sexfold","financialize","sortical","plauset","althoughity","lookature","raiseet","nexization","labable","scoreast","lamino","altivity","juvenency","west","plectice","caldion","chirible","scendsome","segetette","howfy","covercy","ros","despiteproof","plur","scyphan","howeverenne","doctorability","lotarian","vehmost","cruccampaignacious","fromaster","frug","septiawayosity","exoate","creasfaction","rapac","scriptacious","gestcostency","northian","op","informationition","semblknowate","media","fungesque","clamsayature","malleo","igous","liqutruthia","courseine","plurimen","iratry","beautifulate","everyoneate","jursure","kakocatchence","ludacity","arriveion","tauraneity","psammosity","themselvesly","byair","notator","totaleur","muno","projectose","improve","buccseaably","nearlyile","cruci","a","paedate","using","work","focacle","pudeify","paternast","phyt","bibital","lexicoel","causemost","falctreatful","pancreatoitious","caten","areaial","ludprofessorible","ethuous","keyorium","phragmad","sceptward","methodeer","along","current","attorneyature","menilet","quinqueactuallyhood","squallayetic","autho","flav","scandature","colorian","movieite","cheiroistic","regkindlike","billionar","terrster","unguiic","capsputor","sparsism","octogen","misoory","ventr","here","almostful","higharium","ramably","spendie","allaneity","finally","sputless","dealot","nothitious","thyrcollectionior","mesterization","oncusial","revealor","toxfaction","hered","severalibility","faciian","reachule","debateial","edgeety","tersative","seniorsure","lystcontinueit","sinator","gnorness","participantit","countryive","scaphics","oner","finalar","habilably","aroundorium","conbeautifullet","puthour","peccesque","culinible","like","addsive","semiair","credia","fodize","autkin","fivecy","shoulderish","predability","likeise","popularern","studenter","mustcy","ptera","decaly","somebodyical","dis","environmentth","materlateward","section","herster","nubnaturalain","culinive","patientics","micrard","peccular","vestfication","hotelness","octavacy","opto","moreenne","offication","bookibility","bager","live","vigenosity","trop","chairarian","brontcommunity","cidose","animalaster","exist","evening","synsome","staffan","dign","manade","shareish","mens","knowatic","policain","vomyourselfise","necr","pugnably","chrom","betterose","mancyless","corporeur","quadrsendality","studwise","minim","voro","frontmeetie","dormic","desdata","dayia","diee","ligive","writer","ecclesofor","liveeous","part","phantory","treatmentress","oldage","ord","modelship","philedefenseing","nemalet","nothingfy","sapi","pacard","cornthank","cedbelieveose","crimeacy","machineivity","prettyatory","denlarge","viscosiry","oncoform","tomoeous","taxify","myrmecish","gonoet","phragmward","yeahhood","player","vellship","testast","amourice","scienceation","itinerency","productionator","transblood","gnarfier","audeur","telokitchen","manish","recordwise","scriptbestsion","soletsuddenly","phasyesque","pulllike","sortice","program","Mrice","availablester","audienceo","glabralongosity","ossive","windowesque","churchform","anthropside","tostite","brachyial","fulgsimplester","fricad","quadragesim","itemence","juvenmustess","anythingate","ticly","mereur","military","productionor","scanditive","tenaciship","plectality","nugatacious","expertcy","tropice","cut","tergimost","axieous","deacity","projectile","pterpartner","amountster","bursless","levely","American","student","hendecageeer","givetion","captacy","othersosity","paleostudyist","officeary","corollade","athlsive","creatproof","platinowise","anlet","half","logyion","continueaneous","ceptator","fringquestion","contrenetworkic","bothfication","phantaneous","eeconomyar","whiteo","baseally","firm","us","arch","pedojustmost","figaster","audi","opin","micbrotheraster","resourceee","candably","proximry","sinceaster","ethmI","than","pedocy","lesenne","stirpion","throwly","didactial","shorteous","vicoveritude","hairatory","laminator","silismilefic","attackade","both","awayade","lysoon","potibility","pneu","plecitive","cingular","phetcoldmost","dosaster","cheirosion","caulo","westernth","nugaible","smile","cinctoon","guttform","beid","its","acious","pendation","worryise","color","sali","lentshouldair","tetrage","ant","fric","exper","hieroo","biopracticeery","merward","xanthage","vertpartysure","ceramacy","trachylet","individualation","everyoneitude","travelern","buildmost","jug","plethmessagetion","captexplainine","rancation","xerative","practice","heavyite","perhapseer","vertard","significantation","nudast","horreallyaceous","vertproof","omasthing","bringate","axioeous","clavicoverion","theid","ed","planish","rhombry","orexiofficeation","nothingetic","paucitious","likeuous","volatwindosity","pluriming","peleer","falsamount","volitaceous","vigesimatic","calypaceous","situationette","auous","luminon","millenency","occuring","treatice","lookmost","iter","chelon","taskion","meile","curv","augad","workive","speakish","expect","sten","euory","sceneish","ornithoivity","floorlet","givement","beatess","arboriarium","acerblet","managead","billian","fant","legitimary","meretship","borance","idecustomer","peopleie","flux","moreality","pteraoon","productionar","northtic","graphyization","pyr","talidark","actionfic","barally","along","politine","palinance","proprieur","quickly","menern","found","vagaquestionship","tetanomethodfy","product","continueatory","foot","quinform","mayture","everythingability","longency","munofold","vulsmissionous","withinivity","autfication","photacious","ungulical","sinistrition","dermaneity","riskesque","miran","sorptise","couple","nodious","coranyone","pecchood","merition","pans","nigrty","wallity","theirian","becauseness","generalar","ctenie","squarrostaxacy","emesisfallate","onchoety","precly","phloearian","factorfic","menotask","centritive","comior","cruciant","templ","sembl","middleature","nightit","torristic","youoon","ecoia","somedom","auriuous","rightad","bronchast","opoterture","niceo","argentorium","hugeaneity","radicive","existeur","authorose","cipitalongible","bilster","whoth","crucior","accountless","theness","employeefier","difficulteous","fulminory","problearnful","themular","ideaitive","paternably","trochindeed","iqusion","sequeous","ominfold","actionen","gonAmerican","sell","flamaceous","willent","plur","conion","expert","threat","nevering","baselike","ursfinditude","Iarium","und","dactyloacy","caloring","pastent","circumize","motheritor","utry","untilacious","bol","placeibility","shortal","tedithoseia","pall","risant","puberably","nugatic","dinnerian","equinbabyile","duringatory","plupreventatory","scene","lapsbuildingeer","grav","fossative","PMaster","chant","traical","failable","backtion","collectionule","vitellnetworkeous","atid","herpnoror","storedom","ballo","soror","lightfier","fineistic","claustracle","maintaino","phylcoachivity","politics","bothitive","roborory","macrer","recently","desious","vulsatory","scutish","western","travel","cruactivityier","lossfold","applyeous","fligorium","traumar","away","picturesure","larveur","pansization","certain","arriveern","managementtion","pantoier","environmentitude","hugear","cusp","howative","scabiaster","ficency","gas","munard","earlyth","jurismost","agr","ocition","multatably","tedikitchenon","umbrosity","sexagenproof","her","coldally","orexiing","about","hundredaire","miasmat","algenne","recentee","tropoon","specialcy","policyatory","thingian","dyso","andity","creaspointitude","enterar","growent","pathy","spaceibility","lytling","ctenment","klept","fisseastery","hospital","hel","nugament","includingule","ali","vicesimular","gemule","clamious","pedoherselfward","beyondate","candidateture","dipsodeath","meningling","polresearchsion","chairsive","prav","rurister","spicety","duringize","bronchical","prepareosity","podally","care","mening","pteroern","nephrstorelike","tripscourtward","miasma","largetic","outsidester","countryard","coach","polemion","balloaceous","poor","courmost","rhynchical","theresque","recognizeine","comeion","townally","balo","palliics","brothersion","pastseaain","axiovoteard","Congressdom","lubrictheorysive","caldition","doctorition","througher","lithor","ternise","foreer","afterety","foenamongtion","kidry","norsome","securityeur","amountor","cytoitor","oscillment","nectagainain","carni","sorcie","belliorium","stin","measureproof","generier","campness","ishood","tertiain","entreette","tough","germin","hemification","vivior","junct","eitherist","hirsutlossfier","asative","elseality","tendic","oncoship","evidenceenne","typile","ogness","veni","politicsorium","salicize","munery","gontic","preterhope","rapaciparticipantality","agentence","group","timely","taskable","octogesimfic","everybodyot","clysmmusicesque","unitise","satia","restard","machineproof","whoseine","uberunitie","me","ruminacy","censcienceee","very","drawwise","tendature","scab","radary","liquidid","take","polickin","clarnationity","alteron","network","surdor","flig","uliginthrowess","PM","fundier","prehenswise","acrosslike","potamform","retauthor","halitage","crassitive","monstratous","nugactic","pandward","flamability","plicist","tenuise","buyaneity","teacherize","opiine","opacy","emetoagoful","church","centric","penitture","enoughible","ideaability","sagittment","anteness","treeosity","patot","walkenne","verain","paedo","sclerauthoritive","mediasive","eccles","athlative","thalass","caprpainory","subbornmost","chantmanyish","crispory","communityling","stalagmern","esoable","glabrarian","rigory","highacity","heia","praeture","egribyious","cardon","justfy","riskoon","ntorium","oical","conferenceial","hold","movieast","doorious","ornist","casresponsibilityitious","miss","aoon","nau","hit","answerable","sperier","wifeular","studyosity","alwaysly","hotel","orecticfaction","housearian","phascoursely","mord","corteer","pasccustomer","sacraitemular","goalast","orexally","rhombontoade","larvot","andory","opoter","sophyeur","septenwaterule","penoly","iterair","meta","veraci","redition","acerbical","signian","onto","stann","totihundredsome","hang","functast","turpitth","primo","stenid","jursave","prob","folial","pallitsome","several","obsation","bibitarian","cusreality","powerial","acuwise","gen","acuture","sparssure","half","annably","mechano","capical","agree","cuspcy","mammfication","fulg","individual","habiltownon","teamth","retroie","vot","compareise","catenmorning","transtic","terminize","etho","machinfloorness","property","dogent","votespeciallyacity","tentaery","schoolatory","cubance","mean","edency","col","clastmost","emesiproof","plum","malimostless","breakaster","nephrnotice","ergwise","umbilicaceous","meanade","seriession","raucish","du","nexstandardosity","girlarium","natureeur","syringmost","argueivity","situationitive","tenachood","shouldal","lekanputite","entireosity","caulresponsibilityy","overast","becomeesque","somaably","genator","fumuous","anyoneain","ethory","majarian","hotice","miasmine","clystmajor","versical","leonular","pyr","pingu","logformit","pedially","meetent","dataful","acance","ptychid","nonefaction","soundfy","dataation","rhach","goaleur","nothing","nasety","stageive","gemmsiteious","florot","radioie","stageth","instead","fundfic","patientition","viciious","dexiRepublicanless","stagead","keeptic","orexicety","isious","effortance","officer","computerly","artistain","reason","somnality","bulbness","horm","only","liqueel","passer","philoy","nightian","jurissouthence","near","fastice","youngling","firm","institutionetic","omniivity","pick","bisward","ting","democratic","axillwhatever","military","wishably","stirpid","representery","wall","bibituous","cutial","gelateveryone","buildingly","bank","leuker","plantkin","dipldrugable","vectosity","wonder","reduceability","quesitmaterialify","graphation","arster","truthitor","come","arrive","foot","pseudous","policyatic","acet","explainacy","joincy","produceent","nowsion","humanious","phetally","page","undentroublekin","development","groupsome","sutarian","generationing","performanceade","turbowould","flavical","very","solith","doctrlet","ostracetic","mindeer","brother","inside","orling","palmcertainlyibility","sac","ridaneity","unitia","yes","siphoacious","valuead","reason","state","veritude","vicade","experitor","fluar","federaire","sordeer","vuls","stichmost","fan","machine","domative","digmaire","quiteian","Mrair","colorally","ofast","cilily","ethmsonenne","cryptwise","seaile","amount","halfarium","during","vulphang","hedrise","vit","productionive","seeast","olecranexpecttic","censor","axilloeous","gnatitive","education","axiwhoseel","savear","moreism","sentiorium","sceloilial","foenade","emdom","acier","algiath","addressably","hiem","money","enjoy","few","fugarian","ontitive","once","oment","tostproof","claustroatory","evenant","everyonear","introaneous","aphie","glorior","eoscharacter","arriveish","narr","workerform","program","pepseer","analysisacious","positavailable","septuagesim","salvite","saccibility","tendacity","similarior","phetism","cribrsocialary","biobititive","ultraular","dreamance","four","fratrity","sitaneous","cenism","fluation","suggestet","jutsure","bitature","coriaire","fanmarriageen","sympicking","sagac","raceast","methodet","take","bulbism","superency","agyrty","calliitious","ophthalmdark","futilet","internationalion","commonary","collectionar","volatbodyade","segetoh","prettyture","theeer","wayast","quaternose","decen","dropeous","clinator","runarium","fugitaster","those","ran","gust","severalally","thisent","trogl","dysunderise","vitell","macrage","product","three","professoran","preventard","todayial","errdaughterage","earlyan","menaciular","pneustatewise","cochletic","ratherern","unipracticeory","unguichair","phonality","numberivity","stinguty","longine","dinoborn","vapitor","villacious","seasonfy","hospitalably","businessain","mesteror","be","dogwise","localous","comparehood","rosee","keyitude","allowite","such","alwaterward","allowety","knowledgeess","alternar","feminnationability","chanceer","malleoety","magnid","miasmless","coach","societyous","thelsmileation","wayice","myrmecen","salin","merg","teachereur","tersery","stereative","stateety","never","richess","membereous","somalongosity","andal","iteraceous","warivity","untilice","groupward","itslike","psammish","mammacity","movie","courttic","septimwise","squam","vehan","rhombaneity","score","veh","camera","emeti","prepareier","supin","grad","animalacious","prepareably","weekition","redyardaster","psammsaveivity","esnaturalice","uxorth","polisment","television","vulgain","save","repsensehood","newer","station","cause","onomatcivilette","sputable","octogenfication","pulchrid","word","magn","genily","lystmorningality","doctorness","hexfold","par","glass","udin;tude","thersorter","puniious","texhimfic","butably","legion","flammfication","dendrit","population","eightling","ossad","cystair","keyress","veryics","aboveary","quartpeaceacity","lyzaire","frictator","junct","pain","partikin","bilate","ctenoldious","laushairot","hopeesque","bac","trainingment","quistoryate","vivible","plas","solit","flacc","affect","pulmontic","rocktic","unific","dealette","PMity","light","soonality","rich","germinpersonon","rarfold","white","natee","democraticably","end","traumie","hippsometimesular","viice","fiveability","might","card","uvuless","thank","receiveture","reasonward","momentness","jobfication","callfaction","viccheckify","tendage","hostian","acr","penoot","sectionier","monness","containship","science","pedoitselfine","veruous","lunie","dulcth","wish","stuffor","autoary","clysmate","partnerarium","geneserviceical","venia","humanage","myair","rexiaeitherfold","emul","fidify","carcerress","halfile","ofic","soize","deictwise","nearard","scabioify","urs","Mrsatory","productth","season","amphaneous","hodhand","ownot","merister","scienceatic","fellor","legisward","scisstreatment","leteur","teamacle","designably","negally","tenacihotelial","offerth","artive","centrevealose","ceasal","cheiroture","passarium","histri","praefoodice","talogreatast","euruous","theoryistic","coeldifferent","servent","leftity","pediorium","iqu","treat","iter","relationship","landlet","halitcity","scope","minsome","ulodeal","statior","photoain","unitive","itsance","pellation","nomidead","edency","factorism","omenuntilette","nameth","ursier","hit","setist","body","aboutuous","arctel","mortuability","eoseous","natural","costarium","start","stereoward","orexiian","macrory","understandier","ters","minacistic","logyot","auth","moveacity","nonagesimrange","uligindevelopable","foodeous","breviency","oleade","uvair","absure","schisen","solitition","carpacross","pacto","nextot","ferto","minuteization","blennly","scabistic","meeting","quotneverive","spondture","valsonatic","quatern","degreeence","policyry","whomose","apfaction","call","etymible","fac","frugless","lysette","lax","zelature","feelingo","nomen","whyory","myrmecarticlesome","difrangeard","endfy","cost","pneuclassorium","it","societyence","afization","schooltion","paintingency","orecticen","challengeule","phileie","dealen","caedess","aboutible","pennance","summer","crevcareeribility","toughist","primia","hemisignate","conditionety","capaster","oligoacious","first","felinstateaceous","circument","productency","meet","sporthood","opisth","termics","axilloenne","donnew","trabize","archoproof","emetoee","bromoee","especiallyar","lotsion","liqujoinkin","eye","severalad","orexially","yetot","includeability","decafier","bigment","alg","eightary","bromoquicklyfold","arriveid","stepory","parentot","puratory","experienceful","paedpatient","controleous","stillful","buildingern","bromocultural","certainlyenne","aurless","penslearnen","eitherition","serveitive","archness","nihilous","vect","archaeuous","factorfold","cauloform","afterally","introforce","plutation","pamant","foreign","templaboveess","cen","regionier","frontform","addiscoveror","occur","increase","educationair","serviceical","gasize","messageer","sorpt","senseid","treatfication","languageia","opoterhundredern","hundredify","similararian","blastacle","statemention","educationency","mulctcy","vocally","vituular","eyeability","fewably","fendage",
-             "phenite","carefication","avoid","in1ical","plean","shoulderit","volutage","prunid","myricustomeroon","boarditive","diplsoutherno","jungaster","fring","do","noxproof","right","fingerfier","ageful","ctenise","tricbeginice","anyoneain","panstype","texfication","specificious","pang","fornicdevelopmentment","exist","stopity","horofic","trips","atite",
-             "withoutior","igyoung","expertise","somni","glans","phantad","cip","will","dipsoconsiderivity","parern","hydrodaughter","alternful","ser","clearatory","verbminuteition","keepive","cernon","market","ogdoatic","creas","soldierise","juriad","ocorium","bility","cinehood","therioably","equiical","treiskaideko","plicet","pageatory","figence","heency","actety","defenseitude","yet","present","pangreveal","lictdom","periodosity","knowledgeitor","anni","quiteial","politaster","habilaster","gramoety","sitenne","bolaproof","ductwriterally","phylacty","rhag","tremule","nonagenly","naissauthorfic","thusster","situationic","extremia","familying","megalization","costad",
-             "mersexecutivekin","artistality","learnaceous","concern","imicsimple","rhynchier","valeforget","lysety","primence","cleithr","sentor","similic","meter","theirette","takesive","nephrage","politics","plurgeneral","cusress","exist","acristic","trudast","nictsure","politicalatory","off","seekible","free","thirdarium","drugan","tondy","continueee","andrmovementast","soph","figappearette","perhapsling","floor","hemiical","araceous","emeator","orththanator","sapi","anyster","alleloyes","dicial","benefitation","bioature","graphator","thank","plesiosity","terrontoitor","out","leprair","managementacy","beautifuldom","indicateair","fellster","speechade","commonance","systemade","blue","cup","institutionory","kinetship","stig","purposeaceous","hetero","prepare","heteroate","civilling","claudproducead","scaphatic","with","directorsion","gratform","situationitive","dextrivity","demity","carpth","legcameraship","time","they","ontanothertic","pallitwhich","cylindcy","middle","protectety","sesquiise","ontoate","can","Congressacle","heartel","simulansweracy","cogn","withtic","tranor","authorsure","accountant","involveie","rumpier","veluous","phanish","scopesome","felicitair","muncy","ntress","laughitor","dysdayful","without","plyacle","onceize","shoot","acrosslet","playerel","gamot","soporaster","service","along","raiseature","sacroize","vorit","hispidinside","dexteracy","butment","oenofficial","cruci","eastward","leaderarium","steghowern","ballodom","past","improveier","bloodics","dis","way","meriation","focusad","practiceship","redence","theoistic","positionaneity","saliic","medicalability","vilrealo","partally","seminar","Mr","egorast","byly","calori","herious","claimform","vertivity","circaneous","vorac","suddenlyster","currary","heise","fably","eofication","salacious","mill","gasose","soonot","salinous","memoryature","van","tendent","addresset","montstaff","talkship","hepar","peran","trecentacle","watereur","trancy","federalibility","failery","junctivity","punctaccordingorium","lactwhetherible","dexterth","earlyable","scrupuleous","soundward","uxoriard","rancous","typoness","matersive","housear","cineenne","listenate","fatid","awayarium","thefeelingad","agentary","para","saxtion","discussatic","noture","trabine","studyress","isfactage","uloesque","algomore","stopfold","thusition","pubator","magn","ultimization","trapez","astr","sorcadministrationsome","picteffect","babyful","tricesim","heavyive","cris","generationous","risesome","megamaterialuous","locut","lamino","heterwhoitive","carcinincludeize","sexability","roommost","affect","tomofinishibility","chordous","mulgseaian","pessim","everyoneaceous","nt","augibility","seaarium","stigbut","hedr","thanage","rangesion","gaslet","wife","phasybadess","quarttion","pickeer","difficultsure","cernition","myrmec","studsion","attentionform","uni","pecuitor","pygel","tonacity","doctrion","pressureose","archo","backism","interestast","cernition","graphoesque","meeteur","gravier","avoidian","determineally","legalator","better","produce","purion","octav","triboet","girleur","calcatic","matter","phrenety","patientproof"]
+genest_word=[]
 
-xcode_project_path = '/Users/ganyuanrong/iOSProject/game_mw_sdk_ios/MainSDK/MW_SDK.xcodeproj'
-
-
-# cpp
-cpp_all_path = ''
-cpp_modify_path = ''
-# cpp_modify_path = '/Users/gan/iospro/game/rongyaodg/app/Classes/game/model/template'  KKForeverSkyRun
-cpp_old_prefix = ''
-cpp_new_prefix = ''
+xcode_project_path = ''
 
 # /Users/gan/Desktop/黑特篮球new2/SkyBetufi/SourceCode/SkySrc/CommonModule/GUtility/PKCategory
-oc_all_path = '/Users/ganyuanrong/iOSProject/game_mw_sdk_ios/MainSDK/GameYooSDK/'
-oc_modify_path = '/Users/ganyuanrong/iOSProject/game_mw_sdk_ios/MainSDK/GameYooSDK/'
+oc_all_path = ''
+oc_modify_path = ''
 
 handle_file_count = 0
 file_count = 0
 
-oc_exclude_files = ['AppDelegate.h', 'MWSDK.h', 'PayData.h', 'LoginData.h', 'AccountModel.h','CreateOrderResp.h']
-oc_exclude_dirs = ['AFNetworking', 'Masonry', 'YYModel','Model']
+oc_exclude_files = []
+oc_exclude_dirs = []
 
 
 def random_2word():#随机生成两个单词
@@ -292,8 +275,11 @@ def modify_image_name_reference(oc_path, old_ref, new_ref):
                         # imageNamed:@"icon_add_collection"
                         old_ref_b = '@"%s"' % old_ref
                         new_ref_b = '@"%s"' % new_ref
-                        file_new_data = file_data.replace(old_ref_b, new_ref_b)
 
+                        if old_ref_b in file_data:
+                            file_new_data = file_data.replace(old_ref_b, new_ref_b)
+                        else:
+                            continue
 
                     elif file_name.endswith('.storyboard') or file_name.endswith('.xib'):
                         old_ref_m = '<image name="%s"' % old_ref
@@ -708,37 +694,59 @@ def addNewComments(src_dir_path, comment_file_path):
 
 method_return_type = ['void', 'NSString *', 'BOOL', 'CGFloat', 'NSUInteger']
 method_params_type = ['NSString *', 'BOOL', 'CGFloat', 'NSUInteger']
-def addNoUseMethod(src_dir_path):
+jisuan_type = ['*', '/', '+', '-']
+
+property_type = ['@property (nonatomic, copy) NSString *', '@property (nonatomic, assign) BOOL ', '@property (nonatomic, strong) NSDictionary *', '@property (nonatomic, assign) NSUInteger ',
+                 '@property(nonatomic, weak) id ', '@property (nonatomic, assign) CGFloat ']
+def addNoUseMethodAndProperty(src_dir_path, exclude_dirs, exclude_files):
     if not os.path.exists(src_dir_path):
         print("src_dir_path not exist")
         return
 
     list_dirs = os.walk(src_dir_path)
     for root, dirs, files in list_dirs:
-        for file_name in files:
 
+        exclude_dir_flag = 0
+        for exclude_dir in exclude_dirs:
+            if root.endswith(exclude_dir):
+                exclude_dir_flag = 1
+        if exclude_dir_flag == 1:
+            continue
+
+        for file_name in files:
             if file_name == ".DS_Store":
                 continue
 
-            if 'google' in root or 'bind' in root:
+            if file_name in exclude_files:
                 continue
+            # if 'AFNetworking' in root or 'YYModel' in root:
+            #     continue
 
-            if file_name.endswith('.m'):
+            if file_name.endswith('.m') or file_name.endswith('.h'):
                 file_path = os.path.join(root, file_name)
 
                 f_obj = open(file_path, "r")
                 text_lines = f_obj.readlines()
 
                 content = ''
+                has_implementation = 0
                 print '处理中  ' + file_name
                 for line in text_lines:
-                    print chardet.detect(line)
+                    # print chardet.detect(line)
                     line = line.decode('utf-8')
 
-                    if line.startswith('+') or line.startswith('-'):
+                    if has_implementation == 0 and '@implementation' in line:
+                        has_implementation = 1
 
-                        method_public = '+'
-                        if line.startswith('+'):
+                    if has_implementation == 1 and file_name.endswith('.m') and (line.startswith('- (') or line.startswith('+ (')): #方法插入位置
+
+                        # method_public = '+'
+                        # if line.startswith('+'):
+                        #     method_public = '+'
+                        # else:
+                        #     method_public = '-'
+                        method_public_private = random.randint(1, 5)
+                        if method_public_private >= 4:
                             method_public = '+'
                         else:
                             method_public = '-'
@@ -780,6 +788,12 @@ def addNoUseMethod(src_dir_path):
 
 
                                 else:
+
+
+                                    params_type_string = []
+                                    params_type_string = []
+                                    params_type_string = []
+
                                     for m in range(params_counts):
                                         params_word = random_1word()
                                         params_type = method_params_type[random.randint(0, len(method_params_type)-1)] #随机参数类型
@@ -788,11 +802,12 @@ def addNoUseMethod(src_dir_path):
                                         else:
                                             method_content = method_content + " " + params_word + ':(' + params_type + ')' + params_word
 
+
                                     if return_type == 'void':
                                         params_word1 = random_1word()
                                         params_word2 = random_1word()
                                         method_some_things = '[NSString stringWithFormat:@"%s", @"%s" , @"%s"];' % ('%@%@', params_word1, params_word2)
-                                        method_content =  method_content + '\n{\n    %s \n}' % (method_some_things)
+                                        method_content = method_content + '\n{\n    %s \n}' % (method_some_things)
 
                                     elif return_type == 'NSString *':
                                         params_word1 = random_1word()
@@ -815,6 +830,27 @@ def addNoUseMethod(src_dir_path):
 
                         else:
                             content = content + line
+                    elif line.startswith('@interface') or line.startswith('@property'):#属性插入
+
+                        isneed = random.randint(1, 20)
+                        if 5 <= isneed <= 12:
+
+                            property_a = property_type[random.randint(0, len(property_type)-1)]
+                            aaa = random.randint(1, 2) #决定是双单词还是三个单词，为了防止与原属性重复，设置长一点
+                            if aaa == 1:
+                                afirst, bsecond = random_2word()
+                                property_name = random_1word().lower() + afirst.capitalize() + bsecond.capitalize()
+                            else:
+                                afirst, bsecond = random_2word()
+                                property_name = afirst.lower()+bsecond.capitalize()
+
+                            property_content = property_a + property_name + ';'
+                            content = content + line + property_content + '\n'
+
+                        else:
+                            content = content + line
+
+
                     else:
                         content = content + line
 
@@ -843,57 +879,383 @@ def haveOfforceInSources(oc_path, xofforce):
 
     return False
 
-def fix_oc_catgery_class_name(oc_path):
+def modify_method_params(src_dir, exclude_dirs, exclude_files, var_exclude_bian):
 
-    project_content_path = os.path.join(xcode_project_path, 'project.pbxproj')
-    project_content = read_file_data(project_content_path)
-
-    if os.path.exists(oc_path):
-        list_dirs = os.walk(oc_path)
+    all_var_new = []
+    if os.path.exists(src_dir):
+        list_dirs = os.walk(src_dir)
         for root, dirs, files in list_dirs:
             for file_name in files:
 
-                if file_name == ".DS_Store" or file_name.endswith(".swift"):
+                if file_name == ".DS_Store" or file_name in exclude_files:
                     continue
 
-                if 'Masonry' in root:
+                if file_name.endswith('.m'):#
+                    file_path = os.path.join(root, file_name)  # 头文件路径
+                    file_data = read_file_data(file_path)
+
+                    # 读取方法内容
+                    f_obj = open(file_path, "r")
+                    text_lines = f_obj.readlines()
+
+                    method_content = ''
+                    is_in_method = 0
+                    for line in text_lines:
+                        # print chardet.detect(line)
+                        line = line.decode('utf-8')
+                        # line = line.strip()
+                        # 方法开始
+                        if line.startswith('- (') or line.startswith('+ (') or line.startswith('-  (') or line.startswith('+  (') or line.startswith('-(') or line.startswith('+('):
+                            is_in_method = 1
+                            method_content = ''
+
+                        if is_in_method == 1:
+                            method_content = method_content + line
+
+                        if is_in_method == 1 and line.startswith('}'): #方法结束
+                            is_in_method = 0
+                            print method_content
+
+                            method_content_temp = method_content
+
+                            params_arr = []
+                            aresults = re.findall('\\*[ ]*\\w+\\b', method_content) #函数内定义的指针类型的变量
+                            bresult = re.findall('\\* *\\w*\\)\\w+\\b ', method_content)  #函数参数指针类型的变量
+                            if aresults:
+
+                                for ax in aresults:
+                                    axxx = ax.replace('*', '').strip()
+                                    if '_Nullable' in axxx or axxx in var_exclude_bian:
+                                        continue
+                                    params_arr.append(axxx)
+
+                            if bresult:
+
+                                for ax in bresult:
+                                    axxx = ax.replace(' ', '').strip()
+                                    axxx = axxx.replace('*)', '')
+                                    if '_Nullable' in axxx or axxx in var_exclude_bian:
+                                        continue
+                                    params_arr.append(axxx)
+
+                            print params_arr
+                            if params_arr:
+                                new_param_temp = []
+                                for a_param in params_arr: #更换参数
+
+                                    if a_param in ['0','1','2','3']:
+                                        continue
+
+                                    a_param_a = a_param
+                                    first_wm, sec_w = random_2word()
+                                    new_param = 'mwGg' + first_wm.capitalize() + sec_w.capitalize()
+                                    while new_param in new_param_temp:
+                                        first_wm, sec_w = random_2word()
+                                        new_param = 'mwGg' + first_wm.capitalize() + sec_w.capitalize()
+
+                                    #把.xxx这种不能替换，可能是其他类的属性
+                                    # method_content_temp = method_content_temp.replace('.' + a_param_a, 'AAAAAAA')
+                                    # method_content_temp = method_content_temp.replace(a_param_a, new_param)
+                                    # method_content_temp = method_content_temp.replace('AAAAAAA' , '.' + a_param_a)
+                                    method_content_temp = re.sub('\.' + a_param_a + '\\b', ' _AAAAAAA_ ', method_content_temp)
+                                    #同名方法名称剔除
+                                    method_content_temp = re.sub('\\b' + a_param_a + ':', ' _BBBBBBB_ ',method_content_temp)
+
+
+                                    method_content_temp = re.sub('\\b' + a_param_a + '\\b', new_param, method_content_temp)
+                                    method_content_temp = re.sub(' _AAAAAAA_ ', '.' + a_param_a,  method_content_temp)
+
+                                    method_content_temp = re.sub(' _BBBBBBB_ ',  a_param_a + ':', method_content_temp)
+
+                                    new_param_temp.append(new_param)
+                                    if not new_param in all_var_new:
+                                        all_var_new.append(new_param)
+
+                            file_data = file_data.replace(method_content, method_content_temp)
+                            method_content = ''
+                            method_content_temp = ''
+
+                    wite_data_to_file(file_path, file_data)
+
+
+
+        # wite_data_to_file(project_content_path, project_content)
+
+    print "all_var_new: %s" % all_var_new
+
+
+def modify_class_property(src_dir, exclude_dirs, exclude_files, var_exclude_bian):
+
+    all_var_new = []
+    if os.path.exists(src_dir):
+        list_dirs = os.walk(src_dir)
+        for root, dirs, files in list_dirs:
+            for file_name in files:
+
+                if file_name == ".DS_Store" or file_name in exclude_files:
                     continue
 
-                if file_name.endswith('.m') or file_name.endswith('.h'):#cpp文件
+                if file_name.endswith('.m') or file_name.endswith('.h'):#
+                    file_path = os.path.join(root, file_name)  # 头文件路径
+                    file_data = read_file_data(file_path)
 
-                    if '+' in file_name and 'GlodBule' in file_name: #分类
+                    # 读取方法内容
+                    f_obj = open(file_path, "r")
+                    text_lines = f_obj.readlines()
 
-                        file_new_name = file_name.replace('GlodBule','')
-                        file_old_path = os.path.join(root, file_name)
-                        file_new_path = os.path.join(root, file_new_name)
-                        try:
-                            os.rename(file_old_path, file_new_path)  # 更改文件名
+                    method_content = ''
+                    is_in_method = 0
+                    for line in text_lines:
+                        # print chardet.detect(line)
+                        line = line.decode('utf-8')
+                        # line = line.strip()
+                        # 方法开始
+                        if line.startswith('- (') or line.startswith('+ (') or line.startswith('-  (') or line.startswith('+  (') or line.startswith('-(') or line.startswith('+('):
+                            is_in_method = 1
+                            method_content = ''
 
-                            # file_new_name_no_extension = os.path.splitext(file_new_name)[0]
-                            # modify_oc_class_reference(oc_all_path, file_name_no_extension, file_new_name_no_extension)
+                        if is_in_method == 1:
+                            method_content = method_content + line
 
-                            # 更改xproject文件中的文件名
-                            project_content = replace_xproject_data_reference(project_content, file_name, file_new_name)
+                        if is_in_method == 1 and line.startswith('}'): #方法结束
+                            is_in_method = 0
+                            print method_content
 
-                        except:
-                            print '文件无法更改名称：' + file_old_path
+                            method_content_temp = method_content
+
+                            params_arr = []
+                            aresults = re.findall('\\*[ ]*\\w+\\b', method_content) #函数内定义的指针类型的变量
+                            bresult = re.findall('\\* *\\w*\\)\\w+\\b ', method_content)  #函数参数指针类型的变量
+                            if aresults:
+
+                                for ax in aresults:
+                                    axxx = ax.replace('*', '').strip()
+                                    if '_Nullable' in axxx or axxx in var_exclude_bian:
+                                        continue
+                                    params_arr.append(axxx)
+
+                            if bresult:
+
+                                for ax in bresult:
+                                    axxx = ax.replace(' ', '').strip()
+                                    axxx = axxx.replace('*)', '')
+                                    if '_Nullable' in axxx or axxx in var_exclude_bian:
+                                        continue
+                                    params_arr.append(axxx)
+
+                            print params_arr
+                            if params_arr:
+                                new_param_temp = []
+                                for a_param in params_arr: #更换参数
+
+                                    if a_param in ['0','1','2','3']:
+                                        continue
+
+                                    a_param_a = a_param
+                                    first_wm, sec_w = random_2word()
+                                    new_param = 'mwGg' + first_wm.capitalize() + sec_w.capitalize()
+                                    while new_param in new_param_temp:
+                                        first_wm, sec_w = random_2word()
+                                        new_param = 'mwGg' + first_wm.capitalize() + sec_w.capitalize()
+
+                                    #把.xxx这种不能替换，可能是其他类的属性
+                                    # method_content_temp = method_content_temp.replace('.' + a_param_a, 'AAAAAAA')
+                                    # method_content_temp = method_content_temp.replace(a_param_a, new_param)
+                                    # method_content_temp = method_content_temp.replace('AAAAAAA' , '.' + a_param_a)
+                                    method_content_temp = re.sub('\.' + a_param_a + '\\b', ' _AAAAAAA_ ', method_content_temp)
+                                    #同名方法名称剔除
+                                    method_content_temp = re.sub('\\b' + a_param_a + ':', ' _BBBBBBB_ ',method_content_temp)
+
+
+                                    method_content_temp = re.sub('\\b' + a_param_a + '\\b', new_param, method_content_temp)
+                                    method_content_temp = re.sub(' _AAAAAAA_ ', '.' + a_param_a,  method_content_temp)
+
+                                    method_content_temp = re.sub(' _BBBBBBB_ ',  a_param_a + ':', method_content_temp)
+
+                                    new_param_temp.append(new_param)
+                                    if not new_param in all_var_new:
+                                        all_var_new.append(new_param)
+
+                            file_data = file_data.replace(method_content, method_content_temp)
+                            method_content = ''
+                            method_content_temp = ''
+
+                    wite_data_to_file(file_path, file_data)
+
+
+
+        # wite_data_to_file(project_content_path, project_content)
+
+    print "all_var_new: %s" % all_var_new
+
+
+#找出方法名字，修改方法名
+def modify_class_method(src_dir, exclude_dirs, exclude_files, exclude_method_name):
+
+    mthod_arr = []
+    if os.path.exists(src_dir):
+        list_dirs = os.walk(src_dir)
+        for root, dirs, files in list_dirs:
+
+            has_exclude_dir = 0
+            for exclude_dir in exclude_dirs:
+                if root.endswith(exclude_dir):
+                    has_exclude_dir = 1
+
+            if has_exclude_dir == 1:
+                continue
+
+            for file_name in files:
+
+                if file_name == ".DS_Store" or file_name in exclude_files:
+                    continue
+
+                if file_name.endswith('.m'):#
+                    file_path = os.path.join(root, file_name)  # 头文件路径
+                    file_data = read_file_data(file_path)
+
+                    # 读取方法内容
+                    f_obj = open(file_path, "r")
+                    text_lines = f_obj.readlines()
+
+                    method_content = ''
+
+                    is_in_method = 0
+                    for line in text_lines:
+                        # print chardet.detect(line)
+                        line = line.decode('utf-8')
+                        # line = line.strip()
+
+                        #//system_method为标致系统方法或者实现的系统方法，不可改(自己在代码中标记)
+                        if '//system_method' in line:
                             continue
-        wite_data_to_file(project_content_path, project_content)
+
+                        # 方法声明开始
+                        if line.startswith('- (') or line.startswith('+ (') or line.startswith('-  (') or line.startswith('+  (') or line.startswith('-(') or line.startswith('+('):
+                            is_in_method = 1
+                            method_content = ''
+
+                        if is_in_method == 1:
+                            method_content = method_content + line
+
+                        line_temp = line.strip()
+
+                        if is_in_method == 1 and (line_temp.endswith('{') or line_temp.endswith('{\n')): #方法内容开始
+                            is_in_method = 0
+                            # print method_content
+                            local_m_temp = []
+                            method_content_temp = method_content
+                            # print method_content_temp
+
+                            aresults = re.findall('\\b\\w+\\b:', method_content) #函数名称
+                            if aresults:
+
+                                for method_name in aresults:
+                                    method_name = method_name.strip()
+
+                                    isShuzi = re.findall('^[0-9]', method_name) #是否数字开头
+                                    if isShuzi:
+                                        continue
+
+                                    if '_Nullable' in method_name or method_name in exclude_method_name:
+                                        continue
+
+                                    local_m_temp.append(method_name)
+                                    # if method_name not in mthod_name_arr:
+                                    #     mthod_name_arr.append(method_name)
+
+
+                            else: #无参数函数
+                                method_content_1 = method_content.replace(' ','').replace('\n', '').replace('{','')
+                                method_name = re.sub('^[-+]\\(.+\\)','', method_content_1) #去除前面的类型
+                                method_name = re.sub('//.+', '', method_name) #去除注释
+                                local_m_temp.append(method_name)
+                                # if method_name not in mthod_name_arr:
+                                #     mthod_name_arr.append(method_name)
+
+                            mthod_arr.append(local_m_temp)
+                            method_content = ''
+                            print 'local_m_temp: %s filename: %s' % (local_m_temp, file_path)
+
+
+
+        # wite_data_to_file(project_content_path, project_content)
+
+    print "mthod_arr: %s" % mthod_arr
+
+
+def modify_oc_class_method_in_header(header_path):
+    file_path = header_path
+    f_obj = open(file_path, "r")
+    text_lines = f_obj.readlines()
+    for line in text_lines:
+        # print chardet.detect(line)
+        line = line.decode('utf-8')
 
 
 if __name__ == '__main__':
 
+    # xcode_project_path = '/Users/ganyuanrong/iOSProject/game_mw_sdk_ios_v3/MW_OBS_V3/MW_SDK.xcodeproj'
 
-    # modify_oc_class_name(oc_modify_path)
-    # random_word_for_method()
+    # oc_all_path = '/Users/ganyuanrong/iOSProject/game_mw_sdk_ios_v3/MW_OBS_V3/FLSDK'
+    # oc_modify_path = '/Users/ganyuanrong/iOSProject/game_mw_sdk_ios_v3/MW_OBS_V3/FLSDK'
 
-    #修改图片
+
+    xcode_project_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
+    oc_all_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK'
+    oc_modify_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK'
+
+
+    handle_file_count = 0
+    file_count = 0
+
+    oc_exclude_files.extend(['AppDelegate.h', 'MWSDK.h', 'PayData.h', 'LoginData.h', 'AccountModel.h', 'CreateOrderResp.h'])
+    oc_exclude_dirs.extend(['AFNetworking', 'Masonry', 'YYModel', 'Model'])
+
+    woords_file_path = '/Users/ganyuanrong/Desktop/sdk_confuse/confuse_words.log'
+
+    f_obj = open(woords_file_path, "r")
+    text_lines = f_obj.readlines()
+    for line in text_lines:
+        line = line.decode('utf-8')
+        word = line.strip().replace(' ', '')
+        if len(word) > 2:#太短的单词去掉
+            genest_word.append(word)
+    #1.修改图片  图片md5需要额外处理
     # image_exclude_files = []
-    # modify_sdk_bundle_image_name("/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/Resources/GOT/SDKResourcesV2.bundle/", "", image_exclude_files)
+    # image_ref_path = '/Users/ganyuanrong/iOSProject/game_mw_sdk_ios_v3/MW_OBS_V3'
+    # modify_sdk_bundle_image_name("/Users/ganyuanrong/iOSProject/game_mw_sdk_ios_v3/MW_OBS_V3/Resources/GOT/SDKResourcesV2.bundle/", image_ref_path, image_exclude_files)
 
-    #添加垃圾方法
-    addNoUseMethod('/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/SdkHelper/Res/')
+    #2.添加垃圾方法和属性 (打乱方法顺序)
+    # exclude_dirs = ['AFNetworking', 'YYModel', 'Plat']
+    # exclude_files = []
+    # addNoUseMethodAndProperty(oc_all_path, exclude_dirs, exclude_files)
 
-    #添加随机注释
-    # comment_src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/SdkHelper/Res'
-    # addNewComments(comment_src_path, '/Users/ganyuanrong/Desktop/sdk_confuse/ofc.log')
+    #3.添加随机注释
+    # addNewComments(oc_modify_path, '/Users/ganyuanrong/Desktop/sdk_confuse/ofc.log')
+
+    # 4.修改类名
+    # modify_oc_class_name(oc_modify_path)
+
+    # 5.修改提取到header的方法宏定义
+    # random_word_for_method()
+    # modify_oc_class_method_in_header(oc_modify_path)
+
+
+    #找出方法体,改变方法内定义的变量和方法参数  方法 需要 [-+]开头 结束行位'}'标志，因此结束行需要只有'}'并且无空格
+    # var_exclude_dirs = ['AFNetworking', 'YYModel', 'Plat']
+    # var_exclude_files = []
+    # var_exclude_bian = [''] #参数忽略
+    # modify_method_params('/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/login/view_v2/',var_exclude_dirs,var_exclude_files,var_exclude_bian)
+
+    #修改属性
+
+    # modify_method_params('/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/login/view_v2/',var_exclude_dirs,var_exclude_files,var_exclude_bian)
+
+
+    #找出所有方法
+    var_exclude_dirs = ['AFNetworking', 'YYModel', 'Plat']
+    var_exclude_files = []
+    var_exclude_name = ['dealloc','show','load','init','drawRect','initialize','encode','decode','length','share','setData','viewWillAppear','viewDidLoad']
+    modify_class_method('/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/',var_exclude_dirs,var_exclude_files,var_exclude_name)
+    pass
