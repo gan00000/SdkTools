@@ -1090,9 +1090,10 @@ def modify_class_property(src_dir, exclude_dirs, exclude_files, var_exclude_bian
 
 
 #找出方法名字，修改方法名
-def modify_class_method(src_dir, exclude_dirs, exclude_files, exclude_method_name):
+def modify_class_method(src_dir, exclude_dirs,var_exclude_change_dirs, exclude_files, exclude_method_name):
 
     mthod_arr = []
+    mthod_arr2 = []
     if os.path.exists(src_dir):
         list_dirs = os.walk(src_dir)
         for root, dirs, files in list_dirs:
@@ -1157,21 +1158,26 @@ def modify_class_method(src_dir, exclude_dirs, exclude_files, exclude_method_nam
                                     if isShuzi:
                                         continue
 
-                                    if '_Nullable' in method_name or method_name in exclude_method_name:
+                                    method_name_exclude_temp = method_name.replace(':','')
+                                    method_name_exclude_temp = method_name_exclude_temp.strip()
+                                    if '_Nullable' in method_name or method_name_exclude_temp in exclude_method_name:
                                         continue
 
                                     local_m_temp.append(method_name)
-                                    # if method_name not in mthod_name_arr:
-                                    #     mthod_name_arr.append(method_name)
+                                    if method_name not in mthod_arr2:
+                                        mthod_arr2.append(method_name)
 
 
                             else: #无参数函数
                                 method_content_1 = method_content.replace(' ','').replace('\n', '').replace('{','')
                                 method_name = re.sub('^[-+]\\(.+\\)','', method_content_1) #去除前面的类型
                                 method_name = re.sub('//.+', '', method_name) #去除注释
-                                local_m_temp.append(method_name)
-                                # if method_name not in mthod_name_arr:
-                                #     mthod_name_arr.append(method_name)
+
+                                if method_name not in exclude_method_name:
+                                    local_m_temp.append(method_name)
+
+                                    if method_name not in mthod_arr2:
+                                        mthod_arr2.append(method_name)
 
                             mthod_arr.append(local_m_temp)
                             method_content = ''
@@ -1181,7 +1187,94 @@ def modify_class_method(src_dir, exclude_dirs, exclude_files, exclude_method_nam
 
         # wite_data_to_file(project_content_path, project_content)
 
-    print "mthod_arr: %s" % mthod_arr
+    # print "mthod_arr: %s" % mthod_arr
+
+    if mthod_arr2 and len(mthod_arr2) > 0:
+        if os.path.exists(src_dir):
+            list_dirs = os.walk(src_dir)
+            for root, dirs, files in list_dirs:
+
+                has_exclude_dir = 0
+                for exclude_dir in var_exclude_change_dirs:
+                    if root.endswith(exclude_dir):
+                        has_exclude_dir = 1
+
+                if has_exclude_dir == 1:
+                    continue
+
+                for file_name in files:
+                    if file_name == ".DS_Store":
+                        continue
+
+                    if file_name.endswith('.m') or file_name.endswith('.h'):#
+                        file_path = os.path.join(root, file_name)  # 头文件路径
+                        file_data = read_file_data(file_path)
+                        for method_name_x in mthod_arr2:
+
+                            # method_name_all_in = 1
+                            # for method_name_x in method_name_list:
+                            #     if method_name_x not in file_data:
+                            #         method_name_all_in = 0
+                            #         break
+
+                            # if method_name_all_in == 1:
+                            #
+                            #     m_partter = None
+                            #     for method_name_x in method_name_list:
+                            #
+                            #         if ':' in method_name_x:
+                            #
+                            #             m_partter = method_name_x + ''
+                            #
+                            #             # method_name_aaaa = method_name_x.replace(':','')
+                            #             # file_data = file_data.replace(method_name_x , method_name_aaaa + '_MMMethodMMM:')
+                            #
+                            #
+                            #
+                            #         else:
+                            #             print 'sss'
+                            #             # file_data = file_data.replace(method_name_x + ']', method_name_aaaa + '_MMMethodMMM]')
+                            #             # file_data = file_data.replace(method_name_x + ' ]',
+                            #             #                               method_name_aaaa + '_MMMethodMMM]')
+                            #
+                            #    if m_partter:
+                            #         method_call_content = re.findall(m_partter, file_data)
+
+                            if ':' in method_name_x:
+                                method_name_aaaa = method_name_x.replace(':', '')
+
+                                # 修改方法定义的第一个
+                                file_data = file_data.replace(')' + method_name_x,
+                                                              ')' + method_name_aaaa + '_MMMethodMMM:')
+                                file_data = file_data.replace(') ' + method_name_x,
+                                                              ') ' + method_name_aaaa + '_MMMethodMMM:')
+                                file_data = file_data.replace(')  ' + method_name_x,
+                                                              ')  ' + method_name_aaaa + '_MMMethodMMM:')
+
+                                # 修改方法定义或者引用
+                                file_data = file_data.replace(' ' + method_name_x, ' ' + method_name_aaaa + '_MMMethodMMM:')
+
+                                # file_data = re.sub('\\) *' + method_name_x + '\\b',
+                                #                    ')' + method_name_x + '_MMMethodMMM', file_data)
+
+                            else:
+
+                                file_data = re.sub('\\) *' + method_name_x + '\\b', ')' + method_name_x + '_MMMethodMMM', file_data)
+
+                                # 修改方法定义或者引用
+                                file_data = file_data.replace(' ' + method_name_x + ']', ' ' + method_name_x + '_MMMethodMMM]')
+                                file_data = file_data.replace(' ' + method_name_x + ' ]', ' ' + method_name_x + '_MMMethodMMM]')
+                                file_data = file_data.replace(' ' + method_name_x + '  ]', ' ' + method_name_x + '_MMMethodMMM]')
+
+                                # 修改方法定义的第一个
+                                # file_data = file_data.replace(')' + method_name_x, ')' + method_name_x + '_MMMethodMMM')
+                                # file_data = file_data.replace(') ' + method_name_x, ')' + method_name_x + '_MMMethodMMM')
+                                # file_data = file_data.replace(')  ' + method_name_x,
+                                #                               ')' + method_name_x + '_MMMethodMMM')
+                                print 'sss'
+
+                        wite_data_to_file(file_path, file_data)
+
 
 
 def modify_oc_class_method_in_header(header_path):
@@ -1191,6 +1284,36 @@ def modify_oc_class_method_in_header(header_path):
     for line in text_lines:
         # print chardet.detect(line)
         line = line.decode('utf-8')
+
+
+def find_method_name_by_tag(src_dir_path):
+
+    xxxresult = []
+    if os.path.exists(src_dir_path):
+        list_dirs = os.walk(src_dir_path)
+        for root, dirs, files in list_dirs:
+            for file_name in files:
+
+                if file_name.endswith('.m') or file_name.endswith('.h'):
+                    file_path = os.path.join(root, file_name)  # 头文件路径
+                    file_data = read_file_data(file_path)
+                    method_tag_results = re.findall('\\b\\w+_MMMethodMMM', file_data)
+                    for xxxd in method_tag_results:
+                        if xxxd not in xxxresult:
+                            xxxresult.append(xxxd)
+
+    if xxxresult:
+        for xssss in xxxresult:
+
+            w1, w2 = random_2word()
+            if xssss.startswith('initWith'):
+                ww = 'initWith' + w1.capitalize() + w2.capitalize() + '_MMMethodMMM'
+            elif xssss.startswith('init'):
+                ww = 'init' + w1.capitalize() + w2.capitalize() + '_MMMethodMMM'
+            else:
+                ww = w1.lower() + w2.capitalize() + '_MMMethodMMM'
+
+            print '#define ' + xssss + '   ' + ww
 
 
 if __name__ == '__main__':
@@ -1254,8 +1377,14 @@ if __name__ == '__main__':
 
 
     #找出所有方法
-    var_exclude_dirs = ['AFNetworking', 'YYModel', 'Plat']
-    var_exclude_files = []
-    var_exclude_name = ['dealloc','show','load','init','drawRect','initialize','encode','decode','length','share','setData','viewWillAppear','viewDidLoad']
-    modify_class_method('/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/',var_exclude_dirs,var_exclude_files,var_exclude_name)
+    # var_exclude_dirs = ['AFNetworking', 'YYModel', 'Plat']
+    # var_exclude_change_dirs = ['AFNetworking', 'YYModel']
+    # var_exclude_files = ['AppDelegate.m', 'MWSDK.m', 'PayData.m', 'LoginData.m', 'AccountModel.m', 'CreateOrderResp.m','USDefault.m','UIAlertController+Sdk.m']
+    # var_exclude_name = ['loadView','target','handleAuthrization','error','delegate','name','selector','didFinishLaunchingWithOptions','application','options','annotation','sourceApplication','openURL','dealloc','show','load','init','drawRect','initialize','encode','decode','length','share','setData','viewWillAppear','viewDidLoad','shouldAutorotate','viewDidDisappear','sharedInstance','forKey','objectForKey','setObject','length','presentingViewController','action','completion']
+    # modify_class_method('/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/',var_exclude_dirs,var_exclude_change_dirs,var_exclude_files,var_exclude_name)
+
+
+
+    #找出所有被特别标记的方法，并且生成宏
+    # find_method_name_by_tag('/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/')
     pass
