@@ -4,12 +4,15 @@ import csv
 
 import time
 import types
+from datetime import datetime
 
 import xlrd
 import os
 import sys
 
 #解决 UnicodeDecodeError: 'ascii' codec can't decode 报错
+from xlrd import xldate_as_tuple
+
 reload(sys)
 sys.setdefaultencoding('utf8')
 
@@ -26,8 +29,9 @@ def readInfoFromExcel(file_name,sheets):
         # #获取行数和列数
         nrows = table.nrows
         ncols = table.ncols
+        return table
+    return None
 
-    return table
         # google_price_info = []
         # for row in range(nrows):
         #     if row == 0:
@@ -46,8 +50,8 @@ def readInfoFromExcel(file_name,sheets):
 
 
 def handleShengao(table_index):
-    height_temple_boy_table = readInfoFromExcel("/Users/gan/Desktop/jie/shengaotizhong_temple.xlsx", 0)
-    height_temple_girl_table = readInfoFromExcel("/Users/gan/Desktop/jie/shengaotizhong_temple.xlsx", 1)
+    height_temple_boy_table = readInfoFromExcel("/Users/ganyuanrong/Desktop/jie/shengaotizhong_temple.xlsx", 0)
+    height_temple_girl_table = readInfoFromExcel("/Users/ganyuanrong/Desktop/jie/shengaotizhong_temple.xlsx", 1)
 
     height_student_table = readInfoFromExcel(data_file, table_index)
     nrows_student = height_student_table.nrows
@@ -57,11 +61,23 @@ def handleShengao(table_index):
         if row < 3:
             continue
 
-        name = height_student_table.cell(row, 1).value  # 性别
+        name = height_student_table.cell(row, 1).value  # 名字
         gender = height_student_table.cell(row, 2).value #性别
         gender = str(gender).strip()
-        month_age = height_student_table.cell(row, 14).value
-        body_height = height_student_table.cell(row, 8).value
+
+        # month_age = height_student_table.cell(row, 14).value
+        body_height = height_student_table.cell(row, 5).value
+
+        month_age = ''
+        born_time_float = height_student_table.cell(row, 3).value  # 出生日期
+        if born_time_float:
+            if type(born_time_float) == float:
+                born_time = datetime(*xldate_as_tuple(born_time_float, 0)).strftime('%Y/%m/%d')
+            born_timea = datetime.strptime(born_time.strip(), '%Y/%m/%d')
+            now = datetime.now()
+            days = (now - born_timea).days
+            month_age = int(days/30)-1
+            # print month_age
 
         if month_age == "" or month_age == " ":
             print "年龄错误"
@@ -215,8 +231,8 @@ def handleBodyWeightCompare(body_height, height_temple_table, month_age):
                 break
 
 def handleTizhong(table_index):
-    weight_temple_boy_table = readInfoFromExcel("/Users/gan/Desktop/jie/shengaotizhong_temple.xlsx", 2)
-    weight_temple_girl_table = readInfoFromExcel("/Users/gan/Desktop/jie/shengaotizhong_temple.xlsx", 3)
+    weight_temple_boy_table = readInfoFromExcel("/Users/ganyuanrong/Desktop/jie/shengaotizhong_temple.xlsx", 2)
+    weight_temple_girl_table = readInfoFromExcel("/Users/ganyuanrong/Desktop/jie/shengaotizhong_temple.xlsx", 3)
 
     weight_student_table = readInfoFromExcel(data_file, table_index)
     nrows_student = weight_student_table.nrows
@@ -229,8 +245,19 @@ def handleTizhong(table_index):
         name = weight_student_table.cell(row, 1).value
         gender = weight_student_table.cell(row, 2).value #性别
         gender = str(gender).strip()
-        month_age = weight_student_table.cell(row, 14).value
-        body_weight = weight_student_table.cell(row, 9).value
+        # month_age = weight_student_table.cell(row, 14).value
+        body_weight = weight_student_table.cell(row, 7).value
+
+        month_age = ''
+        born_time_float = weight_student_table.cell(row, 3).value  # 出生日期
+        if born_time_float:
+            if type(born_time_float) == float:
+                born_time = datetime(*xldate_as_tuple(born_time_float, 0)).strftime('%Y/%m/%d')
+            born_timea = datetime.strptime(born_time.strip(), '%Y/%m/%d')
+            now = datetime.now()
+            days = (now - born_timea).days
+            month_age = int(days/30)-1
+            # print month_age
 
         if month_age == "" or month_age == " ":
             print "年龄错误"
@@ -263,10 +290,11 @@ if __name__ == '__main__':
     # get_second_time()
     # readInfoFromExcel("/Users/gan/Downloads/xxxxx.xlsx", 0)
 
-    index = 11
-    data_file = '/Users/gan/Desktop/jie/aaa-1-10.xlsx'
+    index = 12
+    data_file = '/Users/ganyuanrong/Desktop/jie/2022springschool-1.xlsx'
     handleShengao(index)
 
+    print "==========下面是体重==========="
     print "==========下面是体重==========="
 
     handleTizhong(index)

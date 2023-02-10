@@ -12,6 +12,8 @@ import chardet
 # 导入 random(随机数) 模块
 import random
 
+from modifyXcodeProject.utils.PrpCrypt import PrpCrypt
+
 xcode_project_path = '/Users/gan/Desktop/黑特篮球new2/XXXHeiTaiPro.xcodeproj'
 
 #res
@@ -1116,4 +1118,7 @@ if __name__ == '__main__':
     # aa = replace_image_data(temp, '数据 (1).png', 'eeee数据 (1).png')
     # print aa
     # fix_oc_catgery_class_name(oc_modify_path)
+
+
+
     pass

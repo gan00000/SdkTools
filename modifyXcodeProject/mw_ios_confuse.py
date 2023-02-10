@@ -1,6 +1,11 @@
 #coding=utf-8
 import imp
 import sys
+
+from modifyXcodeProject import oc_class_parser
+from modifyXcodeProject.utils import file_util, word_util
+from modifyXcodeProject.utils.PrpCrypt import PrpCrypt
+
 imp.reload(sys)
 sys.setdefaultencoding('utf-8') #设置默认编码,只能是utf-8,下面\u4e00-\u9fa5要求的
 
@@ -12,13 +17,15 @@ import chardet
 # 导入 random(随机数) 模块
 import random
 
-genest_word=[]
+genest_word = []
+words_dong = []
+words_name = []
 
-xcode_project_path = ''
+# xcode_project_path = ''
 
 # /Users/gan/Desktop/黑特篮球new2/SkyBetufi/SourceCode/SkySrc/CommonModule/GUtility/PKCategory
-oc_all_path = ''
-oc_modify_path = ''
+# oc_all_path = ''
+# oc_modify_path = ''
 
 handle_file_count = 0
 file_count = 0
@@ -26,6 +33,26 @@ file_count = 0
 oc_exclude_files = []
 oc_exclude_dirs = []
 
+words_dong_s = []
+def random_word_dong():
+    temp_int = random.randint(0, len(words_dong) - 1)
+    temp = words_dong[temp_int]
+    while temp in words_dong_s:
+        temp_int = random.randint(0, len(words_dong) - 1)
+        temp = words_dong[temp_int]
+    words_dong_s.append(temp)
+    return temp
+
+
+words_name_s = []
+def random_word_name():
+    temp_int = random.randint(0, len(words_name) - 1)
+    temp = words_name[temp_int]
+    while temp in words_name_s:
+        temp_int = random.randint(0, len(words_name) - 1)
+        temp = words_name[temp_int]
+    words_name_s.append(temp)
+    return temp
 
 def random_2word():#随机生成两个单词
 
@@ -45,6 +72,18 @@ def random_1word():
     first_word = genest_word[first_index]
 
     return first_word
+
+def words_reader(word_file_path):
+
+    words = []
+    f_obj = open(word_file_path, "r")
+    text_lines = f_obj.readlines()
+    for line in text_lines:
+        line = line.decode('utf-8')
+        word = line.strip().replace(' ', '')
+        if len(word) > 2:  # 太短的单词去掉
+            words.append(word)
+    return words
 
 word_oc_class_temp = []
 def random_word_for_oc_class():
@@ -101,10 +140,20 @@ def random_word_for_no_use_method():
     word_oc_method_temp.append(new_word)
     return new_word
 
+def random_word_for_no_use_method_for_cpp():
+
+    first_word, sec_word = random_2word()
+    new_word = first_word.lower() + '_' + sec_word.lower() + '_' + random_1word().lower()
+
+    while (new_word in word_oc_method_temp):
+        first_word, sec_word = random_2word()
+        new_word = first_word.lower() + '_' + sec_word.lower() + '_' + random_1word().lower()
+
+    word_oc_method_temp.append(new_word)
+    return new_word
 
 
-
-def modify_oc_class_name(oc_path):
+def modify_oc_class_name(oc_path, xcode_project_path, oc_all_path, oc_exclude_dirs_ref_modify):
     global file_count, handle_file_count, fia
 
     project_content_path = os.path.join(xcode_project_path, 'project.pbxproj')
@@ -115,17 +164,16 @@ def modify_oc_class_name(oc_path):
         for root, dirs, files in list_dirs:
             for file_name in files:
 
-                if file_name == ".DS_Store" or file_name.endswith(".swift"):
+                if file_name == ".DS_Store" or file_name.endswith(".swift") or 'main' in file_name:
                     continue
 
                 file_count = file_count + 1
 
-                aaa = 1
-                for not_dir in oc_exclude_dirs:
-                    if not_dir in root:
-                        aaa = 2
-
-                if aaa == 2:
+                exclude_dir_flag = 0
+                for exclude_dir in oc_exclude_dirs:
+                    if exclude_dir in root:
+                        exclude_dir_flag = 1
+                if exclude_dir_flag == 1:
                     continue
 
 
@@ -152,16 +200,30 @@ def modify_oc_class_name(oc_path):
 
                         print '正在处理文件：' + file_name
                         new_word = random_word_for_oc_class()
+                        if file_name_no_extension.endswith('View') or file_name_no_extension.endswith('ViewV2'):
+                            new_word = new_word + 'View'
+                        elif file_name_no_extension.endswith('Mode'):
+                            new_word = new_word + 'Mode'
+                        elif file_name_no_extension.endswith('Data'):
+                            new_word = new_word + 'Data'
+                        elif file_name_no_extension.endswith('Controller'):
+                            new_word = new_word + 'Controller'
+                        elif file_name_no_extension.endswith('Button'):
+                            new_word = new_word + 'Button'
+                        elif file_name_no_extension.endswith('TextFiled'):
+                            new_word = new_word + 'TextFiled'
+                        elif file_name_no_extension.endswith('Cell'):
+                            new_word = new_word + 'Cell'
 
                         if '+' in file_name:  # 分类
                             fia = file_name_no_extension.split('+')
-                            file_new_name = fia[0] + "+" + new_word + '.m'
+                            file_new_name = fia[0] + "+" + new_word + file_extension
                             header_file_new_name = fia[0] + "+" + new_word + '.h'
 
 
 
                         else:
-                            file_new_name = new_word + '.m'
+                            file_new_name = new_word + file_extension
                             header_file_new_name = new_word + '.h'
 
                         file_old_path = os.path.join(root, file_name)
@@ -190,7 +252,7 @@ def modify_oc_class_name(oc_path):
                             file_new_name_no_extension = new_word
 
 
-                        modify_oc_class_reference(oc_all_path, file_name_no_extension, file_new_name_no_extension)
+                        modify_oc_class_reference(oc_all_path, file_name_no_extension, file_new_name_no_extension, oc_exclude_dirs_ref_modify)
 
                         # 更改xproject文件中的.m
                         project_content = replace_xproject_data_reference(project_content, file_name, file_new_name)
@@ -206,14 +268,23 @@ def modify_oc_class_name(oc_path):
 
 
 #oc_path 所有源文件，置于一个单独目录最好
-def modify_oc_class_reference(oc_path, old_ref, new_ref):
-
+def modify_oc_class_reference(oc_path, old_ref, new_ref, oc_exclude_dirs_ref_modify):
+    file_count = 0
     if os.path.exists(oc_path):
         list_dirs = os.walk(oc_path)
         for root, dirs, files in list_dirs:
             for file_name in files:
 
                 if file_name == ".DS_Store":
+                    continue
+
+                file_count = file_count + 1
+
+                exclude_dir_flag = 0
+                for exclude_dir in oc_exclude_dirs_ref_modify:
+                    if exclude_dir in root:
+                        exclude_dir_flag = 1
+                if exclude_dir_flag == 1:
                     continue
 
                 if file_name.endswith('.m') or file_name.endswith('.mm') \
@@ -226,7 +297,7 @@ def modify_oc_class_reference(oc_path, old_ref, new_ref):
                     # if have_the_word_in_data(file_data, old_ref):
 
                     file_new_data = replace_data_by_word(file_data, old_ref, new_ref)
-                    if (file_name.endswith('.m') or file_name.endswith('.h')) and new_ref in file_name and '+' in old_ref and '+' in new_ref: #分类
+                    if (file_name.endswith('.m') or file_name.endswith('.mm') or file_name.endswith('.h')) and new_ref in file_name and '+' in old_ref and '+' in new_ref: #分类
                         old_ref_categery = old_ref.split('+')[1]
                         new_ref_categery = new_ref.split('+')[1]
                         file_new_data = file_new_data.replace('(' + old_ref_categery + ')', '(' + new_ref_categery + ')')
@@ -559,11 +630,12 @@ def deleteComments():#还有问题
 
                     wite_data_to_file(file_path, file_data_4)
 
-def addNewComments(src_dir_path, comment_file_path):
+def addNewComments(src_dir_path,comment_exclude_dirs, comment_file_path):
 
     if not os.path.exists(comment_file_path):
         print("comment_file_path not exist")
         return
+
     aaa_data = read_file_data(comment_file_path)
 
     # str2 = aaa_data.decode('windows-1252')
@@ -594,6 +666,13 @@ def addNewComments(src_dir_path, comment_file_path):
                 if 'google' in root or 'bind' in root:
                     continue
 
+                exclude_dir_flag = 0
+                for exclude_dir in comment_exclude_dirs:
+                    if exclude_dir in root:
+                        exclude_dir_flag = 1
+                if exclude_dir_flag == 1:
+                    continue
+
                 if file_name.endswith('.h') or file_name.endswith('.m') or file_name.endswith(
                         '.mm') or file_name.endswith('.cpp'):
                     file_path = os.path.join(root, file_name)
@@ -608,89 +687,94 @@ def addNewComments(src_dir_path, comment_file_path):
                     file_data_1 = replace_data_content(file_data_0, '([^:/])//.*', '\\1')
                     file_data_2 = replace_data_content(file_data_1, '^//.*', '')
                     file_data_3 = replace_data_content(file_data_2, '/\\*{1,2}[\\s\\S]*?\\*/', '')
-                    file_data_4 = replace_data_content(file_data_3, '\\s*\\n', '\\n')
+                    # file_data_4 = replace_data_content(file_data_3, '\\s*\\n', '\\n')
 
-                    src_data = file_data_4
+                    src_data = file_data_3
                     #删除注释完成
 
-                    data_list = list(src_data)
-
-                    huan_hang_pos = []
-                    for m in re.finditer('\n', src_data):
-                        # print(m.start(), m.end())
-                        # print(m.end())
-                        huan_hang_pos.append(m.end())
-
-                    for pos in reversed(huan_hang_pos):
-                        # print(m.start(), m.end())
-
-                        isneed = random.randint(1, 20)  # 随机决定是否改行需要添加注释
-                        if 5 <= isneed <= 10:  # 添加注释
-                            new_comment_len = random.randint(10, 400)  # 随机产生注释长度,最少10，最长不超400字符
-                            new_comment_start_index = random.randint(0, comment_data_length - 401)  # 随机注释文章的起始位置
-                            new_comment = comment_data[new_comment_start_index: new_comment_start_index + new_comment_len]
-
-                            comment_type = random.randint(1, 3)  # 随机注释类型
-
-                            if comment_type == 2:
-
-                                comment_data_2 = new_comment.replace('\n', '\n//')
-                                comment_data_2 = comment_data_2 + '\n'
-                                data_list.insert(pos, '//' + comment_data_2)
-
-                            else:
-
-                                comment_data_2 = '\n/**\n  ' + new_comment + ' \n**/\n'
-                                # content = content + line + comment_data_2
-                                data_list.insert(pos, comment_data_2)
-
-                    content = ''.join(data_list)
-                    # content = unicode(content, "utf-8")
-
-                    try:
-                        content = content.encode("utf-8")
-                    except:
-                        print "encode error:" + file_path
-                        pass
-                    wite_data_to_file(file_path, content)
-# =========
-
-                    # f_obj = open(file_path, "r")
-                    # text_lines = f_obj.readlines()
+                    # data_list = list(src_data)
                     #
-                    # content = ''
-                    # print '处理中  ' + file_name
-                    # for line in text_lines:
-                    #     print chardet.detect(line)
-                    #     line = line.decode('utf-8')
+                    # huan_hang_pos = []
+                    # for m in re.finditer('\n', src_data):
+                    #     # print(m.start(), m.end())
+                    #     # print(m.end())
                     #
-                    #     isneed = random.randint(1, 20) #随机决定是否改行需要添加注释
-                    #     if isneed <= 5  and isneed <= 10:#添加注释
-                    #         new_comment_len = random.randint(10, 400) #随机产生注释长度,最少10，最长不超400字符
-                    #         new_comment_start_index = random.randint(0, comment_data_length - 401) #随机注释文章的起始位置
-                    #         new_comment = comment_data[new_comment_start_index : new_comment_start_index + new_comment_len]
+                    #     huan_hang_pos.append(m.end())
                     #
-                    #         comment_type = random.randint(1, 3) #随机注释类型
+                    # for pos in reversed(huan_hang_pos):
+                    #     # print(m.start(), m.end())
+                    #
+                    #     isneed = random.randint(1, 20)  # 随机决定是否改行需要添加注释
+                    #     if 8 <= isneed <= 10:  # 添加注释
+                    #         new_comment_len = random.randint(10, 400)  # 随机产生注释长度,最少10，最长不超400字符
+                    #         new_comment_start_index = random.randint(0, comment_data_length - 401)  # 随机注释文章的起始位置
+                    #         new_comment = comment_data[new_comment_start_index: new_comment_start_index + new_comment_len]
+                    #
+                    #         comment_type = random.randint(1, 3)  # 随机注释类型
                     #
                     #         if comment_type == 2:
                     #
                     #             comment_data_2 = new_comment.replace('\n', '\n//')
                     #             comment_data_2 = comment_data_2 + '\n'
-                    #             content = content + line + '//' + comment_data_2
+                    #             data_list.insert(pos, '//' + comment_data_2)
                     #
                     #         else:
                     #
                     #             comment_data_2 = '\n/**\n  ' + new_comment + ' \n**/\n'
-                    #             content = content + line + comment_data_2
+                    #             # content = content + line + comment_data_2
+                    #             data_list.insert(pos, comment_data_2)
                     #
-                    #     else:
-                    #         content = content + line
+                    # content = ''.join(data_list)
+                    # # content = unicode(content, "utf-8")
                     #
-                    #         # start = random.randint(1, data_length - 600)
-                    #         # comment_length = random.randint(1, 300)
-                    #         # comment_data = aaa_data[start: start + comment_length]
-                    #
+                    # try:
+                    #     content = content.encode("utf-8")
+                    # except:
+                    #     print "encode error:" + file_path
+                    #     pass
                     # wite_data_to_file(file_path, content)
+# =========
+
+                    wite_data_to_file(file_path, src_data)
+                    f_obj = open(file_path, "r")
+                    text_lines = f_obj.readlines()
+
+                    content = ''
+                    print '处理中  ' + file_name
+                    for line in text_lines:
+                        print chardet.detect(line)
+                        line = line.decode('utf-8')
+
+                        if '\\' not in line.strip():
+                            isneed = random.randint(1, 20) #随机决定是否改行需要添加注释
+                            if 8 <= isneed <= 10:#添加注释
+                                new_comment_len = random.randint(10, 300) #随机产生注释长度,最少10，最长不超400字符
+                                new_comment_start_index = random.randint(0, comment_data_length - 301) #随机注释文章的起始位置
+                                new_comment = comment_data[new_comment_start_index : new_comment_start_index + new_comment_len]
+
+                                comment_type = random.randint(1, 3) #随机注释类型
+
+                                if comment_type == 2:
+
+                                    comment_data_2 = new_comment.replace('\n', '\n//')
+                                    comment_data_2 = comment_data_2 + '\n'
+                                    content = content + line + '//' + comment_data_2
+
+                                else:
+
+                                    comment_data_2 = '\n/**\n  ' + new_comment + ' \n**/\n'
+                                    content = content + line + comment_data_2
+
+                            else:
+                                content = content + line
+
+                                # start = random.randint(1, data_length - 600)
+                                # comment_length = random.randint(1, 300)
+                                # comment_data = aaa_data[start: start + comment_length]
+                        else:
+                            content = content + line
+
+                    wite_data_to_file(file_path, content)
 
 method_return_type = ['void', 'NSString *', 'BOOL', 'CGFloat', 'NSUInteger']
 method_params_type = ['NSString *', 'BOOL', 'CGFloat', 'NSUInteger']
@@ -708,7 +792,7 @@ def addNoUseMethodAndProperty(src_dir_path, exclude_dirs, exclude_files):
 
         exclude_dir_flag = 0
         for exclude_dir in exclude_dirs:
-            if root.endswith(exclude_dir):
+            if exclude_dir in root:
                 exclude_dir_flag = 1
         if exclude_dir_flag == 1:
             continue
@@ -722,7 +806,7 @@ def addNoUseMethodAndProperty(src_dir_path, exclude_dirs, exclude_files):
             # if 'AFNetworking' in root or 'YYModel' in root:
             #     continue
 
-            if file_name.endswith('.m') or file_name.endswith('.h'):
+            if file_name.endswith('.m') or file_name.endswith('.h') or file_name.endswith('.mm'):
                 file_path = os.path.join(root, file_name)
 
                 f_obj = open(file_path, "r")
@@ -752,7 +836,7 @@ def addNoUseMethodAndProperty(src_dir_path, exclude_dirs, exclude_files):
                             method_public = '-'
 
                         isneed = random.randint(1, 20) #随机决定是否改行需要添加无用方法
-                        if 5 <= isneed <= 10:#添加
+                        if 6 <= isneed <= 10:#添加
 
                             method_count = random.randint(1, 3) #随机产生插入的方法数量
                             new_add_method_content = ''
@@ -763,7 +847,6 @@ def addNoUseMethodAndProperty(src_dir_path, exclude_dirs, exclude_files):
 
                                 method_content = '\n' + method_public + ' ' + '(' + return_type + ')' + noUserMethod_name
 
-
                                 params_counts = random.randint(0, 5) #随机参数个数,最大5个
                                 if params_counts == 0:
 
@@ -771,7 +854,7 @@ def addNoUseMethodAndProperty(src_dir_path, exclude_dirs, exclude_files):
                                         params_word1 = random_1word()
                                         params_word2 = random_1word()
                                         method_some_things = '[NSString stringWithFormat:@"%s", @"%s" , @"%s"];' % ('%@%@', params_word1, params_word2)
-                                        method_content =  method_content + '\n{\n    %s \n}' % (method_some_things)
+                                        method_content = method_content + '\n{\n    %s \n}' % (method_some_things)
 
                                     elif return_type == 'NSString *':
                                         params_word1 = random_1word()
@@ -785,11 +868,7 @@ def addNoUseMethodAndProperty(src_dir_path, exclude_dirs, exclude_files):
                                         method_some_things = 'return %s * %s + %s ;' % (params_word1, params_word2, params_word3)
                                         method_content = method_content + '\n{\n    %s \n}' % (method_some_things)
 
-
-
                                 else:
-
-
                                     params_type_string = []
                                     params_type_string = []
                                     params_type_string = []
@@ -833,7 +912,7 @@ def addNoUseMethodAndProperty(src_dir_path, exclude_dirs, exclude_files):
                     elif line.startswith('@interface') or line.startswith('@property'):#属性插入
 
                         isneed = random.randint(1, 20)
-                        if 5 <= isneed <= 12:
+                        if 6 <= isneed <= 12:
 
                             property_a = property_type[random.randint(0, len(property_type)-1)]
                             aaa = random.randint(1, 2) #决定是双单词还是三个单词，为了防止与原属性重复，设置长一点
@@ -857,7 +936,89 @@ def addNoUseMethodAndProperty(src_dir_path, exclude_dirs, exclude_files):
                 wite_data_to_file(file_path, content)
 
 
+def addNoUseMethodForCpp(src_dir_path, exclude_dirs, exclude_files):
+    if not os.path.exists(src_dir_path):
+        print("src_dir_path not exist")
+        return
+    cppReturnType = ['int32_t','int64_t']
+    list_dirs = os.walk(src_dir_path)
+    for root, dirs, files in list_dirs:
 
+        exclude_dir_flag = 0
+        for exclude_dir in exclude_dirs:
+            if exclude_dir in root:
+                exclude_dir_flag = 1
+        if exclude_dir_flag == 1:
+            continue
+
+        for file_name in files:
+            if file_name == ".DS_Store":
+                continue
+
+            if file_name in exclude_files:
+                continue
+            # if 'AFNetworking' in root or 'YYModel' in root:
+            #     continue
+
+            if file_name.endswith('.cpp'):
+                file_path = os.path.join(root, file_name)
+
+                f_obj = open(file_path, "r")
+                text_lines = f_obj.readlines()
+
+                content = ''
+                has_implementation = 0
+                print '处理中  ' + file_name
+                for line in text_lines:
+                    # print chardet.detect(line)
+                    line = line.decode('utf-8')
+                    line_strip = line.strip()
+                    if line_strip.startswith('static inline'): #方法插入位置
+
+                        isneed = random.randint(1, 20) #随机决定是否改行需要添加无用方法
+                        if 4 <= isneed <= 6:#添加
+
+                            method_count = random.randint(1, 2) #随机产生插入的方法数量
+                            new_add_method_content = ''
+                            for i in range(method_count):
+
+                                return_type = cppReturnType[random.randint(0, len(cppReturnType)-1)] #随机方法返回类型
+                                noUserMethod_name = random_word_for_no_use_method_for_cpp()
+
+                                method_content = '\n' + '   static inline ' + return_type + ' mwdk_' + noUserMethod_name + '() {\n'
+
+                                params_counts = random.randint(0, 5) #随机参数个数,最大5个
+                                eee = str(random.randint(2,999999))
+                                qqq = str(random.randint(880, 999990))
+                                # dd = 'return static_cast<%s> (floor(%s) * %s);\n }\n' % (return_type, eee, qqq)
+                                if params_counts == 0:
+                                    method_content = method_content + '     return static_cast<%s> (floor(%s) * %s);\n  }\n' % (return_type, eee, qqq)
+
+                                elif params_counts == 1:
+                                    method_content = method_content + '     return static_cast<%s> (abs(%s) - %s);\n    }\n' % (return_type, eee, qqq)
+
+                                elif params_counts == 2:
+                                    method_content = method_content + '     return static_cast<%s> (%s - %s);\n     }\n' % (return_type, eee, qqq)
+
+                                elif params_counts == 3:
+                                    method_content = method_content + '     return static_cast<%s> (%s + %s);\n     }\n' % (return_type, eee, qqq)
+                                elif params_counts == 4:
+                                    method_content = method_content + '     return static_cast<%s> (ceil(%s) + %s);\n   }\n' % (return_type, eee, qqq)
+
+                                elif params_counts == 5:
+                                    method_content = method_content + '     return static_cast<%s> (exp(%s) + %s);\n    }\n' % (return_type, eee, qqq)
+
+                                new_add_method_content = new_add_method_content + method_content
+                            content = content + new_add_method_content + '\n' + line
+
+
+
+                        else:
+                            content = content + line
+                    else:
+                        content = content + line
+
+                wite_data_to_file(file_path, content)
 
 def haveOfforceInSources(oc_path, xofforce):
     if os.path.exists(oc_path):
@@ -1094,13 +1255,14 @@ def modify_class_method(src_dir, exclude_dirs,var_exclude_change_dirs, exclude_f
 
     mthod_arr = []
     mthod_arr2 = []
+    property_list = []
     if os.path.exists(src_dir):
         list_dirs = os.walk(src_dir)
         for root, dirs, files in list_dirs:
 
             has_exclude_dir = 0
             for exclude_dir in exclude_dirs:
-                if root.endswith(exclude_dir):
+                if exclude_dir in root:
                     has_exclude_dir = 1
 
             if has_exclude_dir == 1:
@@ -1111,9 +1273,23 @@ def modify_class_method(src_dir, exclude_dirs,var_exclude_change_dirs, exclude_f
                 if file_name == ".DS_Store" or file_name in exclude_files:
                     continue
 
-                if file_name.endswith('.m'):#
+                if file_name.endswith('.m') or file_name.endswith('.mm') or file_name.endswith('.h'):#
                     file_path = os.path.join(root, file_name)  # 头文件路径
                     file_data = read_file_data(file_path)
+                    if file_data:
+                        property_result_list = re.findall('@property ?\\(.+;', file_data)  # 正则匹配出所有属性
+                        if property_result_list:
+                            for property_def in property_result_list:
+                                # if 'recording' in property_def:
+                                #     print 'xxxx'
+                                property_names = re.findall(' \\b\\w+;', property_def)
+                                if property_names:
+                                    for property_name in property_names:
+                                        property_name = property_name.replace(' ', '').replace('*', '').replace(';', '')
+                                        property_list.append(property_name)
+
+                    if file_name.endswith('.h'):
+                        continue
 
                     # 读取方法内容
                     f_obj = open(file_path, "r")
@@ -1122,6 +1298,7 @@ def modify_class_method(src_dir, exclude_dirs,var_exclude_change_dirs, exclude_f
                     method_content = ''
 
                     is_in_method = 0
+                    is_in_implementation = 0
                     for line in text_lines:
                         # print chardet.detect(line)
                         line = line.decode('utf-8')
@@ -1131,8 +1308,13 @@ def modify_class_method(src_dir, exclude_dirs,var_exclude_change_dirs, exclude_f
                         if '//system_method' in line:
                             continue
 
+                        if '@implementation' in line:
+                            is_in_implementation = 1
+                        if is_in_implementation != 1:
+                            continue
                         # 方法声明开始
-                        if line.startswith('- (') or line.startswith('+ (') or line.startswith('-  (') or line.startswith('+  (') or line.startswith('-(') or line.startswith('+('):
+                        if line.strip().startswith('- (') or line.strip().startswith('+ (') or line.strip().startswith('-  (') or line.strip().startswith('+  (') \
+                                or line.strip().startswith('-(') or line.strip().startswith('+('):
                             is_in_method = 1
                             method_content = ''
 
@@ -1181,14 +1363,36 @@ def modify_class_method(src_dir, exclude_dirs,var_exclude_change_dirs, exclude_f
 
                             mthod_arr.append(local_m_temp)
                             method_content = ''
-                            print 'local_m_temp: %s filename: %s' % (local_m_temp, file_path)
+                            # print 'local_m_temp: %s filename: %s' % (local_m_temp, file_path)
 
 
 
         # wite_data_to_file(project_content_path, project_content)
 
-    # print "mthod_arr: %s" % mthod_arr
+    method_property_same_temp = []
+    method_property_have_tag = []
+    for xa in mthod_arr2:
+        # print "%s" % xa
+        if '_MMMethodMMM' in xa:
+            method_property_have_tag.append(xa)
 
+        for property in property_list:
+            if property == xa or ('is' + property).lower() in xa.lower() or ('get' + property).lower() in xa.lower() or ('set' + property).lower() in xa.lower() :
+                if xa not in method_property_same_temp:
+                    method_property_same_temp.append(xa)
+
+    for same_temp in method_property_same_temp:
+        mthod_arr2.remove(same_temp)
+
+    for method_tag in method_property_have_tag:
+        mthod_arr2.remove(method_tag)
+
+    for xa in mthod_arr2:
+        print "%s" % xa
+
+    # xx = 1
+    # if xx:
+    #     return
     if mthod_arr2 and len(mthod_arr2) > 0:
         if os.path.exists(src_dir):
             list_dirs = os.walk(src_dir)
@@ -1196,7 +1400,7 @@ def modify_class_method(src_dir, exclude_dirs,var_exclude_change_dirs, exclude_f
 
                 has_exclude_dir = 0
                 for exclude_dir in var_exclude_change_dirs:
-                    if root.endswith(exclude_dir):
+                    if exclude_dir in root:
                         has_exclude_dir = 1
 
                 if has_exclude_dir == 1:
@@ -1206,40 +1410,13 @@ def modify_class_method(src_dir, exclude_dirs,var_exclude_change_dirs, exclude_f
                     if file_name == ".DS_Store":
                         continue
 
-                    if file_name.endswith('.m') or file_name.endswith('.h'):#
+                    if file_name.endswith('.m') or file_name.endswith('.mm') or file_name.endswith('.h'):#
                         file_path = os.path.join(root, file_name)  # 头文件路径
                         file_data = read_file_data(file_path)
                         for method_name_x in mthod_arr2:
-
-                            # method_name_all_in = 1
-                            # for method_name_x in method_name_list:
-                            #     if method_name_x not in file_data:
-                            #         method_name_all_in = 0
-                            #         break
-
-                            # if method_name_all_in == 1:
-                            #
-                            #     m_partter = None
-                            #     for method_name_x in method_name_list:
-                            #
-                            #         if ':' in method_name_x:
-                            #
-                            #             m_partter = method_name_x + ''
-                            #
-                            #             # method_name_aaaa = method_name_x.replace(':','')
-                            #             # file_data = file_data.replace(method_name_x , method_name_aaaa + '_MMMethodMMM:')
-                            #
-                            #
-                            #
-                            #         else:
-                            #             print 'sss'
-                            #             # file_data = file_data.replace(method_name_x + ']', method_name_aaaa + '_MMMethodMMM]')
-                            #             # file_data = file_data.replace(method_name_x + ' ]',
-                            #             #                               method_name_aaaa + '_MMMethodMMM]')
-                            #
-                            #    if m_partter:
-                            #         method_call_content = re.findall(m_partter, file_data)
-
+                            method_name_x = method_name_x.strip()
+                            if method_name_x is None or method_name_x == '':
+                                continue
                             if ':' in method_name_x:
                                 method_name_aaaa = method_name_x.replace(':', '')
 
@@ -1254,6 +1431,11 @@ def modify_class_method(src_dir, exclude_dirs,var_exclude_change_dirs, exclude_f
                                 # 修改方法定义或者引用
                                 file_data = file_data.replace(' ' + method_name_x, ' ' + method_name_aaaa + '_MMMethodMMM:')
 
+                                if '@selector(' + method_name_x + ')' in file_data:
+                                    print '@selector(' + method_name_x + ')'
+                                    file_data = file_data.replace('@selector(' + method_name_x + ')',
+                                                              '@selector(' + method_name_aaaa + '_MMMethodMMM:)')
+
                                 # file_data = re.sub('\\) *' + method_name_x + '\\b',
                                 #                    ')' + method_name_x + '_MMMethodMMM', file_data)
 
@@ -1265,25 +1447,18 @@ def modify_class_method(src_dir, exclude_dirs,var_exclude_change_dirs, exclude_f
                                 file_data = file_data.replace(' ' + method_name_x + ']', ' ' + method_name_x + '_MMMethodMMM]')
                                 file_data = file_data.replace(' ' + method_name_x + ' ]', ' ' + method_name_x + '_MMMethodMMM]')
                                 file_data = file_data.replace(' ' + method_name_x + '  ]', ' ' + method_name_x + '_MMMethodMMM]')
-
+                                if '@selector(' + method_name_x + ')' in file_data:
+                                    print '@selector(' + method_name_x + ')'
+                                    file_data = file_data.replace('@selector(' + method_name_x + ')',
+                                                              '@selector(' + method_name_x + '_MMMethodMMM)')
                                 # 修改方法定义的第一个
                                 # file_data = file_data.replace(')' + method_name_x, ')' + method_name_x + '_MMMethodMMM')
                                 # file_data = file_data.replace(') ' + method_name_x, ')' + method_name_x + '_MMMethodMMM')
                                 # file_data = file_data.replace(')  ' + method_name_x,
                                 #                               ')' + method_name_x + '_MMMethodMMM')
-                                print 'sss'
+                                # print 'sss'
 
                         wite_data_to_file(file_path, file_data)
-
-
-
-def modify_oc_class_method_in_header(header_path):
-    file_path = header_path
-    f_obj = open(file_path, "r")
-    text_lines = f_obj.readlines()
-    for line in text_lines:
-        # print chardet.detect(line)
-        line = line.decode('utf-8')
 
 
 def find_method_name_by_tag(src_dir_path):
@@ -1307,13 +1482,263 @@ def find_method_name_by_tag(src_dir_path):
 
             w1, w2 = random_2word()
             if xssss.startswith('initWith'):
-                ww = 'initWith' + w1.capitalize() + w2.capitalize() + '_MMMethodMMM'
+                ww = 'initWith' + w1.capitalize() + w2.capitalize()
             elif xssss.startswith('init'):
-                ww = 'init' + w1.capitalize() + w2.capitalize() + '_MMMethodMMM'
+                ww = 'init' + w1.capitalize() + w2.capitalize()
             else:
-                ww = w1.lower() + w2.capitalize() + '_MMMethodMMM'
+                ww = w1.lower() + w2.capitalize() + '_' + random_1word().capitalize()
 
             print '#define ' + xssss + '   ' + ww
+
+def find_string_tag(src_dir_path,exclude_dirs,exclude_strings, encrpty_key,encrpty_iv):
+
+    xxxresult = []
+    if os.path.exists(src_dir_path):
+        list_dirs = os.walk(src_dir_path)
+        for root, dirs, files in list_dirs:
+
+            has_exclude_dir = 0
+            for exclude_dir in exclude_dirs:
+                if exclude_dir in root:
+                    has_exclude_dir = 1
+
+            if has_exclude_dir == 1:
+                continue
+
+            for file_name in files:
+
+                if file_name.endswith('.m') or file_name.endswith('.h'):
+                    file_path = os.path.join(root, file_name)  # 头文件路径
+                    file_data = read_file_data(file_path)
+                    file_data = unicode(file_data)
+                    compile_pp = re.compile(u'@"[\\w.#\u4e00-\u9fa5]+"')  #中文 ：\u4e00-\u9fa5
+                    method_tag_results = compile_pp.findall(file_data)
+                    # method_tag_results = re.findall(r'@"[\w.#]+"', file_data)
+                    for xxxd in method_tag_results:
+                        if xxxd not in xxxresult:
+                            xxxresult.append(xxxd)
+
+    if xxxresult:
+        # wanxianmzxqKEY, eIV = wanxianmzxqIV
+        pc = PrpCrypt(encrpty_key, encrpty_iv)  # 初始化密钥
+        for xssss in xxxresult:
+
+            xssss_vale = xssss[2 : len(xssss)-1]
+
+            # defineVale_test = '#define %s Decrypt_AllStringContent(@"%s")  //%s' % (xssss, xssss_vale, xssss)
+            # print defineVale_test
+
+            if xssss_vale in exclude_strings:
+                continue
+
+            w1, w2 = random_2word()
+            # 匹配所有汉字
+            # print(re.findall(u'[\u4e00-\u9fa5]', xssss_vale))
+            # if re.match(u'[\u4e00-\u9fa5]', xssss_vale):
+            if re.findall(u'[\u4e00-\u9fa5]', xssss_vale):
+
+                ssa = "wwwww_tag_wwwww_" + w1 + '_' + w2
+            else:
+                ssa = "wwwww_tag_wwwww_" + xssss_vale
+            ssa = ssa.replace(".","_").replace("#","_CC_")
+            encryptValue = pc.aes_encrypt(xssss_vale)
+            if encryptValue.endswith('\n'):
+                encryptValue = encryptValue[0:len(encryptValue)-1]
+
+            # defineVale = '#define %s        Decrypt_AllStringContent_2(@"%s")  //%s' % (ssa, encryptValue, xssss)
+            defineVale = '#define %s        %s  //%s' % (ssa, xssss, xssss)
+            print defineVale
+
+            if os.path.exists(src_dir_path):
+                list_dirs = os.walk(src_dir_path)
+                for root, dirs, files in list_dirs:
+
+                    has_exclude_dir = 0
+                    for exclude_dir in exclude_dirs:
+                        if exclude_dir in root:
+                            has_exclude_dir = 1
+
+                    if has_exclude_dir == 1:
+                        continue
+
+                    for file_name in files:
+
+                        if file_name.endswith('.m') or file_name.endswith('.h'):
+                            file_path = os.path.join(root, file_name)  # 头文件路径
+                            file_data = read_file_data(file_path)
+                            if xssss in file_data:
+                                file_data = file_data.replace(xssss,ssa)
+                                wite_data_to_file(file_path,file_data)
+
+def replace_string_tag(src_dir_path,exclude_dirs,exclude_strings, re_pr, encrpty_key,encrpty_iv):
+
+    xxxresult = []
+    if os.path.exists(src_dir_path):
+        list_dirs = os.walk(src_dir_path)
+        for root, dirs, files in list_dirs:
+
+            has_exclude_dir = 0
+            for exclude_dir in exclude_dirs:
+                if exclude_dir in root:
+                    has_exclude_dir = 1
+
+            if has_exclude_dir == 1:
+                continue
+
+            for file_name in files:
+
+                if file_name.endswith('.m') or file_name.endswith('.h'):
+                    file_path = os.path.join(root, file_name)  # 头文件路径
+                    file_data = read_file_data(file_path)
+                    file_data = unicode(file_data)
+                    compile_pp = re.compile(re_pr)  #中文 ：\u4e00-\u9fa5
+                    method_tag_results = compile_pp.findall(file_data)
+                    # method_tag_results = re.findall(r'@"[\w.#]+"', file_data)
+                    for xxxd in method_tag_results:
+                        if xxxd not in xxxresult:
+                            xxxresult.append(xxxd)
+
+    if xxxresult:
+        if encrpty_key and encrpty_iv:
+            # wanxianmzxqKEY, eIV = wanxianmzxqIV
+            pc = PrpCrypt(encrpty_key, encrpty_iv)  # 初始化密钥
+        for xssss in xxxresult:
+
+            xssss_vale = xssss[2 : len(xssss)-1]
+
+            # defineVale_test = '#define %s Decrypt_AllStringContent(@"%s")  //%s' % (xssss, xssss_vale, xssss)
+            # print defineVale_test
+
+            if xssss_vale in exclude_strings:
+                continue
+
+            w1, w2 = random_2word()
+            ssa = w1 + '_' + w2
+            encryptValue = pc.aes_encrypt(xssss_vale)
+            if encryptValue.endswith('\n'):
+                encryptValue = encryptValue[0:len(encryptValue)-1]
+
+            defineVale = '#define %s        Decrypt_AllStringContent_2(@"%s")  //%s' % (ssa, encryptValue, xssss)
+            print defineVale
+
+            # if os.path.exists(src_dir_path):
+            #     list_dirs = os.walk(src_dir_path)
+            #     for root, dirs, files in list_dirs:
+            #
+            #         has_exclude_dir = 0
+            #         for exclude_dir in exclude_dirs:
+            #             if exclude_dir in root:
+            #                 has_exclude_dir = 1
+            #
+            #         if has_exclude_dir == 1:
+            #             continue
+            #
+            #         for file_name in files:
+            #
+            #             if file_name.endswith('.m') or file_name.endswith('.h'):
+            #                 file_path = os.path.join(root, file_name)  # 头文件路径
+            #                 file_data = read_file_data(file_path)
+            #                 if xssss in file_data:
+            #                     file_data = file_data.replace(xssss,ssa)
+            #                     wite_data_to_file(file_path,file_data)
+
+def changeStringHeaderValue(header_path):
+    global f_obj, text_lines, line
+    f_obj = open(header_path, "r")
+    text_lines = f_obj.readlines()
+    for line in text_lines:
+        line = line.decode('utf-8')
+        if 'wwwww_tag_wwwww' in line:
+            str_result = re.findall('//@".+"', line)  # @"[\\w.]+"
+            if str_result:
+                str_result_1 = str_result[0]
+                str_result_1 = str_result_1[4: len(str_result_1) - 1]
+                aes_encrypt_result = pc.aes_encrypt(str_result_1)
+                defineVale = 'Decrypt_AllStringContent(@"%s")' % (aes_encrypt_result)
+
+                if 'Decrypt_AllStringContent' in line:
+                    line = re.sub('Decrypt_AllStringContent\\(@".+"\\)', defineVale, line)
+                    if line.endswith('\n'):
+                        line = line.replace('\n', '')
+                    print line
+                else:
+                    line = re.sub('  @".+" ', "  " + defineVale + " ", line)
+                    if line.endswith('\n'):
+                        line = line.replace('\n', '')
+                    print line
+
+
+def changeMethodHeaderValue(header_path):
+
+    f_obj = open(header_path, "r")
+    text_lines = f_obj.readlines()
+    for line in text_lines:
+        line = line.decode('utf-8')
+        if '_MMMethodMMM' in line:
+            str_result = re.findall(r'#define +\w+_MMMethodMMM ', line)  # @"[\\w.]+"
+            if str_result:
+                str_result_1 = str_result[0]
+                method_name = str_result_1.replace('#define ', '').strip()
+                w1_dong = random_word_dong()
+                w1_name = random_word_name()
+                if method_name.startswith('initWith'):
+                    method_rep = str_result_1 + "         " + 'initWith' + w1_dong.capitalize() + w1_name.capitalize()
+                elif method_name.startswith('init'):
+                    method_rep = str_result_1 + "         " + 'init' + w1_dong.capitalize() + w1_name.capitalize()
+                else:
+                    method_rep = str_result_1 + "         " + w1_dong.lower() + w1_name.capitalize()
+                print method_rep
+
+def changeImageNameForDefindHeader(imageDir,header_path):
+    if os.path.exists(imageDir):
+        list_dirs = os.walk(imageDir)
+        header_data = read_file_data(header_path)
+        isChange = 0
+        for root, dirs, files in list_dirs:
+            for file_name in files:
+                if file_name.endswith('.png') or file_name.endswith('.jpg'):
+
+                    w1, w2 = random_2word()
+                    image_name_new_no_extension = w1.lower() + '_' + w2.lower() + '_img'
+
+                    image_name_no_extension = os.path.splitext(file_name)[0]
+                    file_extension = os.path.splitext(file_name)[1]
+
+                    image_name_new = image_name_new_no_extension + file_extension
+
+                    file_old_path = os.path.join(root, file_name)
+                    file_new_path = os.path.join(root, image_name_new)
+                    os.rename(file_old_path, file_new_path)
+
+                    # @"mmplaygame_apple_signin"
+                    image_str_old = "@\"%s\"" % image_name_no_extension
+                    image_str_new = "@\"%s\"" % image_name_new_no_extension
+                    header_data = header_data.replace(image_str_old, image_str_new)
+                    isChange = 1
+
+        if isChange == 1:
+            wite_data_to_file(header_path, header_data)
+
+def add_code(src_dir_path,exclude_dirs,exclude_files):#添加垃圾代码
+
+    if os.path.exists(src_dir_path):
+        list_dirs = os.walk(src_dir_path)
+        for root, dirs, files in list_dirs:
+
+            has_exclude_dir = 0
+            for exclude_dir in exclude_dirs:
+                if exclude_dir in root:
+                    has_exclude_dir = 1
+
+            if has_exclude_dir == 1:
+                continue
+
+            for file_name in files:
+                if file_name in exclude_files:
+                    continue
+                if file_name.endswith('.m'):
+                    file_path = os.path.join(root, file_name)
+                    oc_class_parser.parse(file_path)
 
 
 if __name__ == '__main__':
@@ -1332,37 +1757,60 @@ if __name__ == '__main__':
     handle_file_count = 0
     file_count = 0
 
-    oc_exclude_files.extend(['AppDelegate.h', 'MWSDK.h', 'PayData.h', 'LoginData.h', 'AccountModel.h', 'CreateOrderResp.h'])
-    oc_exclude_dirs.extend(['AFNetworking', 'Masonry', 'YYModel', 'Model'])
+    woords_file_path = '/Users/ganyuanrong/Desktop/sdk_confuse/confuse_words_2.log'
+    genest_word = words_reader(woords_file_path)
 
-    woords_file_path = '/Users/ganyuanrong/Desktop/sdk_confuse/confuse_words.log'
+    words_dong = words_reader('/Users/ganyuanrong/Desktop/sdk_confuse/word_dong.log')
+    words_name = words_reader('/Users/ganyuanrong/Desktop/sdk_confuse/word_ming.log')
+    word_util.words_name = words_name
+    word_util.words_dong = words_dong
+    word_util.genest_word = genest_word
 
-    f_obj = open(woords_file_path, "r")
-    text_lines = f_obj.readlines()
-    for line in text_lines:
-        line = line.decode('utf-8')
-        word = line.strip().replace(' ', '')
-        if len(word) > 2:#太短的单词去掉
-            genest_word.append(word)
+    for code_i in range(20):
+        code_data = file_util.read_file_data('/Users/ganyuanrong/Desktop/sdk_confuse/code_temples/code_%s.log' % code_i)
+        if code_data:
+            oc_class_parser.code_temples.append(code_data)
+
+    for code_i in range(20):
+        code_data = file_util.read_file_data('/Users/ganyuanrong/Desktop/sdk_confuse/code_temples/code_if_%s.log' % code_i)
+        if code_data:
+            oc_class_parser.code_if_temples.append(code_data)
+
     #1.修改图片  图片md5需要额外处理
     # image_exclude_files = []
-    # image_ref_path = '/Users/ganyuanrong/iOSProject/game_mw_sdk_ios_v3/MW_OBS_V3'
-    # modify_sdk_bundle_image_name("/Users/ganyuanrong/iOSProject/game_mw_sdk_ios_v3/MW_OBS_V3/Resources/GOT/SDKResourcesV2.bundle/", image_ref_path, image_exclude_files)
+    # image_ref_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/obfuscation'
+    # modify_sdk_bundle_image_name("/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/Resources/GOT/SDKResourcesV5.bundle/",
+    #                              image_ref_path, image_exclude_files)
 
-    #2.添加垃圾方法和属性 (打乱方法顺序)
-    # exclude_dirs = ['AFNetworking', 'YYModel', 'Plat']
+    # changeImageNameForDefindHeader('/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/Resources/GOT/SDKResourcesV5.bundle/',
+    #                                '/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/obfuscation/imageNameHeader.h')
+
+    # 2.添加垃圾方法和属性 (打乱方法顺序)
+    # oc_all_path = '/Users/ganyuanrong/Desktop/Default-moqumiaowan_9.27-Release-1.0_scussce/Libraries/'
+    # exclude_dirs = ['AFNetworking', 'YYModel', 'Plat','sdkFrameworks']
     # exclude_files = []
     # addNoUseMethodAndProperty(oc_all_path, exclude_dirs, exclude_files)
 
     #3.添加随机注释
-    # addNewComments(oc_modify_path, '/Users/ganyuanrong/Desktop/sdk_confuse/ofc.log')
+    # oc_all_path = '/Users/ganyuanrong/Desktop/Default-moqumiaowan_9.27-Release-1.0_scussce/Classes/'
+    # comment_exclude_dirs = ['sdkFrameworks','Native']
+    # addNewComments(oc_all_path, comment_exclude_dirs, '/Users/ganyuanrong/Desktop/sdk_confuse/ofc.log')
 
     # 4.修改类名
-    # modify_oc_class_name(oc_modify_path)
+    # oc_exclude_files.extend(
+    #     ['AppDelegate.h', 'MWSDK.h', 'PayData.h', 'LoginData.h', 'AccountModel.h', 'CreateOrderResp.h','UnityAppController.h','UnityAppController+Rendering.h'
+    #      ,'UnityViewControllerBase+iOS.h','UnityViewControllerBase+tvOS.h','UnityViewControllerBase.h','UnityView.h','UnityView+iOS.h','UnityView+tvOS.h'])
+    # oc_exclude_dirs.extend(['AFNetworking', 'Masonry', 'YYModel', 'Model', 'sdkFrameworks', "Resources",'ThirkLib'])
+    # # "ThirkLib", "Model", "YYModel", "AFNetworking", "Plat", "WorkProjResources", "Resources", "obfuscation", "Demo"
+    # oc_exclude_dirs_ref_modify = ['ThirkLib', "YYModel", "AFNetworking", "Resources"]
+    #
+    # xcode_project_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
+    # oc_modify_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/FLSDK'
+    # oc_all_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration'
+    # modify_oc_class_name(oc_modify_path, xcode_project_path, oc_all_path,oc_exclude_dirs_ref_modify)
 
     # 5.修改提取到header的方法宏定义
     # random_word_for_method()
-    # modify_oc_class_method_in_header(oc_modify_path)
 
 
     #找出方法体,改变方法内定义的变量和方法参数  方法 需要 [-+]开头 结束行位'}'标志，因此结束行需要只有'}'并且无空格
@@ -1371,20 +1819,114 @@ if __name__ == '__main__':
     # var_exclude_bian = [''] #参数忽略
     # modify_method_params('/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/login/view_v2/',var_exclude_dirs,var_exclude_files,var_exclude_bian)
 
-    #修改属性
-
+    #修改属性（未完成）
     # modify_method_params('/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/login/view_v2/',var_exclude_dirs,var_exclude_files,var_exclude_bian)
 
 
-    #找出所有方法
-    # var_exclude_dirs = ['AFNetworking', 'YYModel', 'Plat']
-    # var_exclude_change_dirs = ['AFNetworking', 'YYModel']
-    # var_exclude_files = ['AppDelegate.m', 'MWSDK.m', 'PayData.m', 'LoginData.m', 'AccountModel.m', 'CreateOrderResp.m','USDefault.m','UIAlertController+Sdk.m']
-    # var_exclude_name = ['loadView','target','handleAuthrization','error','delegate','name','selector','didFinishLaunchingWithOptions','application','options','annotation','sourceApplication','openURL','dealloc','show','load','init','drawRect','initialize','encode','decode','length','share','setData','viewWillAppear','viewDidLoad','shouldAutorotate','viewDidDisappear','sharedInstance','forKey','objectForKey','setObject','length','presentingViewController','action','completion']
-    # modify_class_method('/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/',var_exclude_dirs,var_exclude_change_dirs,var_exclude_files,var_exclude_name)
+    #找出所有方法名字并修改
+    # var_exclude_dirs = ['AFNetworking', 'YYModel', 'Plat','sdkFrameworks']
+    # var_exclude_change_dirs = ['AFNetworking', 'YYModel','sdkFrameworks','ThirdSDK']
+    # var_exclude_files = ['AppDelegate.m', 'MWSDK.m', 'PayData.m', 'LoginData.m', 'AccountModel.m', 'CreateOrderResp.m','USDefault.m','UIAlertController+Sdk.m','DisplayManager.mm']
+    # var_exclude_name = ['didBecomeActive','willResignActive','didEnterBackground','willEnterForeground','willTerminate',
+    #                     'loadView','target','handleAuthrization','error','delegate','name','selector','didFinishLaunchingWithOptions','application',
+    #                     'options','annotation','sourceApplication','openURL','dealloc','show','load','init','drawRect','initialize','encode',
+    #                     'decode','length','share','setData','viewWillAppear','viewDidLoad','shouldAutorotate','viewDidDisappear','sharedInstance',
+    #                     'forKey','objectForKey','setObject','length','presentingViewController','action','completion','onFrameResolved','keyboardDidShow','keyboardWillHide'
+    #                     ,'touchesBegan','touchesEnded','touchesCancelled','touchesMoved','withEvent','layoutSubviews','initWithFrame','didRotate']
+    #
+    # woords_file_path = '/Users/ganyuanrong/Desktop/sdk_confuse/not_obs_method.log'
+    #
+    # f_obj = open(woords_file_path, "r")
+    # text_lines = f_obj.readlines()
+    # for line in text_lines:
+    #     line = line.decode('utf-8')
+    #     method_name = line.strip().replace(' ', '').replace(':', '')
+    #     var_exclude_name.append(method_name)
+    #
+    # modify_class_method('/Users/ganyuanrong/Desktop/Default-moqumiaowan_9.27-Release-1.0_scussce/Classes/',var_exclude_dirs,var_exclude_change_dirs,var_exclude_files,var_exclude_name)
 
 
 
     #找出所有被特别标记的方法，并且生成宏
-    # find_method_name_by_tag('/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/')
-    pass
+    # find_method_name_by_tag('/Users/ganyuanrong/Desktop/Default-moqumiaowan_9.27-Release-1.0_scussce/Libraries/')
+
+    #给cpp添加随机方法
+    # var_exclude_dirs = []
+    # var_exclude_files = []
+    # addNoUseMethodForCpp('/Users/ganyuanrong/Desktop/Default-moqumiaowan_9.27-Release-1.0_scussce/Classes/Native', var_exclude_dirs, var_exclude_files)
+
+    # xxxresult = []
+    # dataxxx = read_file_data('/Users/ganyuanrong/Desktop/关联文件2.txt')
+    # method_tag_results = re.findall('ui/baseui/[/\\w]*\\.png', dataxxx)
+    # for xxxd in method_tag_results:
+    #     if xxxd not in xxxresult:
+    #         xxxresult.append(xxxd)
+    #
+    # for xxxd in xxxresult:
+    #     print xxxd
+
+    # find_string_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK'
+    # exclude_dirs = ['AFNetworking', 'YYModel','Common','Res','CoreSecurity']
+    # exclude_strings = ['AccountListViewCellID','%@%@','%d','%ld','%@','.']
+    # find_string_tag('/Users/ganyuanrong/iOSProject/game_mw_sdk_ios_v3/MW_OBS_V3/FLSDK', exclude_dirs)
+    # wanxianmzxqKEY, eIV = wanxianmzxqIV
+    # wanxianmzxqKEY = 'wanxianmzxqKEY'
+    # wanxianmzxqIV = 'wanxianmzxqIV'
+    #找出所有字符使用宏替代
+    # find_string_tag(find_string_path, exclude_dirs, exclude_strings, wanxianmzxqKEY, wanxianmzxqIV)
+
+    # eKey=mplaywlzhsKEY,eIV=mplaywlzhsIV
+    # dataxxx = read_file_data('/Users/ganyuanrong/Desktop/73d30001bc0f27f512ed3afa30f2feb3.txt')
+    # pc = PrpCrypt('gamesdkv5v5v5KEY', 'gamesdkv5v5v5IV')  # 初始化密钥
+    # mmxx = pc.aes_decrypt(dataxxx)
+    # print mmxx
+    # dataxxx = read_file_data('/Users/ganyuanrong/iOSProject/game_mw_sdk_ios_v3/MW_OBS_V3/Resources/GOT/com_mplay_wlzhs.json')
+    # mmxx = pc.aes_encrypt(dataxxx)
+    # print mmxx
+    # print pc.aes_decrypt(mmxx)
+
+    # mmxx = pc.encrypt(dataxxx)
+    # print mmxx
+    #
+    # mmxx = pc.decrypt(mmxx)
+    # print mmxx
+
+    # changeStringHeaderValue('/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/obfuscation/MWStringHeaders.h')
+
+    #修改已经定义好的defind中的方法名称
+    # method_header_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/obfuscation/codeObfuscationForMethodName.h'
+    # changeMethodHeaderValue(method_header_path)
+    # print re.findall(u'[\u4e00-\u9fa5]+', u'叫啥叫')
+    #
+    # pchinese = re.compile(u'[\u4e00-\u9fa5]+')  # 判断是否为中文的正则表达式
+    # # for line in ffile.readlines():  # 循环读取要读取文件的每一行
+    # txt = u'叫啥叫'
+    # fcontent = pchinese.findall(txt)  # 使用正则表达获取中文
+    # # print str
+    # if fcontent:
+    #     print fcontent
+
+    # dataxxx = read_file_data('/Users/ganyuanrong/iOSProject/game_mw_sdk_ios_v3/MW_OBS_V3/FLSDK/Plat/WLZSHLib.m')
+    # aare = re.findall(r'\b\w+_WLFuncTag', dataxxx)
+    # if aare:
+    #     aaa_result = []
+    #     for v in aare:
+    #         if v not in aaa_result:
+    #             aaa_result.append(v)
+    #             w1, w2 = random_2word()
+    #             vv_vale = w1.lower() + w2.capitalize()
+    #
+    #             defineVale = '#define %s        %s' % (v, vv_vale)
+    #             print defineVale
+
+    #test
+
+
+    # oc_class_parser.parse('/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/Request/SDKRequest.m')
+    #添加垃圾代码
+    var_exclude_dirs = ['AFNetworking', 'YYModel']
+    var_exclude_files = []
+    # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK'
+    src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/FLSDK'
+    add_code(src_path, var_exclude_dirs, var_exclude_files)
+    print 'end'
