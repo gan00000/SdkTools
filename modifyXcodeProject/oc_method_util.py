@@ -21,7 +21,7 @@ operation_arr = ['+','-','*','%','/']
 words_gl = []
 #找出方法名字，修改方法名
 def create_operation_expression(rightVar):
-    value1 = random.randint(-100000, 100000)
+    value1 = random.randint(-100, 100000)
     content = str(value1)
     operation_count = random.randint(0, 5)
     if (operation_count == 0):
@@ -37,16 +37,17 @@ def create_case_expression(leftVar, rightVar):
     case_count = random.randint(1, 10)
     content = ''
     for c in range(case_count):
-        case_value = random.randint(-100000, 100000)
+        case_value = random.randint(-100, 1000)
         # print case_value
         ex = create_operation_expression(rightVar)
         if ex:
-            content = content + 'case ' + str(case_value) +':\n\t\t\t{\n\t\t\t' \
-                      + leftVar + ' = ' + ex + '; \n\t\t break;\n\t\t\t}\n\t\t\t'
+            content = content + 'case ' + str(case_value) +':\n\t\t\t{\n\t\t\t\t' \
+                      + leftVar + ' = ' + ex + '; \n\t\t\t break;\n\t\t\t}\n\t\t\t'
 
     return content
 
 # def create_switch_expression(switchvar, leftVar):
 
-# if __name__ == '__main__':
-#     print create_case_expression('aaa', 'bbb')
+if __name__ == '__main__':
+    # print create_case_expression('aaa', 'bbb')
+    print create_operation_expression('aadd')
