@@ -17,7 +17,7 @@ import chardet
 # 导入 random(随机数) 模块
 import random
 
-operation_arr = ['+','-','*','%','/']
+operation_arr = ['+', '-', '*', '/']
 words_gl = []
 #找出方法名字，修改方法名
 def create_operation_expression(rightVar):
@@ -36,13 +36,17 @@ def create_operation_expression(rightVar):
 def create_case_expression(leftVar, rightVar):
     case_count = random.randint(1, 10)
     content = ''
+    case_value_aar = []
     for c in range(case_count):
-        case_value = random.randint(-100, 1000)
+        case_value = random.randint(-100, 10000)
+        while case_value in case_value_aar:
+            case_value = random.randint(-100, 10000)
         # print case_value
         ex = create_operation_expression(rightVar)
         if ex:
             content = content + 'case ' + str(case_value) +':\n\t\t\t{\n\t\t\t\t' \
                       + leftVar + ' = ' + ex + '; \n\t\t\t break;\n\t\t\t}\n\t\t\t'
+            case_value_aar.append(case_value)
 
     return content
 

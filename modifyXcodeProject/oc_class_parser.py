@@ -23,13 +23,14 @@ code_temples = []
 code_if_temples = []
 
 params_not_use_list = ['rect', 'alertController'] #排除使用作为条件判断的参数
-
+insert_code_sum = 0
 #找出方法名字，修改方法名
 def parse(file_name):
 
     mthod_arr = []
     mthod_arr2 = []
     mMethodInfo_list = []
+
     if os.path.exists(file_name) and (file_name.endswith('.m') or file_name.endswith('.mm') or file_name.endswith('.h')):
 
         if file_name.endswith('.m'):  #
@@ -226,8 +227,12 @@ def parse(file_name):
                         #     print params_list
                         #     print '\n'
 
+    print '一共插入的代码数量为：' + str(insert_code_sum)
+
 
 def addCodeToSrcCode(code_method_temp_content, code_temple, code_line, is_later=False):
+    global insert_code_sum
+    insert_code_sum = insert_code_sum + 1
     if is_later:
         print '前面插入：' + code_line
         code_method_temp_content = code_method_temp_content + '\n\t\t//====insert my code start===\n\t\t{\n\t\t' + code_temple + '\n\t\t}\n\t\t//====insert my code end===\n\n' + code_line
@@ -290,7 +295,7 @@ def handle_code_temples(condition_var):
 
     code_mumber_temple_params_list = re.findall(r'iiiii\w+_iiiii', code_temple)  # iiiii\w+_iiiii的范围可以是负数
     for code_mumber_temple_params in code_mumber_temple_params_list:
-        numbera = (random.random() + 1) * random.randint(-1000, 10000)
+        numbera = random.randint(-1000, 10000)
         code_temple = code_temple.replace(code_mumber_temple_params, str(numbera))
 
     code_int_temple_params_list = re.findall(r'int\w+_int', code_temple)  # int\w+_int需要时正整数
@@ -356,7 +361,7 @@ def parse_method_local_params(method_data): #解析方法局部变量
         method_data_temp = method_data
         method_data_temp = removeAnnotate(method_data_temp)
 
-        result_list = re.findall(r' \w+ (\*|\* )?\w+ ?=', method_data_temp) #提取类似 NSString * timeStamp=   NSArray *responseArray =
+        result_list = re.findall(r'\w+ (?:\*|\* )?\w+ ?=', method_data_temp) #提取类似 NSString * timeStamp=   NSArray *responseArray =
         if result_list:
             params_list = []
             for param_content_temp in result_list:
