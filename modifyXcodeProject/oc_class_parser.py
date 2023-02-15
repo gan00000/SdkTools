@@ -6,7 +6,7 @@ import sys
 from modifyXcodeProject import oc_method_util
 from modifyXcodeProject.model import PropertyInfo
 from modifyXcodeProject.model.MethodInfo import MethodInfo
-from modifyXcodeProject.utils import file_util, word_util
+from modifyXcodeProject.utils import file_util, word_util, datetime_util
 
 imp.reload(sys)
 sys.setdefaultencoding('utf-8') #设置默认编码,只能是utf-8,下面\u4e00-\u9fa5要求的
@@ -233,13 +233,14 @@ def parse(file_name):
 def addCodeToSrcCode(code_method_temp_content, code_temple, code_line, is_later=False):
     global insert_code_sum
     insert_code_sum = insert_code_sum + 1
+    insert_time = datetime_util.get_current_time()
     if is_later:
         print '前面插入：' + code_line
-        code_method_temp_content = code_method_temp_content + '\n\t\t//====insert my code start===\n\t\t{\n\t\t' + code_temple + '\n\t\t}\n\t\t//====insert my code end===\n\n' + code_line
+        code_method_temp_content = code_method_temp_content + ('\n\t\t//====insert my code start===  %s\n\t\t{\n\t\t' % (insert_time)) + code_temple + ('\n\t\t}\n\t\t//====insert my code end===  %s\n\n' % (insert_time)) + code_line
     else:
         print '后面插入'  + code_line
         code_method_temp_content = code_method_temp_content + code_line
-        code_method_temp_content = code_method_temp_content + '\n\t\t//====insert my code start===\n\t\t{\n\t\t' + code_temple + '\n\t\t}\n\t\t//====insert my code end===\n\n'
+        code_method_temp_content = code_method_temp_content + ('\n\t\t//====insert my code start===  %s\n\t\t{\n\t\t' % (insert_time)) + code_temple + ('\n\t\t}\n\t\t//====insert my code end===  %s\n\n' % (insert_time))
     return code_method_temp_content
 
 
