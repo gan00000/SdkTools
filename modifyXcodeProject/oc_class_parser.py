@@ -315,13 +315,22 @@ def handle_code_temples(condition_var):
 
     if 'dic_value_dic' in code_temple:
         dic_count = random.randint(1, 15)
+        value_int_arr = word_util.generateIntArr(dic_count)
         dic_content = ''
         for i in range(dic_count):
             w1, w2 = word_util.random_2words_not_same_inarr(word_aar)
+
+            value_type = random.randint(1, 3)
             if i == dic_count - 1:
-                val1 = '@"' + w1 + '" : @"' + w2 + '" '
+                if value_type == 3:
+                    val1 = '@"' + w1 + '" : @(' + value_int_arr[i] + ') '
+                else:
+                    val1 = '@"' + w1 + '" : @"' + w2 + '" '
             else:
-                val1 = '@"' + w1 + '" : @"' + w2 + '", '
+                if value_type == 3:
+                    val1 = '@"' + w1 + '" : @(' + value_int_arr[i] + '), '
+                else:
+                    val1 = '@"' + w1 + '" : @"' + w2 + '", '
             dic_content = dic_content + val1
         code_temple = code_temple.replace('dic_value_dic', dic_content)
 

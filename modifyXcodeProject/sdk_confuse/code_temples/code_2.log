@@ -1,0 +1,4 @@
+        NSString *ppppp1_ppppp = @"";
+        if(var_temp){
+            ppppp1_ppppp = @"ppppp3_ppppp";
+        }

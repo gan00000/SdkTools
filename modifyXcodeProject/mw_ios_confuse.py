@@ -1757,22 +1757,22 @@ if __name__ == '__main__':
     handle_file_count = 0
     file_count = 0
 
-    woords_file_path = '/Users/ganyuanrong/Desktop/sdk_confuse/confuse_words_2.log'
+    woords_file_path = '/Users/ganyuanrong/PycharmProjects/SdkTools/modifyXcodeProject/sdk_confuse/confuse_words_2.log'
     genest_word = words_reader(woords_file_path)
 
-    words_dong = words_reader('/Users/ganyuanrong/Desktop/sdk_confuse/word_dong.log')
-    words_name = words_reader('/Users/ganyuanrong/Desktop/sdk_confuse/word_ming.log')
+    words_dong = words_reader('/Users/ganyuanrong/PycharmProjects/SdkTools/modifyXcodeProject/sdk_confuse/word_dong.log')
+    words_name = words_reader('/Users/ganyuanrong/PycharmProjects/SdkTools/modifyXcodeProject/sdk_confuse/word_ming.log')
     word_util.words_name = words_name
     word_util.words_dong = words_dong
     word_util.genest_word = genest_word
 
-    for code_i in range(20):
-        code_data = file_util.read_file_data('/Users/ganyuanrong/Desktop/sdk_confuse/code_temples/code_%s.log' % code_i)
+    for code_i in range(30):
+        code_data = file_util.read_file_data('/Users/ganyuanrong/PycharmProjects/SdkTools/modifyXcodeProject/sdk_confuse/code_temples/code_%s.log' % code_i)
         if code_data:
             oc_class_parser.code_temples.append(code_data)
 
     for code_i in range(20):
-        code_data = file_util.read_file_data('/Users/ganyuanrong/Desktop/sdk_confuse/code_temples/code_if_%s.log' % code_i)
+        code_data = file_util.read_file_data('/Users/ganyuanrong/PycharmProjects/SdkTools/modifyXcodeProject/sdk_confuse/code_temples/code_if_%s.log' % code_i)
         if code_data:
             oc_class_parser.code_if_temples.append(code_data)
 

@@ -89,3 +89,17 @@ def words_reader(word_file_path):
         if len(word) > 2:  # 太短的单词去掉
             words.append(word)
     return words
+
+
+def generateIntArr(count):
+
+    intArr = []
+    for i in range(count):
+
+        a_value = random.randint(1, 100000)
+        while a_value in intArr:
+            a_value = random.randint(1, 100000)
+
+        intArr.append(a_value)
+
+    return intArr

@@ -1,0 +1,7 @@
+        NSArray * ppppp1_ppppp = [NSArray arrayWithObjects:@(int1_int), @(int2_int), @"ppppp3_ppppp", @"ppppp4_ppppp"];
+        if ([ppppp1_ppppp containsObject:@"ppppp2_ppppp"]) {
+            BOOL ppppp5_ppppp = NO;
+            if (ppppp5_ppppp){
+                ppppp1_ppppp = [NSMutableArray array];
+            }
+        }

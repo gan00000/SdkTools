@@ -1,0 +1,6 @@
+        
+        int ppppp1_ppppp = int1_int;
+        NSString *ppppp3_ppppp = @"ppppp4_ppppp";
+        while(ppppp3_ppppp.length > ppppp1_ppppp) {
+            break; 
+        } 

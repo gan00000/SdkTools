@@ -1,0 +1,16 @@
+        
+        int ppppp1_ppppp = int1_int;
+        int ppppp2_ppppp = int2_int;
+        int ppppp3_ppppp = int3_int;
+        int ppppp4_ppppp = int4_int;
+        int ppppp5_ppppp = int5_int;
+        int ppppp6_ppppp = int6_int;
+
+        if (ppppp1_ppppp < int7_int){
+
+            ppppp2_ppppp -= 1;
+            ppppp3_ppppp += ppppp2_ppppp;
+            ppppp5_ppppp -= ppppp1_ppppp;
+            ppppp4_ppppp += 1;
+            ppppp6_ppppp += 10;
+        }

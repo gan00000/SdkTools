@@ -1,0 +1,19 @@
+        
+        NSDictionary *ppppp1_ppppp = @{dic_value_dic};
+        if (ppppp1_ppppp.count > iiiii1_iiiii){
+
+            int ppppp12_ppppp = iiiii12_iiiii;
+            int case_left_var = iiiii188_iiiii;
+            int case_right_var = iiiii182_iiiii;
+            switch (ppppp12_ppppp) {
+                    
+                case_content_case
+                    
+                default:
+                    break;
+            }
+
+
+        }
+
+        
