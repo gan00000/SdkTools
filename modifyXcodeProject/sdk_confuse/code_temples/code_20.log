@@ -1,6 +1,6 @@
 		NSDictionary *ppppp1_ppppp = @{dic_value_dic};
-        NSString *ppppp2_ppppp = ppppp1_ppppp[ppppp3_ppppp];
+        NSString *ppppp2_ppppp = ppppp1_ppppp[@"ppppp3_ppppp"];
 
-        if (ppppp2_ppppp && ppppp2_ppppp.length > int1_int && [ppppp2_ppppp isEqualToString:ppppp4_ppppp]) {
+        if (ppppp2_ppppp && ppppp2_ppppp.length > int1_int && [ppppp2_ppppp isEqualToString:@"ppppp4_ppppp"]) {
             
         }

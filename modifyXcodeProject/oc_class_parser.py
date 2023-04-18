@@ -1,5 +1,6 @@
 #coding=utf-8
 import imp
+import string
 import sys
 
 # from modifyXcodeProject import mw_ios_confuse
@@ -24,12 +25,12 @@ code_if_temples = []
 
 params_not_use_list = ['rect', 'alertController'] #排除使用作为条件判断的参数
 insert_code_sum = 0
+
 #找出方法名字，修改方法名
-def parse(file_name):
+def parse(file_name, sdk_confuse_dir): #.m文件
 
     mthod_arr = []
     mthod_arr2 = []
-    mMethodInfo_list = []
 
     if os.path.exists(file_name) and (file_name.endswith('.m') or file_name.endswith('.mm') or file_name.endswith('.h')):
 
@@ -37,6 +38,9 @@ def parse(file_name):
             file_path = file_name
             # print 'handle file = ' + file_path
             print '正在处理: ' + file_name
+
+            methods_list = insert_methods(file_path, sdk_confuse_dir)
+
             file_data = file_util.read_file_data(file_path)
             # property_list = parse_property(file_data)
             # 读取方法内容
@@ -47,6 +51,7 @@ def parse(file_name):
             method_defind_content = ''
 
             is_in_method = 0
+            method_assess = ''
             for line in text_lines:
                 # print chardet.detect(line)
                 line = line.decode('utf-8')
@@ -57,12 +62,18 @@ def parse(file_name):
                 #     continue
 
                 # 方法声明开始
-                if line.startswith('- (') or line.startswith('+ (') or line.startswith('-  (') or line.startswith(
-                        '+  (') or line.startswith('-(') or line.startswith('+('):
+                if (line.startswith('- (') or line.startswith('+ (') or line.startswith('-  (') or line.startswith(
+                        '+  (') or line.startswith('-(') or line.startswith('+(')) and '//insert method' not in line:
                     is_in_method = 1
                     is_in_method_def_line = 1
                     method_content = ''
                     method_defind_content = ''
+                    method_assess = ''
+                    line_temp = line.strip()
+                    if line_temp.startswith('-'):  # 方法内容开始 方法声明结束
+                        method_assess = '-'
+                    else:
+                        method_assess = '+'
 
                 if is_in_method == 1:
                     method_content = method_content + line
@@ -72,7 +83,6 @@ def parse(file_name):
 
                     line_temp = line.strip()
                     if line_temp.endswith('{') or line_temp.endswith('{\n'):  # 方法内容开始 方法声明结束
-
                         is_in_method_def_line = 0
 
                     if line.startswith('}') or line.startswith('}\n'):#函数end
@@ -83,7 +93,7 @@ def parse(file_name):
 
                         method_defind_params_list = parse_method_defind_params(method_defind_content)
                         local_params_list = parse_method_local_params(method_content)
-                        code_method_temp_file = '/Users/ganyuanrong/Desktop/sdk_confuse/temp/code_method_temp.log'
+                        code_method_temp_file = '/Users/ganyuanrong/PycharmProjects/SdkTools/modifyXcodeProject/sdk_confuse/temp/code_method_temp.log' #把方法内容写到临时文件
                         file_util.wite_data_to_file(code_method_temp_file, method_content)
                         code_method_temp_lines = file_util.read_file_data_for_line(code_method_temp_file)
                         code_method_temp_content = ''
@@ -149,26 +159,26 @@ def parse(file_name):
                                             print '使用函数声明变量为条件判断插入code params:' + method_param_insert
                                             code_temple = handle_code_temples(method_param_insert)
 
-                                            code_method_temp_content = addCodeToSrcCode(code_method_temp_content, code_temple, code_line)
+                                            code_method_temp_content = addCodeToSrcCode(code_method_temp_content, code_temple, code_line, method_assess, insert_methods_list=methods_list)
                                         else:
                                             code_temple = insert_no_param_code()
-                                            code_method_temp_content = addCodeToSrcCode(code_method_temp_content, code_temple, code_line)
+                                            code_method_temp_content = addCodeToSrcCode(code_method_temp_content, code_temple, code_line, method_assess, insert_methods_list=methods_list)
 
                                     elif code_params_type == 1: #本地参数设置条件
                                         if local_params_appear_list: #出现过的本地变量参数
                                             method_param_insert = local_params_appear_list[random.randint(0, len(local_params_appear_list) - 1)]  # 随机抽出一个参数
                                             code_temple = handle_code_temples(method_param_insert)
                                             print '使用本地变量为条件判断插入code params:' + method_param_insert
-                                            code_method_temp_content = addCodeToSrcCode(code_method_temp_content, code_temple,code_line)
+                                            code_method_temp_content = addCodeToSrcCode(code_method_temp_content, code_temple,code_line, method_assess, insert_methods_list=methods_list)
 
                                         else:
                                             code_temple = insert_no_param_code()
-                                            code_method_temp_content = addCodeToSrcCode(code_method_temp_content, code_temple,code_line)
+                                            code_method_temp_content = addCodeToSrcCode(code_method_temp_content, code_temple,code_line, method_assess, insert_methods_list=methods_list)
                                     else:
 
                                         code_temple = insert_no_param_code()
 
-                                        code_method_temp_content = addCodeToSrcCode(code_method_temp_content, code_temple,code_line)
+                                        code_method_temp_content = addCodeToSrcCode(code_method_temp_content, code_temple,code_line, method_assess, insert_methods_list=methods_list)
                                 else:
                                     # 不添加
                                     code_method_temp_content = code_method_temp_content + code_line
@@ -190,27 +200,26 @@ def parse(file_name):
                                                 random.randint(0, len(method_defind_params_list) - 1)]  # 随机抽出一个参数
                                             print '使用函数声明变量为条件判断插入code params:' + method_param_insert
                                             code_temple = handle_code_temples(method_param_insert)
-
-                                            code_method_temp_content = addCodeToSrcCode(code_method_temp_content, code_temple, code_line, True)
+                                            code_method_temp_content = addCodeToSrcCode(code_method_temp_content, code_temple, code_line, method_assess, True, insert_methods_list=methods_list)
                                         else:
                                             code_temple = insert_no_param_code()
-                                            code_method_temp_content = addCodeToSrcCode(code_method_temp_content, code_temple, code_line, True)
+                                            code_method_temp_content = addCodeToSrcCode(code_method_temp_content, code_temple, code_line, method_assess, True, insert_methods_list=methods_list)
 
                                     elif code_params_type == 1:
                                         if local_params_appear_list:
                                             method_param_insert = local_params_appear_list[random.randint(0, len(local_params_appear_list) - 1)]  # 随机抽出一个参数
                                             code_temple = handle_code_temples(method_param_insert)
                                             print '使用本地变量为条件判断插入code params:' + method_param_insert
-                                            code_method_temp_content = addCodeToSrcCode(code_method_temp_content, code_temple, code_line, True)
+                                            code_method_temp_content = addCodeToSrcCode(code_method_temp_content, code_temple, code_line, method_assess, True, insert_methods_list=methods_list)
 
                                         else:
                                             code_temple = insert_no_param_code()
-                                            code_method_temp_content = addCodeToSrcCode(code_method_temp_content, code_temple, code_line, True)
+                                            code_method_temp_content = addCodeToSrcCode(code_method_temp_content, code_temple, code_line, method_assess, True, insert_methods_list=methods_list)
                                     else:
 
                                         code_temple = insert_no_param_code()
 
-                                        code_method_temp_content = addCodeToSrcCode(code_method_temp_content, code_temple, code_line, True)
+                                        code_method_temp_content = addCodeToSrcCode(code_method_temp_content, code_temple, code_line, method_assess, True, insert_methods_list=methods_list)
                                 else:
                                     #不添加
                                     code_method_temp_content = code_method_temp_content + code_line
@@ -229,17 +238,106 @@ def parse(file_name):
 
     print '一共插入的代码数量为：' + str(insert_code_sum)
 
+def code_temp_call_method(mehtod, method_assess):
+    method_def = mehtod.method_def
+    w_inedx = random.randint(0, len(string.letters) - 1)
+    param_name = string.letters[w_inedx] + '_' + str(w_inedx)
+    call_content = ''
+    if mehtod.methodReturnType == 'void':
+        if method_assess == '-':
+            if mehtod.methodIsPrivate == '-':
+                call_content = '\n\t[self %s];\n' % mehtod.method_call
+            else:
+                call_content = '\n\t[%s %s];\n' % (mehtod.class_name, mehtod.method_call)
+        else:
+            if mehtod.methodIsPrivate == '+':
+                call_content = '\n\t[%s %s];\n' % (mehtod.class_name, mehtod.method_call)
+    else:
+        if method_assess == '-':
+            if mehtod.methodIsPrivate == '-':
+                call_content = '\n\t' + mehtod.methodReturnType + ' ' + param_name + ' = [self %s];\n' % mehtod.method_call
+            else:
+                call_content = '\n\t' + mehtod.methodReturnType + ' ' + param_name + ' = [%s %s];\n' % (mehtod.class_name, mehtod.method_call)
+        else:
+            if mehtod.methodIsPrivate == '+':
+                call_content = '\n\t' + mehtod.methodReturnType + ' ' + param_name + ' = [%s %s];\n' % (mehtod.class_name, mehtod.method_call)
+        if len(call_content) > 0:
+            call_content = call_content + '\tif(%s){}\n' % param_name
+    if len(call_content) > 0:
+        call_content = replace_code_temp(call_content, '')
+    return call_content
 
-def addCodeToSrcCode(code_method_temp_content, code_temple, code_line, is_later=False):
+
+def insert_methods(file_path_m, sdk_confuse_dir):
+    # 处理对应.h文件
+    file_path_h = file_path_m.replace('.m', '.h')
+    file_data_h = file_util.read_file_data(file_path_h)
+    file_data_m = file_util.read_file_data(file_path_m)
+
+    # interface_content = re.findall(r'@interface[\s\S]*@end', file_data_h)
+
+    method_access = ''
+    method_tag_list_a = re.findall(r'\n- ?\(', file_data_m)
+    method_tag_list_b = re.findall(r'\n\+ ?\(', file_data_m)
+
+    if method_tag_list_a and len(method_tag_list_a) > 0 and len(method_tag_list_a) > len(method_tag_list_b):
+        method_access = '-'
+    else:
+        method_access = '+'
+
+    # 找出类名
+    class_def_content = re.findall(r'@implementation \w+', file_data_m)
+    if class_def_content and len(class_def_content) > 0:
+        class_name = class_def_content[0].replace('@implementation', '').replace(' ', '').strip()
+
+    implementation_content_list = re.findall(r'@implementation[\s\S]*@end', file_data_m)
+    methods_list = []
+    if implementation_content_list:
+        implementation_content = implementation_content_list[0]
+        tempLog_path = sdk_confuse_dir + 'temp/tempLog.log'
+        file_util.wite_data_to_file(tempLog_path, implementation_content)
+        temp_log_content_lines = file_util.read_file_data_for_line(tempLog_path)
+
+        method_imp_content = ''
+        for line in temp_log_content_lines:
+
+            line_a = line.strip()
+            if line_a.startswith('- (') or line_a.startswith('-(') or line_a.startswith('-  (') \
+                    or line_a.startswith('@end'):  # 前面插入
+                is_insert_method = random.randint(0, 2)
+                if is_insert_method == 1:  # 随机是否需要增加方法
+
+                    method_count = random.randint(1, 2)  # 随机需要增加方法的个数
+                    for mc in range(method_count):
+                        method = create_method_boj(method_access)
+                        method.class_name = class_name
+                        methods_list.append(method)
+                        line = '\n' + method.methodContent + '\n' + line
+                        # method_def_content = method_def_content + '\n//insert my method def start\n' + method.method_def + '\n//insert my method def end\n'
+
+            method_imp_content = method_imp_content + line
+
+        file_data_m = file_data_m.replace(implementation_content, method_imp_content)
+        file_util.wite_data_to_file(file_path_m, file_data_m)
+    return methods_list
+
+
+def addCodeToSrcCode(code_method_temp_content, code_temple, insert_line_content, method_assess, is_later=False, insert_methods_list=None):
+
+    if len(insert_methods_list) > 0:
+        method_obj = insert_methods_list[random.randint(0, len(insert_methods_list) - 1)]
+        call_content = code_temp_call_method(method_obj, method_assess)
+        code_temple = call_content + code_temple
+
     global insert_code_sum
     insert_code_sum = insert_code_sum + 1
     insert_time = datetime_util.get_current_time()
     if is_later:
-        print '前面插入：' + code_line
-        code_method_temp_content = code_method_temp_content + ('\n\t\t//====insert my code start===  %s\n\t\t{\n\t\t' % (insert_time)) + code_temple + ('\n\t\t}\n\t\t//====insert my code end===  %s\n\n' % (insert_time)) + code_line
+        print '前面插入：' + insert_line_content
+        code_method_temp_content = code_method_temp_content + ('\n\t\t//====insert my code start===  %s\n\t\t{\n\t\t' % (insert_time)) + code_temple + ('\n\t\t}\n\t\t//====insert my code end===  %s\n\n' % (insert_time)) + insert_line_content
     else:
-        print '后面插入'  + code_line
-        code_method_temp_content = code_method_temp_content + code_line
+        print '后面插入' + insert_line_content
+        code_method_temp_content = code_method_temp_content + insert_line_content
         code_method_temp_content = code_method_temp_content + ('\n\t\t//====insert my code start===  %s\n\t\t{\n\t\t' % (insert_time)) + code_temple + ('\n\t\t}\n\t\t//====insert my code end===  %s\n\n' % (insert_time))
     return code_method_temp_content
 
@@ -280,25 +378,28 @@ def handle_code_temple_condition():
 
 #代码模版处理
 def handle_code_temples(condition_var):
-    word_aar = []
 
     code_temple = code_temples[random.randint(0, len(code_temples) - 1)]  # 随机抽出一个代码模版
 
+    code_temple = replace_code_temp(code_temple, condition_var)
+
+    return code_temple
+
+
+def replace_code_temp(code_temple, condition_var):
+
+    word_aar = []
+
     # 替换代码模版中的内容start
     code_temple = code_temple.replace('var_temp', condition_var)  # 添加表达式替换代码模版占位符
-
-
     code_temple_params_list = re.findall(r'ppppp\w+_ppppp', code_temple)  # ppppp\w+_ppppp代表字符
     for code_temple_param in code_temple_params_list:
         w1, w2 = word_util.random_2words_not_same_inarr(word_aar)
         code_temple = code_temple.replace(code_temple_param, w1 + w2.capitalize())
-
-
     code_mumber_temple_params_list = re.findall(r'iiiii\w+_iiiii', code_temple)  # iiiii\w+_iiiii的范围可以是负数
     for code_mumber_temple_params in code_mumber_temple_params_list:
         numbera = random.randint(-1000, 10000)
         code_temple = code_temple.replace(code_mumber_temple_params, str(numbera))
-
     code_int_temple_params_list = re.findall(r'int\w+_int', code_temple)  # int\w+_int需要时正整数
     for code_int_temple_param in code_int_temple_params_list:
         int_value = random.randint(1, 10000)
@@ -312,7 +413,6 @@ def handle_code_temples(condition_var):
         code_temple = code_temple.replace('case_right_var', case_right_var)
         case_temp_content = oc_method_util.create_case_expression(case_left_var, case_right_var)
         code_temple = code_temple.replace('case_content_case', case_temp_content)
-
     if 'dic_value_dic' in code_temple:
         dic_count = random.randint(1, 15)
         value_int_arr = word_util.generateIntArr(dic_count)
@@ -333,7 +433,6 @@ def handle_code_temples(condition_var):
                     val1 = '@"' + w1 + '" : @"' + w2 + '", '
             dic_content = dic_content + val1
         code_temple = code_temple.replace('dic_value_dic', dic_content)
-
     if 'array_value_array' in code_temple:
         arr_count = random.randint(1, 15)
         arr_content = ''
@@ -345,7 +444,6 @@ def handle_code_temples(condition_var):
                 val1 = '@"' + w1 + '_' + w2 + '", '
             arr_content = arr_content + val1
         code_temple = code_temple.replace('array_value_array', arr_content)
-
     return code_temple
 
 
@@ -415,3 +513,23 @@ def parse_method_defind_params(method_data): #解析方法前面变量
             return params_list
 
     return None
+
+def create_method_boj(method_access):
+
+     #生成的方法内容、方法定义、参数类型数组、参数名称数组、插入占位符数组
+    mi, imp_mmmmmm_imp_index = oc_method_util.createMehtodTemp(method_access)
+    if len(mi.methodParamsNameList) > 0:
+
+        for i in imp_mmmmmm_imp_index:
+            method_param_insert = mi.methodParamsNameList[random.randint(0, len(mi.methodParamsNameList) - 1)]
+            code_temple = handle_code_temples(method_param_insert)
+            imp_mmmmmm_imp = 'imp_mmmmmm_%s_imp' % i
+            # print 'imp_mmmmmm_imp=' + imp_mmmmmm_imp
+            mi.methodContent = mi.methodContent.replace(imp_mmmmmm_imp, code_temple)
+    else:
+
+        code_temple = insert_no_param_code()
+        mi.methodContent = mi.methodContent.replace('imp_mmmmmm_0_imp', code_temple)
+
+    # mi.methodContent = method_implement
+    return mi

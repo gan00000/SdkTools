@@ -2,7 +2,7 @@
 import imp
 import sys
 
-from modifyXcodeProject import oc_class_parser
+from modifyXcodeProject import oc_class_parser, oc_method_util
 from modifyXcodeProject.utils import file_util, word_util
 from modifyXcodeProject.utils.PrpCrypt import PrpCrypt
 
@@ -1738,7 +1738,7 @@ def add_code(src_dir_path,exclude_dirs,exclude_files):#添加垃圾代码
                     continue
                 if file_name.endswith('.m'):
                     file_path = os.path.join(root, file_name)
-                    oc_class_parser.parse(file_path)
+                    oc_class_parser.parse(file_path, sdk_confuse_dir)
 
 
 if __name__ == '__main__':
@@ -1756,23 +1756,23 @@ if __name__ == '__main__':
 
     handle_file_count = 0
     file_count = 0
-
-    woords_file_path = '/Users/ganyuanrong/PycharmProjects/SdkTools/modifyXcodeProject/sdk_confuse/confuse_words_2.log'
+    sdk_confuse_dir = '/Users/ganyuanrong/PycharmProjects/SdkTools/modifyXcodeProject/sdk_confuse/'
+    woords_file_path = sdk_confuse_dir + 'confuse_words_2.log'
     genest_word = words_reader(woords_file_path)
 
-    words_dong = words_reader('/Users/ganyuanrong/PycharmProjects/SdkTools/modifyXcodeProject/sdk_confuse/word_dong.log')
-    words_name = words_reader('/Users/ganyuanrong/PycharmProjects/SdkTools/modifyXcodeProject/sdk_confuse/word_ming.log')
+    words_dong = words_reader(sdk_confuse_dir + 'word_dong.log')
+    words_name = words_reader(sdk_confuse_dir + 'word_ming.log')
     word_util.words_name = words_name
     word_util.words_dong = words_dong
     word_util.genest_word = genest_word
 
     for code_i in range(30):
-        code_data = file_util.read_file_data('/Users/ganyuanrong/PycharmProjects/SdkTools/modifyXcodeProject/sdk_confuse/code_temples/code_%s.log' % code_i)
+        code_data = file_util.read_file_data(sdk_confuse_dir + 'code_temples/code_%s.log' % code_i)
         if code_data:
             oc_class_parser.code_temples.append(code_data)
 
     for code_i in range(20):
-        code_data = file_util.read_file_data('/Users/ganyuanrong/PycharmProjects/SdkTools/modifyXcodeProject/sdk_confuse/code_temples/code_if_%s.log' % code_i)
+        code_data = file_util.read_file_data(sdk_confuse_dir + 'code_temples/code_if_%s.log' % code_i)
         if code_data:
             oc_class_parser.code_if_temples.append(code_data)
 
@@ -1926,7 +1926,13 @@ if __name__ == '__main__':
     #添加垃圾代码
     var_exclude_dirs = ['AFNetworking', 'YYModel']
     var_exclude_files = []
-    src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK'
+    # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/login/view_v1'
+    src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/Common'
+    # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK'
     # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/FLSDK'
     add_code(src_path, var_exclude_dirs, var_exclude_files)
+
+    # for i in range(20):
+    #     oc_class_parser.create_method_content()
+
     print 'end'

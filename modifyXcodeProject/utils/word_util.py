@@ -9,6 +9,8 @@ sys.setdefaultencoding('utf-8') #设置默认编码,只能是utf-8,下面\u4e00-
 import os
 import re
 
+word_26 = 'qwertyuiopasdfghjklzxcvbnm'
+
 genest_word = []
 words_dong = []
 words_name = []
@@ -100,6 +102,6 @@ def generateIntArr(count):
         while a_value in intArr:
             a_value = random.randint(1, 100000)
 
-        intArr.append(a_value)
+        intArr.append(str(a_value))
 
     return intArr
