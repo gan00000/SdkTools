@@ -31,7 +31,7 @@ numbers_params_type = ['float', 'int', 'long', 'NSInteger','CGFloat']
 
 #找出方法名字，修改方法名
 def create_operation_expression(rightVar):
-    value1 = random.randint(-100, 9999)
+    value1 = random.randint(1, 9999)
     content = str(value1)
     operation_count = random.randint(1, 8)
     # if (operation_count == 0):
@@ -39,8 +39,8 @@ def create_operation_expression(rightVar):
     for c in range(operation_count):
         operation_type = operation_arr[random.randint(0, len(operation_arr) -1)]
         content = content + ' ' + operation_type + ' ' + str(random.randint(1, 9999))
-    operation_type = operation_arr[random.randint(0, len(operation_arr) - 1)]
-    content = rightVar + ' ' + operation_type + ' (' + content + ')'
+    operation_type = operation_arr[random.randint(0, len(operation_arr) - 2)]
+    content = rightVar + ' ' + operation_type + ' ' + content
     return content
 
 def create_case_expression(leftVar, rightVar):
