@@ -24,7 +24,8 @@ words_gl = []
 
 method_access = ['-', '+']
 method_param_type_list = ['NSString *', 'float', 'int', 'BOOL', 'NSArray *', 'NSDictionary *', 'long', 'NSData *', 'NSString *', 'NSInteger', 'CGFloat', 'NSMutableDictionary *', 'NSObject *', 'NSMutableArray *']
-method_return_type_list = ['NSString *', 'void', 'float', 'int', 'BOOL', 'NSArray *', 'NSDictionary *', 'long', 'NSData *', 'NSString *', 'NSInteger', 'CGFloat', 'NSMutableDictionary *', 'NSObject *', 'NSMutableArray *']
+method_return_type_list = method_param_type_list[:]
+method_return_type_list.append('void')
 
 numbers_params_type = ['float', 'int', 'long', 'NSInteger','CGFloat']
 
@@ -43,7 +44,7 @@ def create_operation_expression(rightVar):
     return content
 
 def create_case_expression(leftVar, rightVar):
-    case_count = random.randint(1, 10)
+    case_count = random.randint(1, 16)
     content = ''
     case_value_aar = []
     for c in range(case_count):
@@ -126,7 +127,7 @@ def createMehtodTemp(method_access):
     # print method_def
 
     method_implement = method_def.replace(';', '{ //insert method')
-    method_implement = '\n//===insert my method start=== \n' + method_implement
+    # method_implement = '\n//===insert my method start=== \n' + method_implement
     if params_count == 0:
         method_implement = method_implement + '\n\timp_mmmmmm_%s_imp' % (str(0))
         imp_mmmmmm_imp_inedx.append(0)
@@ -169,7 +170,8 @@ def createMehtodTemp(method_access):
                 return_content = '\n\t%s%s = nil;\n' % (method_return_type, waa)
                 return_content = return_content + '\treturn ' + waa + ';\n'
 
-    method_implement = method_implement + ('\n %s} \n//===insert my method end===\n' % return_content)
+    # method_implement = method_implement + ('\n %s} \n//===insert my method end===\n' % return_content)
+    method_implement = method_implement + ('\n %s}' % return_content)
 
     mi = MethodInfo()
     mi.methodParamsNameList = params_name
