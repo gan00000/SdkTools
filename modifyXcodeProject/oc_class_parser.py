@@ -194,7 +194,7 @@ def insert_method_extra_code(file_path, methods_list, property_list): #方法内
                                     method_param_insert = method_defind_params_list[
                                         random.randint(0, len(method_defind_params_list) - 1)]  # 随机抽出一个参数
                                     print '使用函数声明变量为条件判断插入code params:' + method_param_insert
-                                    code_temple = handle_code_temples(method_param_insert)
+                                    code_temple = create_code_temples(method_param_insert)
 
                                     code_method_temp_content = addCodeToSrcCode(code_method_temp_content, code_temple,
                                                                                 code_line, method_assess, property_list,
@@ -209,7 +209,7 @@ def insert_method_extra_code(file_path, methods_list, property_list): #方法内
                                 if local_params_appear_list:  # 出现过的本地变量参数
                                     method_param_insert = local_params_appear_list[
                                         random.randint(0, len(local_params_appear_list) - 1)]  # 随机抽出一个参数
-                                    code_temple = handle_code_temples(method_param_insert)
+                                    code_temple = create_code_temples(method_param_insert)
                                     print '使用本地变量为条件判断插入code params:' + method_param_insert
                                     code_method_temp_content = addCodeToSrcCode(code_method_temp_content, code_temple,
                                                                                 code_line, method_assess,property_list,
@@ -247,7 +247,7 @@ def insert_method_extra_code(file_path, methods_list, property_list): #方法内
                                     method_param_insert = method_defind_params_list[
                                         random.randint(0, len(method_defind_params_list) - 1)]  # 随机抽出一个参数
                                     print '使用函数声明变量为条件判断插入code params:' + method_param_insert
-                                    code_temple = handle_code_temples(method_param_insert)
+                                    code_temple = create_code_temples(method_param_insert)
                                     code_method_temp_content = addCodeToSrcCode(code_method_temp_content, code_temple,
                                                                                 code_line, method_assess, property_list, True,
                                                                                 insert_methods_list=methods_list)
@@ -261,7 +261,7 @@ def insert_method_extra_code(file_path, methods_list, property_list): #方法内
                                 if local_params_appear_list:
                                     method_param_insert = local_params_appear_list[
                                         random.randint(0, len(local_params_appear_list) - 1)]  # 随机抽出一个参数
-                                    code_temple = handle_code_temples(method_param_insert)
+                                    code_temple = create_code_temples(method_param_insert)
                                     print '使用本地变量为条件判断插入code params:' + method_param_insert
                                     code_method_temp_content = addCodeToSrcCode(code_method_temp_content, code_temple,
                                                                                 code_line, method_assess, property_list, True,
@@ -400,7 +400,7 @@ def code_temp_call_method(mehtod, method_assess): #调用插入的函数
         if len(call_content) > 0:
             call_content = call_content + '\tif(%s){}\n' % param_name
     if len(call_content) > 0:
-        call_content = replace_code_temp(call_content, '')
+        call_content = replace_code_placeholder(call_content, '')
     return call_content
 
 def addCodeToSrcCode(code_method_temp_content, code_temple, insert_line_content, method_assess, property_list, is_later=False, insert_methods_list=None):
@@ -443,53 +443,55 @@ def addCodeToSrcCode(code_method_temp_content, code_temple, insert_line_content,
 def insert_no_param_code():
     print '自动生成条件判断插入code'
     #条件表达式替换start
-    condition_var = handle_code_temple_condition()  #条件变量
+    condition_var = create_code_temple_condition()  #条件变量
 
     # 条件表达式替换end
 
-    code_temple = handle_code_temples(condition_var)
+    code_temple = create_code_temples(condition_var)
 
     # 替换代码模版中的内容end
     return code_temple
 
 
 #处理条件表达式模版
-def handle_code_temple_condition():
+def create_code_temple_condition():
     word_aar = []
-    method_param_insert_code = code_if_temples[random.randint(0, len(code_if_temples) - 1)] #随机抽出一个条件模版
-    method_param_insert_code_str_list = re.findall(r'ppppp\w+_ppppp', method_param_insert_code)
-    for ab in method_param_insert_code_str_list:
-        w1, w2 = word_util.random_2words_not_same_inarr(word_aar)
-        method_param_insert_code = method_param_insert_code.replace(ab, w1 + w1.capitalize())
-    method_param_insert_code_num_list = re.findall(r'iiiii\w+_iiiii', method_param_insert_code)
-    for ab in method_param_insert_code_num_list:
-        numbera = random.randint(1, 10000)
-        method_param_insert_code = method_param_insert_code.replace(ab, str(numbera))
-
-    code_int_temple_params_list = re.findall(r'int\w+_int', method_param_insert_code)  # int\w+_int需要时正整数
-    for code_int_temple_param in code_int_temple_params_list:
-        int_value = random.randint(1, 10000)
-        method_param_insert_code = method_param_insert_code.replace(code_int_temple_param, str(int_value))
-
-    return method_param_insert_code
-
+    code_if_temple = code_if_temples[random.randint(0, len(code_if_temples) - 1)] #随机抽出一个条件模版
+    # method_param_insert_code_str_list = re.findall(r'ppppp\w+_ppppp', method_param_insert_code)
+    # for ab in method_param_insert_code_str_list:
+    #     w1, w2 = word_util.random_2words_not_same_inarr(word_aar)
+    #     method_param_insert_code = method_param_insert_code.replace(ab, w1 + w1.capitalize())
+    # method_param_insert_code_num_list = re.findall(r'iiiii\w+_iiiii', method_param_insert_code)
+    # for ab in method_param_insert_code_num_list:
+    #     numbera = random.randint(1, 10000)
+    #     method_param_insert_code = method_param_insert_code.replace(ab, str(numbera))
+    #
+    # code_int_temple_params_list = re.findall(r'int\w+_int', method_param_insert_code)  # int\w+_int需要时正整数
+    # for code_int_temple_param in code_int_temple_params_list:
+    #     int_value = random.randint(1, 10000)
+    #     method_param_insert_code = method_param_insert_code.replace(code_int_temple_param, str(int_value))
+    #
+    # return method_param_insert_code
+    return replace_code_placeholder(code_if_temple, '')
 
 #代码模版处理
-def handle_code_temples(condition_var):
+def create_code_temples(condition_var):
 
     code_temple = code_temples[random.randint(0, len(code_temples) - 1)]  # 随机抽出一个代码模版
 
-    code_temple = replace_code_temp(code_temple, condition_var)
+    code_temple = replace_code_placeholder(code_temple, condition_var)
 
     return code_temple
 
 
-def replace_code_temp(code_temple, condition_var):
+def replace_code_placeholder(code_temple, condition_var):
 
     word_aar = []
 
     # 替换代码模版中的内容start
-    code_temple = code_temple.replace('var_temp', condition_var)  # 添加表达式替换代码模版占位符
+    if condition_var and len(condition_var) > 0:
+        code_temple = code_temple.replace('var_temp', condition_var)  # 添加表达式替换代码模版占位符
+
     code_temple_params_list = re.findall(r'ppppp\w+_ppppp', code_temple)  # ppppp\w+_ppppp代表字符
     for code_temple_param in code_temple_params_list:
         w1, w2 = word_util.random_2words_not_same_inarr(word_aar)
@@ -637,7 +639,7 @@ def create_method_boj(method_access):
 
         for i in imp_mmmmmm_imp_index:
             method_param_insert = mi.methodParamsNameList[random.randint(0, len(mi.methodParamsNameList) - 1)]
-            code_temple = handle_code_temples(method_param_insert)
+            code_temple = create_code_temples(method_param_insert)
             imp_mmmmmm_imp = 'imp_mmmmmm_%s_imp' % i
             # print 'imp_mmmmmm_imp=' + imp_mmmmmm_imp
             mi.methodContent = mi.methodContent.replace(imp_mmmmmm_imp, code_temple)

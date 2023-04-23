@@ -1771,7 +1771,7 @@ if __name__ == '__main__':
     word_util.words_dong = words_dong
     word_util.genest_word = genest_word
 
-    for code_i in range(30):
+    for code_i in range(50):
         code_data = file_util.read_file_data(sdk_confuse_dir + 'code_temples/code_%s.log' % code_i)
         if code_data:
             oc_class_parser.code_temples.append(code_data)
