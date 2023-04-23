@@ -28,7 +28,7 @@ method_param_type_list = ['NSString *', 'float', 'int', 'BOOL', 'NSArray *', 'NS
 method_return_type_list = method_param_type_list[:]
 method_return_type_list.append('void')
 
-numbers_params_type = ['float', 'int', 'long', 'NSInteger','CGFloat']
+numbers_params_type = ['float', 'int', 'long', 'NSInteger', 'CGFloat']
 
 #找出方法名字，修改方法名
 def create_operation_expression(rightVar):

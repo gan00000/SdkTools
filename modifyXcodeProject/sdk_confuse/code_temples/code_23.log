@@ -16,6 +16,6 @@
           ppppp9_ppppp += int5_int;
           [ppppp1_ppppp setObject: @(ppppp9_ppppp) forKey:@"ppppp8_ppppp"];
              
-          if (ppppp9_ppppp  numcop2_numcop int4_int) {
+          if (ppppp9_ppppp numcop2_numcop int4_int) {
               ppppp9_ppppp = ppppp10_ppppp;
           }

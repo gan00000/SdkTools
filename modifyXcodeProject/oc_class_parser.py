@@ -51,7 +51,12 @@ def insert_class_property(file_path_m):
     insert_property_list = []
     file_path_h = file_path_m.replace('.m', '.h')
     file_data_h = file_util.read_file_data(file_path_h)
+
     if file_data_h:
+
+        (path, file_name) = os.path.split(file_path_m)
+        if '+' in file_name: #分类不插入属性，代码会报错
+            return insert_property_list
         interface_content_list = re.findall(r'@interface[\s\S]*@end', file_data_h)
         if interface_content_list:
             property_tag_list = re.findall(r'@property.+ \*?\w+;', interface_content_list[0])
@@ -185,14 +190,13 @@ def insert_method_extra_code(file_path, methods_list, property_list): #方法内
                             and ('\\' not in code_line):
 
                         is_insert_nouse_code = random.randint(0, 10)
-                        if is_insert_nouse_code > 9:  # 该逗号是否插入代码
+                        if is_insert_nouse_code > 8:  # 该逗号是否插入代码
 
                             code_params_type = random.randint(0, 3)
                             if code_params_type == 0:  # 函数声明参数设置条件
                                 if method_defind_params_list:
 
-                                    method_param_insert = method_defind_params_list[
-                                        random.randint(0, len(method_defind_params_list) - 1)]  # 随机抽出一个参数
+                                    method_param_insert = method_defind_params_list[random.randint(0, len(method_defind_params_list) - 1)]  # 随机抽出一个参数
                                     print '使用函数声明变量为条件判断插入code params:' + method_param_insert
                                     code_temple = create_code_temples(method_param_insert)
 
