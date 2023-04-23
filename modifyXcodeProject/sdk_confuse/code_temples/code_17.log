@@ -6,7 +6,7 @@
         int ppppp5_ppppp = int5_int;
         int ppppp6_ppppp = int6_int;
 
-        if (ppppp1_ppppp < int7_int){
+        if (ppppp1_ppppp numcop1_numcop int7_int){
 
             ppppp2_ppppp -= 1;
             ppppp3_ppppp += ppppp2_ppppp;

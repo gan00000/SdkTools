@@ -3,7 +3,7 @@ import imp
 import sys
 
 from modifyXcodeProject import oc_class_parser, oc_method_util
-from modifyXcodeProject.utils import file_util, word_util
+from modifyXcodeProject.utils import file_util, word_util, datetime_util
 from modifyXcodeProject.utils.PrpCrypt import PrpCrypt
 
 imp.reload(sys)
@@ -161,6 +161,7 @@ def modify_oc_class_name(oc_path, xcode_project_path, oc_all_path, oc_exclude_di
 
     if os.path.exists(oc_path):
         list_dirs = os.walk(oc_path)
+        old_map_new_content = ''
         for root, dirs, files in list_dirs:
             for file_name in files:
 
@@ -262,9 +263,13 @@ def modify_oc_class_name(oc_path, xcode_project_path, oc_all_path, oc_exclude_di
 
                         handle_file_count = handle_file_count + 1
                         print '处理完成' + file_name
+                        old_map_new_content = old_map_new_content + file_name_no_extension + ' -------> ' + file_new_name_no_extension + '\n'
 
         wite_data_to_file(project_content_path, project_content)
         print '修改完成 file_count:' + str(file_count) + "  handle_file_count:" + str(handle_file_count)
+        class_change_log_path = os.path.splitext(xcode_project_path)[0] + 'class_change_%s.log' % datetime_util.get_current_time_2() #写更改类的日志
+        old_map_new_content = '===class change start===\n' + old_map_new_content
+        file_util.wite_data_to_file(class_change_log_path, old_map_new_content)
 
 
 #oc_path 所有源文件，置于一个单独目录最好
@@ -1926,7 +1931,7 @@ if __name__ == '__main__':
     #添加垃圾代码
     var_exclude_dirs = ['AFNetworking', 'YYModel']
     var_exclude_files = []
-    src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/login/'
+    src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/'
     # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/Common'
     # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK'
     # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/FLSDK'

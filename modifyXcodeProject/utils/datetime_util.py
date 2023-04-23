@@ -15,5 +15,8 @@ def get_current_time():
     currentTime = currentDateAndTime.strftime("%Y-%m-%d %H:%M:%S")
     return currentTime
 
-# if __name__ == '__main__':
-#     print get_current_time()
+def get_current_time_2():
+    currentDateAndTime = datetime.now()
+    # print currentDateAndTime
+    currentTime = currentDateAndTime.strftime("%Y_%m_%d_%H_%M_%S")
+    return currentTime

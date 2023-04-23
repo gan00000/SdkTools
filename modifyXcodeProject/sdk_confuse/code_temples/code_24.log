@@ -1,0 +1,8 @@
+      int ppppp1_ppppp = int1_int;
+      NSMutableDictionary *ppppp2_ppppp = [NSMutableDictionary dictionaryWithCapacity:int2_int];
+      ppppp1_ppppp += int3_int;
+      [ppppp2_ppppp setObject: @(ppppp1_ppppp) forKey:@"ppppp3_ppppp"];
+      int ppppp4_ppppp = (int)ppppp1_ppppp;
+      if (ppppp4_ppppp numcop1_numcop int4_int) {
+            ppppp4_ppppp *= int5_int;
+      }

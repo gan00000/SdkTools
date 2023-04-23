@@ -20,6 +20,7 @@ import random
 
 operation_arr = ['+', '-', '*', '/']
 operation_bijiao_arr = ['>', '==', '<', '<=', '>=', '!=']
+bool_value_arr = ['YES', 'NO']
 words_gl = []
 
 method_access = ['-', '+']

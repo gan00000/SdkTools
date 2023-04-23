@@ -1,6 +1,6 @@
         
         NSDictionary *ppppp1_ppppp = @{dic_value_dic};
-        if (ppppp1_ppppp.count > iiiii1_iiiii){
+        if (ppppp1_ppppp.count numcop1_numcop iiiii1_iiiii){
 
             int ppppp12_ppppp = iiiii12_iiiii;
             int case_left_var = iiiii188_iiiii;

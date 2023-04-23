@@ -1,7 +1,7 @@
         
         int ppppp1_ppppp = iiiii1_iiiii;
         BOOL ppppp2_ppppp = NO;
-        if (ppppp1_ppppp > iiiii2_iiiii){
+        if (ppppp1_ppppp numcop1_numcop iiiii2_iiiii){
             
             ppppp2_ppppp = YES;
         }else{

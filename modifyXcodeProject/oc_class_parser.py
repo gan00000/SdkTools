@@ -22,7 +22,7 @@ import random
 code_temples = []
 code_if_temples = []
 
-params_not_use_list = ['rect', 'alertController'] #排除使用作为条件判断的参数
+params_not_use_list = ['rect', 'alertController', 'i'] #排除使用作为条件判断的参数
 insert_code_sum = 0
 
 #找出方法名字，修改方法名
@@ -67,9 +67,9 @@ def insert_class_property(file_path_m):
                             w1, w2 = word_util.random_2words_not_same_inarr(word_aar)
                             propertyName = w1.lower() + w2.capitalize()
                             if '*' in add_property_type:
-                                add_property_content = '@property (nonatomic, strong) %s%s;' %(add_property_type, propertyName)
+                                add_property_content = '@property (nonatomic, strong) %s%s;//===insert my property===' %(add_property_type, propertyName)
                             else:
-                                add_property_content = '@property (nonatomic, assign) %s %s;' % (add_property_type, propertyName)
+                                add_property_content = '@property (nonatomic, assign) %s %s;//===insert my property===' % (add_property_type, propertyName)
                             pi.propertyName = propertyName
                             pi.propertyType = add_property_type
                             insert_property_list.append(pi)
@@ -296,31 +296,44 @@ def insert_method_extra_code(file_path, methods_list, property_list): #方法内
                 #     print '\n'
 
 def insert_methods(file_path_m, sdk_confuse_dir): #类内插入方法
+
+    methods_list = []
+
     # 处理对应.h文件
     file_path_h = file_path_m.replace('.m', '.h')
     file_data_h = file_util.read_file_data(file_path_h)
     file_data_m = file_util.read_file_data(file_path_m)
 
-    # interface_content = re.findall(r'@interface[\s\S]*@end', file_data_h)
+    interface_content = ''
+    if file_data_h:
+        interface_content_list = re.findall(r'@interface[\s\S]+@end', file_data_h)
+        if interface_content_list:
+            if len(interface_content_list) > 1:
+                return methods_list
+            interface_content = interface_content_list[0]   #只处理一个文件只有一个类的情况，多个类的暂不处理
 
-    method_access = ''
-    method_tag_list_a = re.findall(r'\n- ?\(', file_data_m)
-    method_tag_list_b = re.findall(r'\n\+ ?\(', file_data_m)
-
-    if method_tag_list_a and len(method_tag_list_a) > 0 and len(method_tag_list_a) > len(method_tag_list_b):
-        method_access = '-'
-    else:
-        method_access = '+'
+    implementation_content_list = re.findall(r'@implementation[\s\S]+@end', file_data_m) #只处理一个文件只有一个类的情况，多个类的暂不处理
+    if not implementation_content_list or len(implementation_content_list) > 1:
+        return methods_list
+    implementation_content = implementation_content_list[0]
 
     # 找出类名
     class_def_content = re.findall(r'@implementation \w+', file_data_m)
     if class_def_content and len(class_def_content) > 0:
         class_name = class_def_content[0].replace('@implementation', '').replace(' ', '').strip()
 
-    implementation_content_list = re.findall(r'@implementation[\s\S]*@end', file_data_m)
-    methods_list = []
-    if implementation_content_list:
-        implementation_content = implementation_content_list[0]
+
+    method_access = ''
+    method_tag_list_a = re.findall(r'\n- ?\(', implementation_content) #成员方法属性个数 -
+    method_tag_list_b = re.findall(r'\n\+ ?\(', implementation_content) #类方法个数+
+
+    if method_tag_list_a and len(method_tag_list_a) > 0 and len(method_tag_list_a) > len(method_tag_list_b):
+        method_access = '-'
+    else:
+        method_access = '+'
+
+    if implementation_content:
+        # implementation_content = implementation_content_list[0]
         tempLog_path = sdk_confuse_dir + 'temp/tempLog.log'
         file_util.wite_data_to_file(tempLog_path, implementation_content)
         temp_log_content_lines = file_util.read_file_data_for_line(tempLog_path)
@@ -330,6 +343,7 @@ def insert_methods(file_path_m, sdk_confuse_dir): #类内插入方法
 
             line_a = line.strip()
             if line_a.startswith('- (') or line_a.startswith('-(') or line_a.startswith('-  (') \
+                    or line_a.startswith('+ (') or line_a.startswith('+(') or line_a.startswith('+  (') \
                     or line_a.startswith('@end'):  # 前面插入
                 is_insert_method = random.randint(0, 2)
                 if is_insert_method == 1:  # 随机是否需要增加方法
@@ -348,6 +362,16 @@ def insert_methods(file_path_m, sdk_confuse_dir): #类内插入方法
 
         file_data_m = file_data_m.replace(implementation_content, method_imp_content)
         file_util.wite_data_to_file(file_path_m, file_data_m)
+
+        if methods_list:
+            insert_m_content = ''
+            for m in methods_list:
+                insert_m_content = insert_m_content + m.method_def + '//insert method def\n'
+
+            if len(insert_m_content) > 0:
+                interface_content_new = interface_content.replace("@end", insert_m_content + "@end")
+                file_data_h = file_data_h.replace(interface_content, interface_content_new)
+                file_util.wite_data_to_file(file_path_h, file_data_h)
     return methods_list
 
 def code_temp_call_method(mehtod, method_assess): #调用插入的函数
@@ -392,9 +416,9 @@ def addCodeToSrcCode(code_method_temp_content, code_temple, insert_line_content,
             if property.propertyType in oc_method_util.numbers_params_type:
                 #赋值判断
                 if_code = oc_method_util.create_operation_expression_compare('self.%s' % (property.propertyName))
-                call_property = 'self.%s = %s;\nif(%s){}' % (property.propertyName, str(random.randint(1, 9999)), if_code)
+                call_property = 'self.%s = %s;\n\tif(%s){}' % (property.propertyName, str(random.randint(1, 9999)), if_code)
             else:
-                call_property = 'if(self.%s){}' % property.propertyName
+                call_property = '\tif(self.%s){}' % property.propertyName
 
             call_property_content = call_property_content + '\n\t' + call_property
 
@@ -478,6 +502,23 @@ def replace_code_temp(code_temple, condition_var):
     for code_int_temple_param in code_int_temple_params_list:
         int_value = random.randint(1, 10000)
         code_temple = code_temple.replace(code_int_temple_param, str(int_value))
+
+    code_float_temple_params_list = re.findall(r'float\d+_float', code_temple)  # float值
+    for float_value in code_float_temple_params_list:
+        int_value = random.randint(1, 10000)
+        float_v = float(int_value)
+        code_temple = code_temple.replace(float_value, str(float_v))
+
+    code_numcop_list = re.findall(r'numcop\d+_numcop', code_temple)  # 数值比较运算符
+    for numcop in code_numcop_list:
+        bijiao_s = oc_method_util.operation_bijiao_arr[random.randint(0, len(oc_method_util.operation_bijiao_arr) - 1)] #比较符号
+        code_temple = code_temple.replace(numcop, bijiao_s)
+
+    code_bool_list = re.findall(r'bool\d+_bool', code_temple)  # yes no
+    for boola in code_bool_list:
+        bool_value = oc_method_util.bool_value_arr[random.randint(0, len(oc_method_util.bool_value_arr) - 1)]  # 比较符号
+        code_temple = code_temple.replace(boola, bool_value)
+
     if 'case_content_case' in code_temple:
         w1, w2 = word_util.random_2words_not_same_inarr(word_aar)
         case_left_var = w1 + w2.capitalize()
