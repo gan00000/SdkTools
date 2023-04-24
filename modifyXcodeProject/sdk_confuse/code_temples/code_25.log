@@ -1,2 +1,2 @@
             float ppppp1_ppppp = float1_float;
-            if (@(ppppp1_ppppp).doubleValue numcop1_numcop 89) {}
+            if (@(ppppp1_ppppp).doubleValue numcop1_numcop int1_int) {}

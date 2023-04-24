@@ -1,0 +1,16 @@
+            float ppppp1_ppppp = float1_float;
+            int case_left_var = int2_int;
+            int case_right_var = int3_int;
+
+            if (@(ppppp1_ppppp).doubleValue numcop1_numcop int1_int) {
+
+                int ppppp2_ppppp = @(ppppp1_ppppp).intValue;
+                switch (ppppp2_ppppp) {
+                    
+                    case_content_case
+                        
+                    default:
+                        break;
+                }
+
+            }

@@ -34,7 +34,7 @@ numbers_params_type = ['float', 'int', 'long', 'NSInteger', 'CGFloat']
 def create_operation_expression(rightVar):
     value1 = random.randint(1, 9999)
     content = str(value1)
-    operation_count = random.randint(1, 8)
+    operation_count = random.randint(1, 5)
     # if (operation_count == 0):
     #     return content
     for c in range(operation_count):

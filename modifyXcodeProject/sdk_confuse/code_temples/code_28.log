@@ -1,0 +1,20 @@
+    NSArray *ppppp1_ppppp = @[array_value_array];
+
+          int ppppp2_ppppp = ppppp1_ppppp.count;
+         int ppppp3_ppppp = (int)ppppp2_ppppp;
+         int ppppp4_ppppp = int1_int;
+         int ppppp5_ppppp = int2_int;
+         if (ppppp3_ppppp numcop1_numcop ppppp5_ppppp) {
+             ppppp3_ppppp = ppppp5_ppppp;
+         }
+         while (ppppp4_ppppp <= ppppp3_ppppp) {
+            ppppp4_ppppp += 1;
+            ppppp3_ppppp /= ppppp4_ppppp;
+            ppppp3_ppppp += int3_int;
+            break;
+         }
+          [ppppp1_ppppp enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+              if (idx <= int4_int) {
+                  NSLog(@"enumerateObjectsUsingBlock:%@", obj);
+            }
+          }];
