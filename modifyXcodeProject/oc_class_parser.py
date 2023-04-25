@@ -5,6 +5,7 @@ import sys
 
 # from modifyXcodeProject import mw_ios_confuse
 from modifyXcodeProject import oc_method_util
+from modifyXcodeProject.model.MethodInfo import MethodInfo
 from modifyXcodeProject.model.PropertyInfo import PropertyInfo
 from modifyXcodeProject.utils import file_util, word_util, datetime_util
 
@@ -37,6 +38,8 @@ def parse(file_name, sdk_confuse_dir): #.m文件
             file_path = file_name
             # print 'handle file = ' + file_path
             print '正在处理: ' + file_name
+
+            # change_method_order(file_path)
 
             property_list_add = insert_class_property(file_path)
 
@@ -129,7 +132,7 @@ def insert_method_extra_code(file_path, methods_list, property_list): #方法内
             if line.startswith('}') or line.startswith('}\n'):  # 函数end
                 is_in_method = 0
                 print '正则处理方法: ' + method_defind_content
-                # print method_content
+                print '方法内容:' + method_content
                 method_content_temp = method_content
 
                 method_defind_params_list = parse_method_defind_params(method_defind_content)
@@ -667,3 +670,53 @@ def create_method_boj(method_access, ref_class_list):
 
     # mi.methodContent = method_implement
     return mi
+
+#修改方法顺序
+def change_method_order(file_path):
+
+    print '更换方法顺序中:' + file_path
+    if os.path.exists(file_path) and file_path.endswith('.m'):
+        file_data = file_util.read_file_data(file_path)
+        implementation_content_list = re.findall(r'@implementation[\s\S]+?@end', file_data)  # 只处理一个文件只有一个类的情况，多个类的暂不处理
+        if implementation_content_list and len(implementation_content_list) > 0:
+            haschange = 0
+            for implementation_content in implementation_content_list:
+                implementation_content_t = change_implementation_content(implementation_content)
+                if implementation_content == implementation_content_t:
+                    haschange = 0
+                else:
+                    haschange = 1
+                    file_data = file_data.replace(implementation_content, implementation_content_t)
+
+            if haschange == 1:
+                file_util.wite_data_to_file(file_path, file_data)
+
+
+def change_implementation_content(implementation_content): #抽出方法，替换位置
+
+    method_content_list = re.findall(r'\n[-+] ?\([\s\S]+?\n}\n', implementation_content)
+    # mi = MethodInfo()
+    # implementation_content_change = implementation_content
+
+    if method_content_list and len(method_content_list) > 1:
+
+        m_length = len(method_content_list)
+        list_indexs = []
+        m_temps = []
+        for index in range(m_length):
+            list_indexs.append(index)
+            method_content = method_content_list[index]
+            m_temp = 'AAAAA_method_%s_content_AAAAA' % str(index)
+            m_temps.append(m_temp)
+            implementation_content = implementation_content.replace(method_content, m_temp)
+
+        for m_temp in m_temps:
+            index_1 = random.randint(0, len(list_indexs) - 1)
+            index_value = list_indexs[index_1]
+            method_content_r = method_content_list[index_value]
+
+            # m_temp = m_temps[m_temp_index]
+            implementation_content = implementation_content.replace(m_temp, method_content_r)
+            list_indexs.remove(index_value)
+
+    return implementation_content
