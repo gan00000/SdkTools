@@ -57,7 +57,7 @@ def insert_class_property(file_path_m):
         (path, file_name) = os.path.split(file_path_m)
         if '+' in file_name: #分类不插入属性，代码会报错
             return insert_property_list
-        interface_content_list = re.findall(r'@interface[\s\S]*@end', file_data_h)
+        interface_content_list = re.findall(r'@interface[\s\S]+?@end', file_data_h)
         if interface_content_list:
             property_tag_list = re.findall(r'@property.+ \*?\w+;', interface_content_list[0])
             if property_tag_list: #存在属性
@@ -310,19 +310,19 @@ def insert_methods(file_path_m, sdk_confuse_dir): #类内插入方法
 
     interface_content = ''
     if file_data_h:
-        interface_content_list = re.findall(r'@interface[\s\S]+@end', file_data_h)
+        interface_content_list = re.findall(r'@interface[\s\S]+?@end', file_data_h)
         if interface_content_list:
             if len(interface_content_list) > 1:
                 return methods_list
             interface_content = interface_content_list[0]   #只处理一个文件只有一个类的情况，多个类的暂不处理
 
-    implementation_content_list = re.findall(r'@implementation[\s\S]+@end', file_data_m) #只处理一个文件只有一个类的情况，多个类的暂不处理
+    implementation_content_list = re.findall(r'@implementation[\s\S]+?@end', file_data_m) #只处理一个文件只有一个类的情况，多个类的暂不处理
     if not implementation_content_list or len(implementation_content_list) > 1:
         return methods_list
     implementation_content = implementation_content_list[0]
 
     # 找出类名
-    class_def_content = re.findall(r'@implementation \w+', file_data_m)
+    class_def_content = re.findall(r'@implementation \w+\b', file_data_m)
     if class_def_content and len(class_def_content) > 0:
         class_name = class_def_content[0].replace('@implementation', '').replace(' ', '').strip()
 
