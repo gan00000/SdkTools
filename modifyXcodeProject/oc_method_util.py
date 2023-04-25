@@ -25,21 +25,21 @@ words_gl = []
 
 method_access = ['-', '+']
 method_param_type_list = ['NSString *', 'float', 'int', 'BOOL', 'NSArray *', 'NSDictionary *', 'long', 'NSData *', 'NSString *', 'NSInteger', 'CGFloat', 'NSMutableDictionary *', 'NSObject *', 'NSMutableArray *']
-method_return_type_list = method_param_type_list[:]
-method_return_type_list.append('void')
+# method_return_type_list = method_param_type_list[:]
+# method_return_type_list.append('void')
 
 numbers_params_type = ['float', 'int', 'long', 'NSInteger', 'CGFloat']
 
 #找出方法名字，修改方法名
 def create_operation_expression(rightVar):
-    value1 = random.randint(1, 9999)
+    value1 = random.randint(1, 999)
     content = str(value1)
     operation_count = random.randint(1, 5)
     # if (operation_count == 0):
     #     return content
     for c in range(operation_count):
         operation_type = operation_arr[random.randint(0, len(operation_arr) -1)]
-        content = content + ' ' + operation_type + ' ' + str(random.randint(1, 9999))
+        content = content + ' ' + operation_type + ' ' + str(random.randint(1, 999))
     operation_type = operation_arr[random.randint(0, len(operation_arr) - 2)]
     content = rightVar + ' ' + operation_type + ' ' + content
     return content
@@ -49,9 +49,9 @@ def create_case_expression(leftVar, rightVar):
     content = ''
     case_value_aar = []
     for c in range(case_count):
-        case_value = random.randint(-100, 10000)
+        case_value = random.randint(-100, 999)
         while case_value in case_value_aar:
-            case_value = random.randint(-100, 10000)
+            case_value = random.randint(-100, 999)
         # print case_value
         ex = create_operation_expression(rightVar)
         if ex:
@@ -72,12 +72,21 @@ def create_operation_expression_compare(rightVar):
 # def create_switch_expression(switchvar, leftVar):
 
 # -(void)startPayWithProductId_MMMethodMMM:(NSString *)productId cpOrderId_MMMethodMMM:(NSString *)cpOrderId extra_MMMethodMMM:(NSString *)extra gameInfo_MMMethodMMM:(GameUserModel*)gameUserModel accountModel_MMMethodMMM:
-def createMehtodTemp(method_access):
+def createMehtodTemp(method_access, ref_class_list):#ref_class_list为该类中用到有的对象类型
     params_count = random.randint(0, 8) #随机参数个数
     params_type = []
+    method_param_type_list_a = method_param_type_list[:]
+    if ref_class_list and len(ref_class_list) > 0:
+        for type in ref_class_list:
+            if type not in method_param_type_list_a and type != 'NSException *':
+                method_param_type_list_a.append(type)
+
+
     for c in range(params_count):
-        params_type.append(method_param_type_list[random.randint(0, len(method_param_type_list) - 1)]) #随机一个参数类型
+        params_type.append(method_param_type_list_a[random.randint(0, len(method_param_type_list_a) - 1)]) #随机一个参数类型
     method_access_a = method_access #method_access[random.randint(0, len(method_access) - 1)] #随机类或者成员方法
+    method_return_type_list = method_param_type_list_a[:]
+    method_return_type_list.append('void')
     method_return_type = method_return_type_list[random.randint(0, len(method_return_type_list) - 1)]
     method_def = method_access_a + ' (' + method_return_type + ')'
 

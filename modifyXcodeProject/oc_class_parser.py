@@ -326,6 +326,18 @@ def insert_methods(file_path_m, sdk_confuse_dir): #类内插入方法
     if class_def_content and len(class_def_content) > 0:
         class_name = class_def_content[0].replace('@implementation', '').replace(' ', '').strip()
 
+    #找出该类用到的相关类名，用来声明方法的时候使用
+    # ref_class_list = re.findall(r'(?=\b[A-Z]\w+ \*\w+\b)\b[A-Z][a-zA-Z]+ \*', file_data_m)
+    # print ref_class_list
+    ref_class_list = []
+    if file_data_h:
+        ref_class_list_in_h = re.findall(r'(?=[ (][A-Z]\w+ \*\)?\w+\b)[ (][A-Z]\w+ \*', file_data_h)
+        if ref_class_list_in_h:
+            for class_a in ref_class_list_in_h:
+                class_a = class_a.replace('(', '')
+                ref_class_list.append(class_a)
+    print ref_class_list
+
 
     method_access = ''
     method_tag_list_a = re.findall(r'\n- ?\(', implementation_content) #成员方法属性个数 -
@@ -356,7 +368,7 @@ def insert_methods(file_path_m, sdk_confuse_dir): #类内插入方法
                     insert_time = datetime_util.get_current_time()
 
                     for mc in range(method_count):
-                        method = create_method_boj(method_access)
+                        method = create_method_boj(method_access, ref_class_list)
                         method.class_name = class_name
                         methods_list.append(method)
                         line = ('\n//===insert my method start=== %s\n' % insert_time) + method.methodContent + ('\n//===insert my method end=== %s\n' % insert_time) + line
@@ -635,10 +647,10 @@ def parse_method_defind_params(method_data): #解析方法前面变量
 
     return None
 
-def create_method_boj(method_access):
+def create_method_boj(method_access, ref_class_list):
 
      #生成的方法内容、方法定义、参数类型数组、参数名称数组、插入占位符数组
-    mi, imp_mmmmmm_imp_index = oc_method_util.createMehtodTemp(method_access)
+    mi, imp_mmmmmm_imp_index = oc_method_util.createMehtodTemp(method_access, ref_class_list)
     if len(mi.methodParamsNameList) > 0:
 
         for i in imp_mmmmmm_imp_index:
