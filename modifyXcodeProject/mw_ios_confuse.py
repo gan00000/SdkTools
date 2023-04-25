@@ -1937,7 +1937,4 @@ if __name__ == '__main__':
     # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/FLSDK'
     add_code(src_path, var_exclude_dirs, var_exclude_files)
 
-    # for i in range(20):
-    #     oc_class_parser.create_method_content()
-
     print 'end'

@@ -331,7 +331,8 @@ def insert_methods(file_path_m, sdk_confuse_dir): #类内插入方法
     # print ref_class_list
     ref_class_list = []
     if file_data_h:
-        ref_class_list_in_h = re.findall(r'(?=[ (][A-Z]\w+ \*\)?\w+\b)[ (][A-Z]\w+ \*', file_data_h)
+        file_data_h_no_anno = removeAnnotate(file_data_h)
+        ref_class_list_in_h = re.findall(r'(?=[ (][A-Z]\w+ \*\)?\w+\b)[ (][A-Z]\w+ \*', file_data_h_no_anno)
         if ref_class_list_in_h:
             for class_a in ref_class_list_in_h:
                 class_a = class_a.replace('(', '')
@@ -617,17 +618,17 @@ def parse_method_local_params(method_data): #解析方法局部变量
     return None
 
 #删除注释
-def removeAnnotate(method_data_temp):
+def removeAnnotate(code_data):
     # file_data_0 = replace_data_content(src_data, '/\\*\\*/', '')
     # file_data_1 = replace_data_content(file_data_0, '([^:/])//.*', '\\1')
     # file_data_2 = replace_data_content(file_data_1, '^//.*', '')
     # file_data_3 = replace_data_content(file_data_2, '/\\*{1,2}[\\s\\S]*?\\*/', '')
     # 先删掉注释，不然会拿到注释的变量
     # method_data_temp = re.sub(r'^//.*', '', method_data_temp)
-    method_data_temp = re.sub(r'//[\s\S]*?\n', '\n', method_data_temp)
+    code_data = re.sub(r'//[\s\S]*?\n', '\n', code_data)
     # method_data_temp = re.sub(r'^ *//.*', '', method_data_temp)  #//[\s\S]*?\n
-    method_data_temp = re.sub(r'/\*{1,2}[\s\S]*?\*/', '', method_data_temp)  # 非贪婪模式
-    return method_data_temp
+    code_data = re.sub(r'/\*{1,2}[\s\S]*?\*/', '', code_data)  # 非贪婪模式
+    return code_data
 
 
 def parse_method_defind_params(method_data): #解析方法前面变量
