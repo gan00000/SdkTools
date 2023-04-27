@@ -112,21 +112,6 @@ def random_word_for_image():
     return new_word
 
 
-def random_word_for_method():#产生方法名称替代代码方法，使用defind
-
-    for i in range(300):
-
-        first_index = random.randint(0, len(genest_word)-1)
-        sec_index = random.randint(0, len(genest_word) - 1)
-        if first_index == sec_index:
-            sec_index = random.randint(0, len(genest_word) - 1)
-
-        first_word = genest_word[first_index]
-        sec_word = genest_word[sec_index]
-
-        new_word = first_word.lower() + sec_word.capitalize()
-        print new_word
-
 word_oc_method_temp = []
 def random_word_for_no_use_method():
 
@@ -785,161 +770,6 @@ method_return_type = ['void', 'NSString *', 'BOOL', 'CGFloat', 'NSUInteger']
 method_params_type = ['NSString *', 'BOOL', 'CGFloat', 'NSUInteger']
 jisuan_type = ['*', '/', '+', '-']
 
-property_type = ['@property (nonatomic, copy) NSString *', '@property (nonatomic, assign) BOOL ', '@property (nonatomic, strong) NSDictionary *', '@property (nonatomic, assign) NSUInteger ',
-                 '@property(nonatomic, weak) id ', '@property (nonatomic, assign) CGFloat ']
-def addNoUseMethodAndProperty(src_dir_path, exclude_dirs, exclude_files):
-    if not os.path.exists(src_dir_path):
-        print("src_dir_path not exist")
-        return
-
-    list_dirs = os.walk(src_dir_path)
-    for root, dirs, files in list_dirs:
-
-        exclude_dir_flag = 0
-        for exclude_dir in exclude_dirs:
-            if exclude_dir in root:
-                exclude_dir_flag = 1
-        if exclude_dir_flag == 1:
-            continue
-
-        for file_name in files:
-            if file_name == ".DS_Store":
-                continue
-
-            if file_name in exclude_files:
-                continue
-            # if 'AFNetworking' in root or 'YYModel' in root:
-            #     continue
-
-            if file_name.endswith('.m') or file_name.endswith('.h') or file_name.endswith('.mm'):
-                file_path = os.path.join(root, file_name)
-
-                f_obj = open(file_path, "r")
-                text_lines = f_obj.readlines()
-
-                content = ''
-                has_implementation = 0
-                print '处理中  ' + file_name
-                for line in text_lines:
-                    # print chardet.detect(line)
-                    line = line.decode('utf-8')
-
-                    if has_implementation == 0 and '@implementation' in line:
-                        has_implementation = 1
-
-                    if has_implementation == 1 and file_name.endswith('.m') and (line.startswith('- (') or line.startswith('+ (')): #方法插入位置
-
-                        # method_public = '+'
-                        # if line.startswith('+'):
-                        #     method_public = '+'
-                        # else:
-                        #     method_public = '-'
-                        method_public_private = random.randint(1, 5)
-                        if method_public_private >= 4:
-                            method_public = '+'
-                        else:
-                            method_public = '-'
-
-                        isneed = random.randint(1, 20) #随机决定是否改行需要添加无用方法
-                        if 6 <= isneed <= 10:#添加
-
-                            method_count = random.randint(1, 3) #随机产生插入的方法数量
-                            new_add_method_content = ''
-                            for i in range(method_count):
-
-                                return_type = method_return_type[random.randint(0, len(method_return_type)-1)] #随机方法返回类型
-                                noUserMethod_name = random_word_for_no_use_method()
-
-                                method_content = '\n' + method_public + ' ' + '(' + return_type + ')' + noUserMethod_name
-
-                                params_counts = random.randint(0, 5) #随机参数个数,最大5个
-                                if params_counts == 0:
-
-                                    if return_type == 'void':
-                                        params_word1 = random_1word()
-                                        params_word2 = random_1word()
-                                        method_some_things = '[NSString stringWithFormat:@"%s", @"%s" , @"%s"];' % ('%@%@', params_word1, params_word2)
-                                        method_content = method_content + '\n{\n    %s \n}' % (method_some_things)
-
-                                    elif return_type == 'NSString *':
-                                        params_word1 = random_1word()
-                                        params_word2 = random_1word()
-                                        method_some_things = 'return [NSString stringWithFormat:@"%s", @"%s" , @"%s"];' % ('%@%@',params_word1, params_word2)
-                                        method_content = method_content + '\n{\n    %s \n}' % (method_some_things)
-                                    elif return_type == 'BOOL' or return_type == 'CGFloat' or return_type == 'NSUInteger':
-                                        params_word1 = random.randint(1, 10000000)
-                                        params_word2 = random.randint(0, 10000000)
-                                        params_word3 = random.randint(0, 10000000)
-                                        method_some_things = 'return %s * %s + %s ;' % (params_word1, params_word2, params_word3)
-                                        method_content = method_content + '\n{\n    %s \n}' % (method_some_things)
-
-                                else:
-                                    params_type_string = []
-                                    params_type_string = []
-                                    params_type_string = []
-
-                                    for m in range(params_counts):
-                                        params_word = random_1word()
-                                        params_type = method_params_type[random.randint(0, len(method_params_type)-1)] #随机参数类型
-                                        if m == 0:
-                                            method_content = method_content + ':(' + params_type + ')' + params_word
-                                        else:
-                                            method_content = method_content + " " + params_word + ':(' + params_type + ')' + params_word
-
-
-                                    if return_type == 'void':
-                                        params_word1 = random_1word()
-                                        params_word2 = random_1word()
-                                        method_some_things = '[NSString stringWithFormat:@"%s", @"%s" , @"%s"];' % ('%@%@', params_word1, params_word2)
-                                        method_content = method_content + '\n{\n    %s \n}' % (method_some_things)
-
-                                    elif return_type == 'NSString *':
-                                        params_word1 = random_1word()
-                                        params_word2 = random_1word()
-                                        method_some_things = 'return [NSString stringWithFormat:@"%s", @"%s" , @"%s"];' % ('%@%@',params_word1, params_word2)
-                                        method_content = method_content + '\n{\n    %s \n}' % (method_some_things)
-                                    elif return_type == 'BOOL' or return_type == 'CGFloat' or return_type == 'NSUInteger':
-                                        params_word1 = random.randint(1, 10000000)
-                                        params_word2 = random.randint(0, 10000000)
-                                        params_word3 = random.randint(0, 10000000)
-                                        method_some_things = 'return %s * %s + %s ;' % (params_word1, params_word2, params_word3)
-                                        method_content = method_content + '\n{\n    %s \n}' % (method_some_things)
-
-                                    # method_content = method_content + '\n{\n    %s \n}' % (" ")
-
-                                new_add_method_content = new_add_method_content + method_content
-                            content = content + new_add_method_content + '\n' + line
-
-
-
-                        else:
-                            content = content + line
-                    elif line.startswith('@interface') or line.startswith('@property'):#属性插入
-
-                        isneed = random.randint(1, 20)
-                        if 6 <= isneed <= 12:
-
-                            property_a = property_type[random.randint(0, len(property_type)-1)]
-                            aaa = random.randint(1, 2) #决定是双单词还是三个单词，为了防止与原属性重复，设置长一点
-                            if aaa == 1:
-                                afirst, bsecond = random_2word()
-                                property_name = random_1word().lower() + afirst.capitalize() + bsecond.capitalize()
-                            else:
-                                afirst, bsecond = random_2word()
-                                property_name = afirst.lower()+bsecond.capitalize()
-
-                            property_content = property_a + property_name + ';'
-                            content = content + line + property_content + '\n'
-
-                        else:
-                            content = content + line
-
-
-                    else:
-                        content = content + line
-
-                wite_data_to_file(file_path, content)
-
 
 def addNoUseMethodForCpp(src_dir_path, exclude_dirs, exclude_files):
     if not os.path.exists(src_dir_path):
@@ -1044,215 +874,6 @@ def haveOfforceInSources(oc_path, xofforce):
         return False
 
     return False
-
-def modify_method_params(src_dir, exclude_dirs, exclude_files, var_exclude_bian):
-
-    all_var_new = []
-    if os.path.exists(src_dir):
-        list_dirs = os.walk(src_dir)
-        for root, dirs, files in list_dirs:
-            for file_name in files:
-
-                if file_name == ".DS_Store" or file_name in exclude_files:
-                    continue
-
-                if file_name.endswith('.m'):#
-                    file_path = os.path.join(root, file_name)  # 头文件路径
-                    file_data = read_file_data(file_path)
-
-                    # 读取方法内容
-                    f_obj = open(file_path, "r")
-                    text_lines = f_obj.readlines()
-
-                    method_content = ''
-                    is_in_method = 0
-                    for line in text_lines:
-                        # print chardet.detect(line)
-                        line = line.decode('utf-8')
-                        # line = line.strip()
-                        # 方法开始
-                        if line.startswith('- (') or line.startswith('+ (') or line.startswith('-  (') or line.startswith('+  (') or line.startswith('-(') or line.startswith('+('):
-                            is_in_method = 1
-                            method_content = ''
-
-                        if is_in_method == 1:
-                            method_content = method_content + line
-
-                        if is_in_method == 1 and line.startswith('}'): #方法结束
-                            is_in_method = 0
-                            print method_content
-
-                            method_content_temp = method_content
-
-                            params_arr = []
-                            aresults = re.findall('\\*[ ]*\\w+\\b', method_content) #函数内定义的指针类型的变量
-                            bresult = re.findall('\\* *\\w*\\)\\w+\\b ', method_content)  #函数参数指针类型的变量
-                            if aresults:
-
-                                for ax in aresults:
-                                    axxx = ax.replace('*', '').strip()
-                                    if '_Nullable' in axxx or axxx in var_exclude_bian:
-                                        continue
-                                    params_arr.append(axxx)
-
-                            if bresult:
-
-                                for ax in bresult:
-                                    axxx = ax.replace(' ', '').strip()
-                                    axxx = axxx.replace('*)', '')
-                                    if '_Nullable' in axxx or axxx in var_exclude_bian:
-                                        continue
-                                    params_arr.append(axxx)
-
-                            print params_arr
-                            if params_arr:
-                                new_param_temp = []
-                                for a_param in params_arr: #更换参数
-
-                                    if a_param in ['0','1','2','3']:
-                                        continue
-
-                                    a_param_a = a_param
-                                    first_wm, sec_w = random_2word()
-                                    new_param = 'mwGg' + first_wm.capitalize() + sec_w.capitalize()
-                                    while new_param in new_param_temp:
-                                        first_wm, sec_w = random_2word()
-                                        new_param = 'mwGg' + first_wm.capitalize() + sec_w.capitalize()
-
-                                    #把.xxx这种不能替换，可能是其他类的属性
-                                    # method_content_temp = method_content_temp.replace('.' + a_param_a, 'AAAAAAA')
-                                    # method_content_temp = method_content_temp.replace(a_param_a, new_param)
-                                    # method_content_temp = method_content_temp.replace('AAAAAAA' , '.' + a_param_a)
-                                    method_content_temp = re.sub('\.' + a_param_a + '\\b', ' _AAAAAAA_ ', method_content_temp)
-                                    #同名方法名称剔除
-                                    method_content_temp = re.sub('\\b' + a_param_a + ':', ' _BBBBBBB_ ',method_content_temp)
-
-
-                                    method_content_temp = re.sub('\\b' + a_param_a + '\\b', new_param, method_content_temp)
-                                    method_content_temp = re.sub(' _AAAAAAA_ ', '.' + a_param_a,  method_content_temp)
-
-                                    method_content_temp = re.sub(' _BBBBBBB_ ',  a_param_a + ':', method_content_temp)
-
-                                    new_param_temp.append(new_param)
-                                    if not new_param in all_var_new:
-                                        all_var_new.append(new_param)
-
-                            file_data = file_data.replace(method_content, method_content_temp)
-                            method_content = ''
-                            method_content_temp = ''
-
-                    wite_data_to_file(file_path, file_data)
-
-
-
-        # wite_data_to_file(project_content_path, project_content)
-
-    print "all_var_new: %s" % all_var_new
-
-
-def modify_class_property(src_dir, exclude_dirs, exclude_files, var_exclude_bian):
-
-    all_var_new = []
-    if os.path.exists(src_dir):
-        list_dirs = os.walk(src_dir)
-        for root, dirs, files in list_dirs:
-            for file_name in files:
-
-                if file_name == ".DS_Store" or file_name in exclude_files:
-                    continue
-
-                if file_name.endswith('.m') or file_name.endswith('.h'):#
-                    file_path = os.path.join(root, file_name)  # 头文件路径
-                    file_data = read_file_data(file_path)
-
-                    # 读取方法内容
-                    f_obj = open(file_path, "r")
-                    text_lines = f_obj.readlines()
-
-                    method_content = ''
-                    is_in_method = 0
-                    for line in text_lines:
-                        # print chardet.detect(line)
-                        line = line.decode('utf-8')
-                        # line = line.strip()
-                        # 方法开始
-                        if line.startswith('- (') or line.startswith('+ (') or line.startswith('-  (') or line.startswith('+  (') or line.startswith('-(') or line.startswith('+('):
-                            is_in_method = 1
-                            method_content = ''
-
-                        if is_in_method == 1:
-                            method_content = method_content + line
-
-                        if is_in_method == 1 and line.startswith('}'): #方法结束
-                            is_in_method = 0
-                            print method_content
-
-                            method_content_temp = method_content
-
-                            params_arr = []
-                            aresults = re.findall('\\*[ ]*\\w+\\b', method_content) #函数内定义的指针类型的变量
-                            bresult = re.findall('\\* *\\w*\\)\\w+\\b ', method_content)  #函数参数指针类型的变量
-                            if aresults:
-
-                                for ax in aresults:
-                                    axxx = ax.replace('*', '').strip()
-                                    if '_Nullable' in axxx or axxx in var_exclude_bian:
-                                        continue
-                                    params_arr.append(axxx)
-
-                            if bresult:
-
-                                for ax in bresult:
-                                    axxx = ax.replace(' ', '').strip()
-                                    axxx = axxx.replace('*)', '')
-                                    if '_Nullable' in axxx or axxx in var_exclude_bian:
-                                        continue
-                                    params_arr.append(axxx)
-
-                            print params_arr
-                            if params_arr:
-                                new_param_temp = []
-                                for a_param in params_arr: #更换参数
-
-                                    if a_param in ['0','1','2','3']:
-                                        continue
-
-                                    a_param_a = a_param
-                                    first_wm, sec_w = random_2word()
-                                    new_param = 'mwGg' + first_wm.capitalize() + sec_w.capitalize()
-                                    while new_param in new_param_temp:
-                                        first_wm, sec_w = random_2word()
-                                        new_param = 'mwGg' + first_wm.capitalize() + sec_w.capitalize()
-
-                                    #把.xxx这种不能替换，可能是其他类的属性
-                                    # method_content_temp = method_content_temp.replace('.' + a_param_a, 'AAAAAAA')
-                                    # method_content_temp = method_content_temp.replace(a_param_a, new_param)
-                                    # method_content_temp = method_content_temp.replace('AAAAAAA' , '.' + a_param_a)
-                                    method_content_temp = re.sub('\.' + a_param_a + '\\b', ' _AAAAAAA_ ', method_content_temp)
-                                    #同名方法名称剔除
-                                    method_content_temp = re.sub('\\b' + a_param_a + ':', ' _BBBBBBB_ ',method_content_temp)
-
-
-                                    method_content_temp = re.sub('\\b' + a_param_a + '\\b', new_param, method_content_temp)
-                                    method_content_temp = re.sub(' _AAAAAAA_ ', '.' + a_param_a,  method_content_temp)
-
-                                    method_content_temp = re.sub(' _BBBBBBB_ ',  a_param_a + ':', method_content_temp)
-
-                                    new_param_temp.append(new_param)
-                                    if not new_param in all_var_new:
-                                        all_var_new.append(new_param)
-
-                            file_data = file_data.replace(method_content, method_content_temp)
-                            method_content = ''
-                            method_content_temp = ''
-
-                    wite_data_to_file(file_path, file_data)
-
-
-
-        # wite_data_to_file(project_content_path, project_content)
-
-    print "all_var_new: %s" % all_var_new
 
 
 #找出方法名字，修改方法名
@@ -1744,7 +1365,29 @@ def add_code(src_dir_path,exclude_dirs,exclude_files):#添加垃圾代码
                 if file_name.endswith('.m'):
                     file_path = os.path.join(root, file_name)
                     oc_class_parser.parse(file_path, sdk_confuse_dir)
+                    # oc_class_parser.change_method_params_name(file_path)
 
+def change_method_params_name(src_dir_path,exclude_dirs,exclude_files):#修改方法本地变量
+
+    if os.path.exists(src_dir_path):
+        list_dirs = os.walk(src_dir_path)
+        for root, dirs, files in list_dirs:
+
+            has_exclude_dir = 0
+            for exclude_dir in exclude_dirs:
+                if exclude_dir in root:
+                    has_exclude_dir = 1
+
+            if has_exclude_dir == 1:
+                continue
+
+            for file_name in files:
+                if file_name in exclude_files:
+                    continue
+                if file_name.endswith('.m'):
+                    file_path = os.path.join(root, file_name)
+                    # oc_class_parser.parse(file_path, sdk_confuse_dir)
+                    oc_class_parser.change_method_params_name(file_path)
 
 if __name__ == '__main__':
 
@@ -1754,9 +1397,9 @@ if __name__ == '__main__':
     # oc_modify_path = '/Users/ganyuanrong/iOSProject/game_mw_sdk_ios_v3/MW_OBS_V3/FLSDK'
 
 
-    xcode_project_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
-    oc_all_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK'
-    oc_modify_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK'
+    xcode_project_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v6/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
+    oc_all_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v6/GamaSDK_iOS_Integration/FLSDK'
+    oc_modify_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v6/GamaSDK_iOS_Integration/FLSDK'
 
 
     handle_file_count = 0
@@ -1787,14 +1430,13 @@ if __name__ == '__main__':
     # modify_sdk_bundle_image_name("/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/Resources/GOT/SDKResourcesV5.bundle/",
     #                              image_ref_path, image_exclude_files)
 
-    # changeImageNameForDefindHeader('/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/Resources/GOT/SDKResourcesV5.bundle/',
-    #                                '/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/obfuscation/imageNameHeader.h')
+    # 1.1. 修改已经定义好的defind图片名称
+    # changeImageNameForDefindHeader('/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v6/GamaSDK_iOS_Integration/Resources/V6/SDKResourcesV6.bundle',
+    #                                '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v6/GamaSDK_iOS_Integration/obfuscation/imageNameHeader.h')
 
-    # 2.添加垃圾方法和属性 (打乱方法顺序)
-    # oc_all_path = '/Users/ganyuanrong/Desktop/Default-moqumiaowan_9.27-Release-1.0_scussce/Libraries/'
-    # exclude_dirs = ['AFNetworking', 'YYModel', 'Plat','sdkFrameworks']
-    # exclude_files = []
-    # addNoUseMethodAndProperty(oc_all_path, exclude_dirs, exclude_files)
+    #2. 修改已经定义好的defind中的方法名称
+    # method_header_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v6/GamaSDK_iOS_Integration/obfuscation/codeObfuscationForMethodName.h'
+    # changeMethodHeaderValue(method_header_path)
 
     #3.添加随机注释
     # oc_all_path = '/Users/ganyuanrong/Desktop/Default-moqumiaowan_9.27-Release-1.0_scussce/Classes/'
@@ -1813,19 +1455,6 @@ if __name__ == '__main__':
     # oc_modify_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/FLSDK'
     # oc_all_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration'
     # modify_oc_class_name(oc_modify_path, xcode_project_path, oc_all_path,oc_exclude_dirs_ref_modify)
-
-    # 5.修改提取到header的方法宏定义
-    # random_word_for_method()
-
-
-    #找出方法体,改变方法内定义的变量和方法参数  方法 需要 [-+]开头 结束行位'}'标志，因此结束行需要只有'}'并且无空格
-    # var_exclude_dirs = ['AFNetworking', 'YYModel', 'Plat']
-    # var_exclude_files = []
-    # var_exclude_bian = [''] #参数忽略
-    # modify_method_params('/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/login/view_v2/',var_exclude_dirs,var_exclude_files,var_exclude_bian)
-
-    #修改属性（未完成）
-    # modify_method_params('/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/login/view_v2/',var_exclude_dirs,var_exclude_files,var_exclude_bian)
 
 
     #找出所有方法名字并修改
@@ -1873,16 +1502,15 @@ if __name__ == '__main__':
     # find_string_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK'
     # exclude_dirs = ['AFNetworking', 'YYModel','Common','Res','CoreSecurity']
     # exclude_strings = ['AccountListViewCellID','%@%@','%d','%ld','%@','.']
-    # find_string_tag('/Users/ganyuanrong/iOSProject/game_mw_sdk_ios_v3/MW_OBS_V3/FLSDK', exclude_dirs)
-    # wanxianmzxqKEY, eIV = wanxianmzxqIV
-    # wanxianmzxqKEY = 'wanxianmzxqKEY'
-    # wanxianmzxqIV = 'wanxianmzxqIV'
+
+    # wanxianmzxqKEY = 'SeaSdkV6-20230427KEY'
+    # wanxianmzxqIV = 'SeaSdkV6-20230427IV'
     #找出所有字符使用宏替代
     # find_string_tag(find_string_path, exclude_dirs, exclude_strings, wanxianmzxqKEY, wanxianmzxqIV)
 
     # eKey=mplaywlzhsKEY,eIV=mplaywlzhsIV
     # dataxxx = read_file_data('/Users/ganyuanrong/Desktop/73d30001bc0f27f512ed3afa30f2feb3.txt')
-    # pc = PrpCrypt('gamesdkv5v5v5KEY', 'gamesdkv5v5v5IV')  # 初始化密钥
+    pc = PrpCrypt('SdkV6202304KEY', 'SdkV6202304IV')  # 初始化密钥
     # mmxx = pc.aes_decrypt(dataxxx)
     # print mmxx
     # dataxxx = read_file_data('/Users/ganyuanrong/iOSProject/game_mw_sdk_ios_v3/MW_OBS_V3/Resources/GOT/com_mplay_wlzhs.json')
@@ -1896,45 +1524,16 @@ if __name__ == '__main__':
     # mmxx = pc.decrypt(mmxx)
     # print mmxx
 
-    # changeStringHeaderValue('/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/obfuscation/MWStringHeaders.h')
-
-    #修改已经定义好的defind中的方法名称
-    # method_header_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/obfuscation/codeObfuscationForMethodName.h'
-    # changeMethodHeaderValue(method_header_path)
-    # print re.findall(u'[\u4e00-\u9fa5]+', u'叫啥叫')
-    #
-    # pchinese = re.compile(u'[\u4e00-\u9fa5]+')  # 判断是否为中文的正则表达式
-    # # for line in ffile.readlines():  # 循环读取要读取文件的每一行
-    # txt = u'叫啥叫'
-    # fcontent = pchinese.findall(txt)  # 使用正则表达获取中文
-    # # print str
-    # if fcontent:
-    #     print fcontent
-
-    # dataxxx = read_file_data('/Users/ganyuanrong/iOSProject/game_mw_sdk_ios_v3/MW_OBS_V3/FLSDK/Plat/WLZSHLib.m')
-    # aare = re.findall(r'\b\w+_WLFuncTag', dataxxx)
-    # if aare:
-    #     aaa_result = []
-    #     for v in aare:
-    #         if v not in aaa_result:
-    #             aaa_result.append(v)
-    #             w1, w2 = random_2word()
-    #             vv_vale = w1.lower() + w2.capitalize()
-    #
-    #             defineVale = '#define %s        %s' % (v, vv_vale)
-    #             print defineVale
-
-    #test
-
+    changeStringHeaderValue('/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v6/GamaSDK_iOS_Integration/obfuscation/MWStringHeaders.h')
 
     # oc_class_parser.parse('/Users/ganyuanrong/Desktop/AdDelegate.m')
     #添加垃圾代码
-    var_exclude_dirs = ['AFNetworking', 'YYModel']
-    var_exclude_files = []
-    # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/'
-    src_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v41/GamaSDK_iOS_Integration/FLSDK/'
-    # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK'
-    # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/FLSDK'
-    add_code(src_path, var_exclude_dirs, var_exclude_files)
+    # var_exclude_dirs = ['AFNetworking', 'YYModel']
+    # var_exclude_files = []
+    # # # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/'
+    # # src_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v41/GamaSDK_iOS_Integration/FLSDK/'
+    # src_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v6/GamaSDK_iOS_Integration/FLSDK'
+    # # # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/FLSDK'
+    # add_code(src_path, var_exclude_dirs, var_exclude_files)
 
     print 'end'

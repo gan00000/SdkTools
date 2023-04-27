@@ -13,6 +13,10 @@ from Crypto.Util.Padding import pad
 class PrpCrypt(object):
 
     def __init__(self, key, iv):
+        if len(key) > 16:
+            key = key[0:16]
+        if len(iv) > 16:
+            iv = iv[0:16]
         key = key.encode('utf-8')
         while len(key) % 16 != 0:
             key += '\0'
