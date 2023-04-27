@@ -40,11 +40,11 @@ def parse(file_name, sdk_confuse_dir): #.m文件
             print '正在处理: ' + file_name
 
             # change_method_order(file_path)
-
+            #插入属性
             property_list_add = insert_class_property(file_path)
-
+            # 插入方法
             methods_list = insert_methods(file_path, sdk_confuse_dir)
-
+            #插入垃圾代码，调用属性和函数
             insert_method_extra_code(file_path, methods_list, property_list_add)
 
     print '一共插入的代码数量为：' + str(insert_code_sum)
@@ -605,10 +605,10 @@ def parse_method_local_params(method_data): #解析方法局部变量
     if method_data:
         method_data_temp = method_data
         method_data_temp = removeAnnotate(method_data_temp)
+        params_list = []
 
-        result_list = re.findall(r'\w+ (?:\*|\* )?\w+ ?=', method_data_temp) #提取类似 NSString * timeStamp=   NSArray *responseArray =
+        result_list = re.findall(r'\b[A-Z]\w+ (?:\*|\* )?[A-Za-z_]\w+ ?=', method_data_temp) #提取类似 NSString * timeStamp=   NSArray *responseArray =
         if result_list:
-            params_list = []
             for param_content_temp in result_list:
                 param_content_temp_list = re.findall(r' \*?\w+ ?=', param_content_temp)
                 if param_content_temp_list:
@@ -616,7 +616,18 @@ def parse_method_local_params(method_data): #解析方法局部变量
                     param_name = param_name.replace('*', '').replace('=', '').replace(' ', '')
                     if param_name not in params_list and param_name not in params_not_use_list:
                         params_list.append(param_name)
-            return params_list
+
+        result_list_b = re.findall(r'\b[A-Z]\w+ (?:\*|\* )[A-Za-z_]\w+\b;', method_data_temp)
+        if result_list_b:
+            for param_content_temp in result_list_b:
+                param_content_temp_list = re.findall(r'\w+\b;', param_content_temp)
+                if param_content_temp_list:
+                    param_name = param_content_temp_list[0]
+                    param_name = param_name.replace('*', '').replace('=', '').replace(' ', '').replace(';', '')
+                    if param_name not in params_list and param_name not in params_not_use_list:
+                        params_list.append(param_name)
+
+        return params_list
 
     return None
 
@@ -761,7 +772,7 @@ def change_implementation_method_param_name(implementation_content): #抽出方�
                     mi_content_temp = mi_content_temp.replace(' %s:' % param, ' ZZZXXX:')
 
                     param_p = r'\b%s\b' % param
-                    mi_content_temp = re.sub(param_p, param + 'AbcMac', mi_content_temp)
+                    mi_content_temp = re.sub(param_p, param + 'LLAbcMacLL', mi_content_temp)
                     mi_content_temp = mi_content_temp.replace('.VVVVVVBBBBB', '.' + param)
                     mi_content_temp = mi_content_temp.replace('@"DDDDDCCCCC"', '@"%s"' % param)
                     mi_content_temp = mi_content_temp.replace(' ZZZXXX:', ' %s:' % param)
