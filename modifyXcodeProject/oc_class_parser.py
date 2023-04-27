@@ -720,3 +720,53 @@ def change_implementation_content(implementation_content): #抽出方法，替�
             list_indexs.remove(index_value)
 
     return implementation_content
+
+
+
+def change_method_params_name(file_path):
+
+    print '修改类方法参数中:' + file_path
+    if os.path.exists(file_path) and file_path.endswith('.m'):
+        file_data = file_util.read_file_data(file_path)
+        implementation_content_list = re.findall(r'@implementation[\s\S]+?@end', file_data)  # 只处理一个文件只有一个类的情况，多个类的暂不处理
+        if implementation_content_list and len(implementation_content_list) > 0:
+            haschange = 0
+            for implementation_content in implementation_content_list:
+                implementation_content_t = change_implementation_method_param_name(implementation_content)
+                if implementation_content == implementation_content_t:
+                    haschange = 0
+                else:
+                    haschange = 1
+                    file_data = file_data.replace(implementation_content, implementation_content_t)
+
+            if haschange == 1:
+                file_util.wite_data_to_file(file_path, file_data)
+
+
+def change_implementation_method_param_name(implementation_content): #抽出方法，替换位置
+
+    method_content_list = re.findall(r'\n[-+] ?\([\s\S]+?\n}\n', implementation_content)
+    # mi = MethodInfo()
+    # implementation_content_change = implementation_content
+
+    implementation_content_temp = implementation_content
+    if method_content_list:
+        for mi_content in method_content_list:
+            mi_content_temp = mi_content
+            params_arr = parse_method_local_params(mi_content)
+            if params_arr:
+                for param in params_arr:
+                    mi_content_temp = mi_content_temp.replace('.' + param, '.VVVVVVBBBBB')
+                    mi_content_temp = mi_content_temp.replace('@"%s"' % param, '@"DDDDDCCCCC"')
+                    mi_content_temp = mi_content_temp.replace(' %s:' % param, ' ZZZXXX:')
+
+                    param_p = r'\b%s\b' % param
+                    mi_content_temp = re.sub(param_p, param + 'AbcMac', mi_content_temp)
+                    mi_content_temp = mi_content_temp.replace('.VVVVVVBBBBB', '.' + param)
+                    mi_content_temp = mi_content_temp.replace('@"DDDDDCCCCC"', '@"%s"' % param)
+                    mi_content_temp = mi_content_temp.replace(' ZZZXXX:', ' %s:' % param)
+
+                implementation_content_temp = implementation_content_temp.replace(mi_content, mi_content_temp)
+
+    return  implementation_content_temp
+
