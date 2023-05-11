@@ -1400,55 +1400,60 @@ def change_method_params_name(src_dir_path,exclude_dirs,exclude_files):#修改�
                     # oc_class_parser.parse(file_path, sdk_confuse_dir)
                     oc_class_parser.change_method_params_name(file_path)
 
-def changeXcodeProjectUUid(xcode_project_path, src_dir_path, change_dir_path, dir_prefix):
+def changeXcodeProjectUUid(xcode_project_path): #修改所有uuid
+
+    project_content_path = os.path.join(xcode_project_path, 'project.pbxproj')
+    project_data = file_util.read_file_data(project_content_path)
+
+    # 正则找出所有uuid
+    uuid_list = re.findall(r'\b[A-Z0-9]{24}\b', project_data)  # 'fileRef = 03315B9D291DFB7B00A92FBE'
+    # uuid_list = re.findall(r'fileRef = [A-Z0-9]{24} ', project_data)
+
+    uuid_temp_list = []
+    for mid in uuid_list:
+        print mid
+        if mid not in uuid_temp_list:
+            uuid_temp_list.append(mid)
+
+    for id in uuid_temp_list:
+        id_temp = id.strip()
+        new_id = oc_method_util.get_uid()
+        project_data = project_data.replace(id_temp, new_id)
+        print id_temp + '------>' + new_id
+
+    file_util.wite_data_to_file(project_content_path, project_data)
+
+
+def changeXcodeProjectDir(xcode_project_path, src_dir_path, change_dir_path, dir_prefix):#修改指定目录下的目录名，加前缀
     if os.path.exists(src_dir_path):
         list_dirs = os.walk(src_dir_path)
         project_content_path = os.path.join(xcode_project_path, 'project.pbxproj')
         project_data = file_util.read_file_data(project_content_path)
-        # group_list = re.findall(r'Begin PBXGroup section[\s\S]+?End PBXGroup section', project_data)
-        # if not group_list:
-        #     return
-        # group_setion_data = group_list[0]
-        # group_setion_data_1 = group_setion_data
-        # for root, dirs, files in list_dirs:
-        #     if change_dir_path in root:
-        #         for dir in dirs:
-        #             if dir.startswith(dir_prefix):
-        #                 continue
-        #             dir_path_src = os.path.join(root, dir)
-        #             new_dir = dir_prefix + dir.capitalize()
-        #             dir_path_dest = os.path.join(root, new_dir)
-        #             os.rename(dir_path_src, dir_path_dest)
-        #
-        #             # a_uuid_list = re.findall(r'\b\w+\b(?= /\* %s \*/ = \{)' % dir)
-        #             # a_uuid = a_uuid_list[0]
-        #             # new_uuid = oc_method_util.get_uid()
-        #
-        #             group_setion_data_1 = re.sub(r'/\* %s \*/' % dir, '/* %s */' % new_dir, group_setion_data_1)
-        #             group_setion_data_1 = re.sub(r'path = %s;' % dir, 'path = %s;' % new_dir, group_setion_data_1)
-        #
-        #             # group_setion_data_1 = re.sub(r'\b%s\b' % a_uuid, new_uuid, group_setion_data_1)
-        #
-        # project_data = project_data.replace(group_setion_data, group_setion_data_1)
+        group_list = re.findall(r'Begin PBXGroup section[\s\S]+?End PBXGroup section', project_data)
+        if not group_list:
+            return
+        group_setion_data = group_list[0]
+        group_setion_data_1 = group_setion_data
+        for root, dirs, files in list_dirs:
+            if change_dir_path in root:
+                for dir in dirs:
+                    if dir.startswith(dir_prefix):
+                        continue
+                    dir_path_src = os.path.join(root, dir)
+                    new_dir = dir_prefix + dir.capitalize()
+                    dir_path_dest = os.path.join(root, new_dir)
+                    os.rename(dir_path_src, dir_path_dest)
 
-        # files_list = re.findall(r'Begin PBXBuildFile section[\s\S]+?End PBXBuildFile section', project_data)
-        # file_setion_data = files_list[0]
+                    # a_uuid_list = re.findall(r'\b\w+\b(?= /\* %s \*/ = \{)' % dir)
+                    # a_uuid = a_uuid_list[0]
+                    # new_uuid = oc_method_util.get_uid()
 
-        #正则找出所有uuid
-        uuid_list = re.findall(r'\b[A-Z0-9]{24}\b', project_data)  #'fileRef = 03315B9D291DFB7B00A92FBE'
-        # uuid_list = re.findall(r'fileRef = [A-Z0-9]{24} ', project_data)
+                    group_setion_data_1 = re.sub(r'/\* %s \*/' % dir, '/* %s */' % new_dir, group_setion_data_1)
+                    group_setion_data_1 = re.sub(r'path = %s;' % dir, 'path = %s;' % new_dir, group_setion_data_1)
 
-        uuid_temp_list = []
-        for mid in uuid_list:
-            print mid
-            if mid not in uuid_temp_list:
-                uuid_temp_list.append(mid)
+                    # group_setion_data_1 = re.sub(r'\b%s\b' % a_uuid, new_uuid, group_setion_data_1)
 
-        for id in uuid_temp_list:
-            id_temp = id.strip()
-            new_id = oc_method_util.get_uid()
-            project_data = project_data.replace(id_temp, new_id)
-            print id_temp + '------>' + new_id
+        project_data = project_data.replace(group_setion_data, group_setion_data_1)
 
         file_util.wite_data_to_file(project_content_path, project_data)
 
@@ -1612,11 +1617,9 @@ if __name__ == '__main__':
     xcode_project_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v41/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
     src_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v41'
     modify_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v41/GamaSDK_iOS_Integration/FLSDK'
-    changeXcodeProjectUUid(xcode_project_path, src_path, modify_path,'OPEN')
-    # for i in range(10):
-    #     uuid_a = uuid.uuid1()
-    #     id = str(uuid_a)
-    #     id = id.replace('-', '')
-    #     print id[0:24]
+    #指定目录下面的目录加前缀
+    changeXcodeProjectDir(xcode_project_path, src_path, modify_path, 'OPEN')
+    #修改所有uuid
+    changeXcodeProjectUUid(xcode_project_path)
 
     print 'end'
