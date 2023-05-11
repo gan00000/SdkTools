@@ -2,6 +2,7 @@
 import imp
 import string
 import sys
+import uuid
 
 from modifyXcodeProject.model import PropertyInfo
 from modifyXcodeProject.model.MethodInfo import MethodInfo
@@ -194,6 +195,11 @@ def createMehtodTemp(method_access, ref_class_list):#ref_class_list为该类中�
     mi.method_call = method_call
     return mi, imp_mmmmmm_imp_inedx
 
+def get_uid():
+    uuid_a = uuid.uuid1()
+    id = str(uuid_a)
+    id = id.upper().replace('-', '')
+    return id[0:24]
 
 if __name__ == '__main__':
     # print create_case_expression('aaa', 'bbb')

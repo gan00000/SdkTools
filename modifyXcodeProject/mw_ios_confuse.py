@@ -1,6 +1,7 @@
 #coding=utf-8
 import imp
 import sys
+import uuid
 
 from modifyXcodeProject import oc_class_parser, oc_method_util
 from modifyXcodeProject.utils import file_util, word_util, datetime_util
@@ -592,33 +593,43 @@ def modify_sdk_bundle_image_name(image_dir_path, src_dir_path, image_exclude_fil
                 # print 'no match'
         # print image_exclude_files
 
-def deleteComments():#还有问题
 
-    source_dir = '/Users/gan/iospro/game/rongyaodg/app/Classes/device'
 
-    if os.path.exists(source_dir):
-        list_dirs = os.walk(source_dir)
+def deleteComments(src_dir_path, exclude_dirs, exclude_files):  # 删除注释
+
+    if os.path.exists(src_dir_path):
+        list_dirs = os.walk(src_dir_path)
         for root, dirs, files in list_dirs:
+
+            has_exclude_dir = 0
+            for exclude_dir in exclude_dirs:
+                if exclude_dir in root:
+                    has_exclude_dir = 1
+
+            if has_exclude_dir == 1:
+                continue
+
             for file_name in files:
-
-                if file_name == ".DS_Store":
+                if file_name in exclude_files:
                     continue
 
-                if 'google' in root or 'bind' in root:
-                    continue
-
-                if file_name.endswith('.h') or file_name.endswith('.m') or file_name.endswith('.mm') or file_name.endswith('.cpp'):
-
+                if file_name.endswith('.h') or file_name.endswith('.m') or file_name.endswith(
+                        '.mm') or file_name.endswith('.cpp'):
                     file_path = os.path.join(root, file_name)
                     file_data = read_file_data(file_path)
 
-                    file_data_0 = replace_data_content(file_data,'/\\*\\*/', '')
-                    file_data_1 = replace_data_content(file_data_0,'([^:/])//.*', '\\1')
-                    file_data_2 = replace_data_content(file_data_1,'^//.*', '')
-                    file_data_3 = replace_data_content(file_data_2,'/\\*{1,2}[\\s\\S]*?\\*/', '')
-                    file_data_4 = replace_data_content(file_data_3,'\\s*\\n', '\\n')
+                    # file_data_0 = replace_data_content(file_data,'/\\*\\*/', '')
+                    # file_data_1 = replace_data_content(file_data_0,'([^:/])//.*', '\\1')
+                    # file_data_2 = replace_data_content(file_data_1,'^//.*', '')
+                    # file_data_3 = replace_data_content(file_data_2,'/\\*{1,2}[\\s\\S]*?\\*/', '')
+                    # file_data_4 = replace_data_content(file_data_3,'\\s*\\n', '\\n')
 
-                    wite_data_to_file(file_path, file_data_4)
+                    file_data_0 = re.sub(r'//[\s\S]*?\n', '\n', file_data)
+                    # method_data_temp = re.sub(r'^ *//.*', '', method_data_temp)  #//[\s\S]*?\n
+                    file_data_1 = re.sub(r'/\*{1,2}[\s\S]*?\*/', '', file_data_0)  # 非贪婪模式
+
+                    wite_data_to_file(file_path, file_data_1)
+
 
 def addNewComments(src_dir_path,comment_exclude_dirs, comment_file_path):
 
@@ -1389,6 +1400,60 @@ def change_method_params_name(src_dir_path,exclude_dirs,exclude_files):#修改�
                     # oc_class_parser.parse(file_path, sdk_confuse_dir)
                     oc_class_parser.change_method_params_name(file_path)
 
+def changeXcodeProjectUUid(xcode_project_path, src_dir_path, change_dir_path, dir_prefix):
+    if os.path.exists(src_dir_path):
+        list_dirs = os.walk(src_dir_path)
+        project_content_path = os.path.join(xcode_project_path, 'project.pbxproj')
+        project_data = file_util.read_file_data(project_content_path)
+        # group_list = re.findall(r'Begin PBXGroup section[\s\S]+?End PBXGroup section', project_data)
+        # if not group_list:
+        #     return
+        # group_setion_data = group_list[0]
+        # group_setion_data_1 = group_setion_data
+        # for root, dirs, files in list_dirs:
+        #     if change_dir_path in root:
+        #         for dir in dirs:
+        #             if dir.startswith(dir_prefix):
+        #                 continue
+        #             dir_path_src = os.path.join(root, dir)
+        #             new_dir = dir_prefix + dir.capitalize()
+        #             dir_path_dest = os.path.join(root, new_dir)
+        #             os.rename(dir_path_src, dir_path_dest)
+        #
+        #             # a_uuid_list = re.findall(r'\b\w+\b(?= /\* %s \*/ = \{)' % dir)
+        #             # a_uuid = a_uuid_list[0]
+        #             # new_uuid = oc_method_util.get_uid()
+        #
+        #             group_setion_data_1 = re.sub(r'/\* %s \*/' % dir, '/* %s */' % new_dir, group_setion_data_1)
+        #             group_setion_data_1 = re.sub(r'path = %s;' % dir, 'path = %s;' % new_dir, group_setion_data_1)
+        #
+        #             # group_setion_data_1 = re.sub(r'\b%s\b' % a_uuid, new_uuid, group_setion_data_1)
+        #
+        # project_data = project_data.replace(group_setion_data, group_setion_data_1)
+
+        # files_list = re.findall(r'Begin PBXBuildFile section[\s\S]+?End PBXBuildFile section', project_data)
+        # file_setion_data = files_list[0]
+
+        #正则找出所有uuid
+        uuid_list = re.findall(r'\b[A-Z0-9]{24}\b', project_data)  #'fileRef = 03315B9D291DFB7B00A92FBE'
+        # uuid_list = re.findall(r'fileRef = [A-Z0-9]{24} ', project_data)
+
+        uuid_temp_list = []
+        for mid in uuid_list:
+            print mid
+            if mid not in uuid_temp_list:
+                uuid_temp_list.append(mid)
+
+        for id in uuid_temp_list:
+            id_temp = id.strip()
+            new_id = oc_method_util.get_uid()
+            project_data = project_data.replace(id_temp, new_id)
+            print id_temp + '------>' + new_id
+
+        file_util.wite_data_to_file(project_content_path, project_data)
+
+
+
 if __name__ == '__main__':
 
     # xcode_project_path = '/Users/ganyuanrong/iOSProject/game_mw_sdk_ios_v3/MW_OBS_V3/MW_SDK.xcodeproj'
@@ -1443,7 +1508,15 @@ if __name__ == '__main__':
     # comment_exclude_dirs = ['sdkFrameworks','Native']
     # addNewComments(oc_all_path, comment_exclude_dirs, '/Users/ganyuanrong/Desktop/sdk_confuse/ofc.log')
 
-    # 4.修改类名
+    # 4.删除注释
+    # var_exclude_dirs = ['AFNetworking', 'YYModel']
+    # var_exclude_files = []
+    # # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/'
+    # src_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v41/GamaSDK_iOS_Integration/FLSDK/'
+    # src_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v6/GamaSDK_iOS_Integration/FLSDK'
+    # deleteComments(src_path, var_exclude_dirs, var_exclude_files)
+
+    # 5.修改类名
     # oc_exclude_files.extend(
     #     ['AppDelegate.h', 'MWSDK.h', 'PayData.h', 'LoginData.h', 'AccountModel.h', 'CreateOrderResp.h','UnityAppController.h','UnityAppController+Rendering.h'
     #      ,'UnityViewControllerBase+iOS.h','UnityViewControllerBase+tvOS.h','UnityViewControllerBase.h','UnityView.h','UnityView+iOS.h','UnityView+tvOS.h'])
@@ -1451,9 +1524,9 @@ if __name__ == '__main__':
     # # "ThirkLib", "Model", "YYModel", "AFNetworking", "Plat", "WorkProjResources", "Resources", "obfuscation", "Demo"
     # oc_exclude_dirs_ref_modify = ['ThirkLib', "YYModel", "AFNetworking", "Resources"]
     #
-    # xcode_project_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
-    # oc_modify_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/FLSDK'
-    # oc_all_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration'
+    # xcode_project_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v6/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
+    # oc_modify_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v6/GamaSDK_iOS_Integration/FLSDK'
+    # oc_all_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v6/GamaSDK_iOS_Integration'
     # modify_oc_class_name(oc_modify_path, xcode_project_path, oc_all_path,oc_exclude_dirs_ref_modify)
 
 
@@ -1510,7 +1583,7 @@ if __name__ == '__main__':
 
     # eKey=mplaywlzhsKEY,eIV=mplaywlzhsIV
     # dataxxx = read_file_data('/Users/ganyuanrong/Desktop/73d30001bc0f27f512ed3afa30f2feb3.txt')
-    pc = PrpCrypt('SdkV6202304KEY', 'SdkV6202304IV')  # 初始化密钥
+    # pc = PrpCrypt('SdkV6202304KEY', 'SdkV6202304IV')  # 初始化密钥
     # mmxx = pc.aes_decrypt(dataxxx)
     # print mmxx
     # dataxxx = read_file_data('/Users/ganyuanrong/iOSProject/game_mw_sdk_ios_v3/MW_OBS_V3/Resources/GOT/com_mplay_wlzhs.json')
@@ -1524,10 +1597,10 @@ if __name__ == '__main__':
     # mmxx = pc.decrypt(mmxx)
     # print mmxx
 
-    changeStringHeaderValue('/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v6/GamaSDK_iOS_Integration/obfuscation/MWStringHeaders.h')
+    # changeStringHeaderValue('/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v6/GamaSDK_iOS_Integration/obfuscation/MWStringHeaders.h')
 
     # oc_class_parser.parse('/Users/ganyuanrong/Desktop/AdDelegate.m')
-    #添加垃圾代码
+    #6.添加垃圾代码
     # var_exclude_dirs = ['AFNetworking', 'YYModel']
     # var_exclude_files = []
     # # # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/'
@@ -1535,5 +1608,15 @@ if __name__ == '__main__':
     # src_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v6/GamaSDK_iOS_Integration/FLSDK'
     # # # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/FLSDK'
     # add_code(src_path, var_exclude_dirs, var_exclude_files)
+
+    xcode_project_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v41/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
+    src_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v41'
+    modify_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v41/GamaSDK_iOS_Integration/FLSDK'
+    changeXcodeProjectUUid(xcode_project_path, src_path, modify_path,'OPEN')
+    # for i in range(10):
+    #     uuid_a = uuid.uuid1()
+    #     id = str(uuid_a)
+    #     id = id.replace('-', '')
+    #     print id[0:24]
 
     print 'end'
