@@ -6,7 +6,7 @@
             if(ppppp1_ppppp numcop1_numcop iiiii4_iiiii){
                 break;
             }
-            ppppp1_ppppp = ppppp1_ppppp - iiiii2_iiiii;
+            ppppp1_ppppp = ppppp1_ppppp + iiiii2_iiiii;
             ppppp2_ppppp = bool2_bool;
         }
 
