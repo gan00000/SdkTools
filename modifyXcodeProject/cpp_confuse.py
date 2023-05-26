@@ -276,7 +276,7 @@ def changeClassForCpp(src_root, src_change_path, exclude_dirs, exclude_files):
             print '文件处理中=' + file_name
             if file_name in exclude_files:
                 continue
-            if file_name.endswith('.cpp') or file_name.endswith('.hpp') or file_name.endswith('.h'):
+            if file_name.endswith('.cpp') or file_name.endswith('.hpp') or file_name.endswith('.h') or file_name.endswith('.mm'):
                 file_path = os.path.join(root, file_name)
 
                 f_data = file_util.read_file_data_utf8(file_path)
@@ -303,7 +303,7 @@ def changeClassForCpp(src_root, src_change_path, exclude_dirs, exclude_files):
             if file_name in exclude_files:
                 continue
 
-            if file_name.endswith('.cpp') or file_name.endswith('.hpp') or file_name.endswith('.h'):
+            if file_name.endswith('.cpp') or file_name.endswith('.hpp') or file_name.endswith('.h') or file_name.endswith('.mm'):
                 print '文件处理中=' + file_name
                 file_path = os.path.join(root, file_name)
 
@@ -311,8 +311,10 @@ def changeClassForCpp(src_root, src_change_path, exclude_dirs, exclude_files):
                 # f_data = cpp_code_util.removeAnnotate(f_data)
 
                 for class_a in class_arr:
-                    f_data = re.sub(r'::\b%s\b' % class_a, '::' + class_a + 'MWan', f_data)
-                    f_data = re.sub(r'\b%s\b\*' % class_a, class_a + 'MWan*', f_data)
+                    # f_data = re.sub(r'::\b%s\b' % class_a, '::' + class_a + 'MWan', f_data)
+                    f_data = re.sub(r'\b%s\b' % class_a, class_a + 'MWan', f_data)
+                    # f_data = re.sub(r'\b%s\b::' % class_a, class_a + 'MWan::', f_data)
+
                     print '::%s' % class_a + '->' + '::' + class_a + 'MWan'
 
                 file_util.wite_data_to_file(file_path, f_data)
@@ -368,8 +370,8 @@ if __name__ == '__main__':
     #修改类名
     var_exclude_dirs = ['cocos2d','libsimulator','MWSDK','ThirdSDK']
     var_exclude_files = []
-    # src_path = '/Users/ganyuanrong/Downloads/seashhx/dongnyProject/'
-    src_path = '/Users/ganyuanrong/Downloads/seashhx/tools/libfairygui/Classes'
+    src_path = '/Users/ganyuanrong/Downloads/seashhx/dongnyProject/'
+    # src_path = '/Users/ganyuanrong/Downloads/seashhx/tools/libfairygui/Classes'
     src_root = '/Users/ganyuanrong/Downloads/seashhx'
     changeClassForCpp(src_root,src_path,var_exclude_dirs,var_exclude_files)
 
