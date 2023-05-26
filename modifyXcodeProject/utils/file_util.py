@@ -7,11 +7,20 @@ sys.setdefaultencoding('utf-8') #设置默认编码,只能是utf-8,下面\u4e00-
 import os
 import re
 
-def read_file_data(file_path):
-
+def read_file_data_utf8(file_path):
+    print 'read_file_data=' + file_path
     if os.path.exists(file_path):
         f_obj = open(file_path, mode="rb")  # 首先先创建一个文件对象
         f_data = f_obj.read().decode("UTF-8")  # 用read()方法读取文件内容  contents = f.read().decode("UTF-8")
+        f_obj.close()
+        return f_data
+    return None
+
+def read_file_data(file_path):
+    print 'read_file_data=' + file_path
+    if os.path.exists(file_path):
+        f_obj = open(file_path, mode="rb")  # 首先先创建一个文件对象
+        f_data = f_obj.read()#.decode("UTF-8")  # 用read()方法读取文件内容  contents = f.read().decode("UTF-8")
         f_obj.close()
         return f_data
     return None

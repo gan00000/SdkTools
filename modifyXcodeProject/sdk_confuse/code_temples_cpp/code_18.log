@@ -3,9 +3,9 @@
         int ppppp3_ppppp = iiiii1_iiiii;
         if (ppppp1_ppppp){
 
-            ppppp3_ppppp = ppppp3_ppppp operator1_operator case_left_var
+            ppppp3_ppppp = ppppp3_ppppp operator1_operator iiiii3_iiiii;
 
-            int ppppp12_ppppp = iiiii1_iiiii;
+            int ppppp12_ppppp = iiiii2_iiiii;
             int case_left_var = iiiii188_iiiii;
             int case_right_var = iiiii182_iiiii;
             switch (ppppp12_ppppp) {

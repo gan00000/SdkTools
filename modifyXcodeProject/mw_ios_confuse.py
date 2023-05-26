@@ -781,7 +781,7 @@ method_return_type = ['void', 'NSString *', 'BOOL', 'CGFloat', 'NSUInteger']
 method_params_type = ['NSString *', 'BOOL', 'CGFloat', 'NSUInteger']
 jisuan_type = ['*', '/', '+', '-']
 
-cpp_base_type = ['int', 'bool', 'void', 'int32_t', 'int64_t','double']
+cpp_base_type = ['int', 'bool', 'void', 'int32_t', 'int64_t', 'double']
 def addNoUseMethodForCpp2(src_dir_path, exclude_dirs, exclude_files):
     if not os.path.exists(src_dir_path):
         print("src_dir_path not exist")
@@ -815,54 +815,64 @@ def addNoUseMethodForCpp2(src_dir_path, exclude_dirs, exclude_files):
                 content = ''
                 has_implementation = 0
                 print '处理中  ' + file_name
+                start_insert_method = 0
+                pre_line = ''
                 for line in text_lines:
                     # print chardet.detect(line)
+                    # try:
+                    #     line = line.decode('utf-8')
+                    # except:
+                    #     pass
                     line = line.decode('utf-8')
                     line_strip = line.strip()
-                    if line_strip.startswith(';'): #方法插入位置
+                    if(line_strip.endswith('{')):
+                        start_insert_method = 1
 
-                        isneed = random.randint(1, 20) #随机决定是否改行需要添加无用方法
-                        if 4 <= isneed <= 10:#添加
+                    if start_insert_method == 1 \
+                            and line_strip.endswith(';') \
+                            and not line_strip.startswith('};') \
+                            and not line_strip.startswith('USING') \
+                            and not line_strip.startswith('static') \
+                            and not line_strip.startswith('for') \
+                            and not line_strip.startswith('break') \
+                            and not line_strip.startswith('//') and not line_strip.startswith('#define'): #无效代码插入位置
 
-                            method_count = random.randint(1, 2) #随机产生插入的方法数量
-                            new_add_method_content = ''
-                            for i in range(method_count):
+                        isneed = random.randint(1, 20) #随机决定是否改行需要添加代码
+                        if 4 <= isneed <= 8:#添加
+                            code_temp = ''
+                            aType = random.randint(1,6)
+                            if aType == 1:
+                                vars, code_temp = cpp_code_util.cpp_code_auto_create1()
+                            elif aType == 2:
+                                vars, code_temp = cpp_code_util.cpp_code_auto_create2()
+                            elif aType == 3:
+                                vars, code_temp = cpp_code_util.cpp_switch_code()
+                            else:
+                                code_temp = cpp_code_temp_aar[random.randint(0, len(cpp_code_temp_aar) -1)]
+                            code_temp = cpp_code_util.replace_code_placeholder(code_temp,'')
+                            code_temp = '\n\t//add my cpp code start\n\t{\n\t' + code_temp + '\n\t}\n\t//add my cpp code end\n\n'
 
-                                return_type = cppReturnType[random.randint(0, len(cppReturnType)-1)] #随机方法返回类型
-                                noUserMethod_name = random_word_for_no_use_method_for_cpp()
-
-                                method_content = '\n' + '   static inline ' + return_type + ' mwdk_' + noUserMethod_name + '() {\n'
-
-                                params_counts = random.randint(0, 5) #随机参数个数,最大5个
-                                eee = str(random.randint(2,999999))
-                                qqq = str(random.randint(880, 999990))
-                                # dd = 'return static_cast<%s> (floor(%s) * %s);\n }\n' % (return_type, eee, qqq)
-                                if params_counts == 0:
-                                    method_content = method_content + '     return static_cast<%s> (floor(%s) * %s);\n  }\n' % (return_type, eee, qqq)
-
-                                elif params_counts == 1:
-                                    method_content = method_content + '     return static_cast<%s> (abs(%s) - %s);\n    }\n' % (return_type, eee, qqq)
-
-                                elif params_counts == 2:
-                                    method_content = method_content + '     return static_cast<%s> (%s - %s);\n     }\n' % (return_type, eee, qqq)
-
-                                elif params_counts == 3:
-                                    method_content = method_content + '     return static_cast<%s> (%s + %s);\n     }\n' % (return_type, eee, qqq)
-                                elif params_counts == 4:
-                                    method_content = method_content + '     return static_cast<%s> (ceil(%s) + %s);\n   }\n' % (return_type, eee, qqq)
-
-                                elif params_counts == 5:
-                                    method_content = method_content + '     return static_cast<%s> (exp(%s) + %s);\n    }\n' % (return_type, eee, qqq)
-
-                                new_add_method_content = new_add_method_content + method_content
-                            content = content + new_add_method_content + '\n' + line
-
-
+                            if line_strip.startswith('return'):
+                                if (pre_line.endswith('else if') or pre_line.startswith('if')) and not pre_line.endswith('{') and not line_strip.startswith('{'):
+                                    content = content + '\n\t{//add brackets\n\t' + code_temp + '\n\t' + line + '\n\t}//add brackets end \n'
+                                elif pre_line.endswith('else') and not pre_line.endswith('#else') and not pre_line.endswith('{') and not line_strip.startswith('{'):
+                                    content = content + '\n\t{//add brackets\n\t' + code_temp + '\n\t' + line + '\n\t}//add brackets end \n'
+                                else:
+                                    content = content + code_temp + '\n' + line
+                            else:
+                                if (pre_line.endswith('else if') or pre_line.startswith('if')) and not pre_line.endswith('{') and not line_strip.startswith('{'):
+                                    content = content + '\n\t{//add brackets\n\t' + line + '\n' + code_temp + '\n\t}//add brackets end \n'
+                                elif pre_line.endswith('else') and not pre_line.endswith('#else') and not pre_line.endswith('{') and not line_strip.startswith('{'):
+                                    content = content + '\n\t{//add brackets\n\t' + line + '\n' + code_temp + '\n\t}//add brackets end \n'
+                                else:
+                                    content = content + line + '\n' + code_temp
 
                         else:
                             content = content + line
                     else:
                         content = content + line
+                    if line_strip and not line_strip == '':
+                        pre_line = line_strip
 
                 wite_data_to_file(file_path, content)
 
@@ -1487,7 +1497,7 @@ def change_method_params_name(src_dir_path,exclude_dirs,exclude_files):#修改�
 def changeXcodeProjectUUid(xcode_project_path): #修改所有uuid
 
     project_content_path = os.path.join(xcode_project_path, 'project.pbxproj')
-    project_data = file_util.read_file_data(project_content_path)
+    project_data = file_util.read_file_data_utf8(project_content_path)
 
     # 正则找出所有uuid
     uuid_list = re.findall(r'\b[A-Z0-9]{24}\b', project_data)  # 'fileRef = 03315B9D291DFB7B00A92FBE'
@@ -1512,7 +1522,7 @@ def changeXcodeProjectDir(xcode_project_path, src_dir_path, change_dir_path, dir
     if os.path.exists(src_dir_path):
         list_dirs = os.walk(src_dir_path)
         project_content_path = os.path.join(xcode_project_path, 'project.pbxproj')
-        project_data = file_util.read_file_data(project_content_path)
+        project_data = file_util.read_file_data_utf8(project_content_path)
         group_list = re.findall(r'Begin PBXGroup section[\s\S]+?End PBXGroup section', project_data)
         if not group_list:
             return
@@ -1569,20 +1579,23 @@ if __name__ == '__main__':
     word_util.genest_word = genest_word
 
     for code_i in range(50):
-        code_data = file_util.read_file_data(sdk_confuse_dir + 'code_temples/code_%s.log' % code_i)
+        code_data = file_util.read_file_data_utf8(sdk_confuse_dir + 'code_temples/code_%s.log' % code_i)
         if code_data:
             oc_class_parser.code_temples.append(code_data)
 
     for code_i in range(20):
-        code_data = file_util.read_file_data(sdk_confuse_dir + 'code_temples/code_if_%s.log' % code_i)
+        code_data = file_util.read_file_data_utf8(sdk_confuse_dir + 'code_temples/code_if_%s.log' % code_i)
         if code_data:
             oc_class_parser.code_if_temples.append(code_data)
 
     cpp_code_temp_aar = []
     for code_i in range(50):
-        code_data = file_util.read_file_data(sdk_confuse_dir + 'code_temples_cpp/code_%s.log' % code_i)
+        code_data = file_util.read_file_data_utf8(sdk_confuse_dir + 'code_temples_cpp/code_%s.log' % code_i)
         if code_data:
             cpp_code_temp_aar.append(code_data)
+
+    for code_data in cpp_code_temp_aar:
+        oc_class_parser.code_temples.append(code_data)
 
     #1.修改图片  图片md5需要额外处理
     # image_exclude_files = []
@@ -1712,6 +1725,21 @@ if __name__ == '__main__':
     # #修改所有uuid
     # changeXcodeProjectUUid(xcode_project_path)
 
-    cpp_code_util.cpp_switch_code()
+
+    # 处理cpp
+
+    var_exclude_dirs = []
+    var_exclude_files = []
+    # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/'
+    # src_path = '/Users/ganyuanrong/Downloads/seashhx/dongnyProject/'
+    src_path = '/Users/ganyuanrong/Downloads/seashhx/tools/libfairygui/Classes'
+    deleteComments(src_path, var_exclude_dirs, var_exclude_files)
+
+    #cpp添加代码
+    var_exclude_dirs = []
+    var_exclude_files = []
+    # src_path = '/Users/ganyuanrong/Downloads/seashhx/dongnyProject/'
+    src_path = '/Users/ganyuanrong/Downloads/seashhx/tools/libfairygui/Classes'
+    addNoUseMethodForCpp2(src_path,var_exclude_dirs,var_exclude_files)
 
     print 'end'

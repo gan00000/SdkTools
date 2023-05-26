@@ -12,7 +12,7 @@
         int ppppp3_ppppp = iiiii1_iiiii;
         if (ppppp1_ppppp){
 
-            ppppp3_ppppp = ppppp3_ppppp operator1_operator case_left_var
+            ppppp3_ppppp = ppppp3_ppppp operator1_operator case_left_var;
         }
         
         

@@ -86,7 +86,7 @@ def cpp_code_auto_create1():
             content = content + '\n'
         var1 = var3
         var_arr.append(var3)
-    print content
+    # print content
     return var_arr, content
 
 def cpp_code_auto_create2():
@@ -126,7 +126,7 @@ def cpp_code_auto_create2():
             content = content.replace('if_temp%s_if' % (str(i - 1)), ifdata)
         var1 = var3
         var_arr.append(var3)
-    print content
+    # print content
     return var_arr, content
 
 def create_case_expression(leftVar, rightVar):
@@ -168,7 +168,10 @@ def cpp_switch_code():
     content = content.replace('ppppp1_ppppp', var1)
     data = create_case_expression(var1, var2)
     content = content.replace('case_content_case', data)
-    print content
+    var_return = []
+    var_return.append(var1)
+    var_return.append(var2)
+    return var_return,content
 
 def replace_code_placeholder(code_temple, condition_var):
 
@@ -259,6 +262,18 @@ def replace_code_placeholder(code_temple, condition_var):
         code_temple = code_temple.replace('array_value_array', arr_content)
     return code_temple
 
+#删除注释
+def removeAnnotate(code_data):
+    # file_data_0 = replace_data_content(src_data, '/\\*\\*/', '')
+    # file_data_1 = replace_data_content(file_data_0, '([^:/])//.*', '\\1')
+    # file_data_2 = replace_data_content(file_data_1, '^//.*', '')
+    # file_data_3 = replace_data_content(file_data_2, '/\\*{1,2}[\\s\\S]*?\\*/', '')
+    # 先删掉注释，不然会拿到注释的变量
+    # method_data_temp = re.sub(r'^//.*', '', method_data_temp)
+    code_data = re.sub(r'//[\s\S]*?\n', '\n', code_data)
+    # method_data_temp = re.sub(r'^ *//.*', '', method_data_temp)  #//[\s\S]*?\n
+    code_data = re.sub(r'/\*{1,2}[\s\S]*?\*/', '', code_data)  # 非贪婪模式
+    return code_data
 
 if __name__ == '__main__':
     # print create_case_expression('aaa', 'bbb')

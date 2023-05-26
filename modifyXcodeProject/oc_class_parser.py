@@ -53,7 +53,7 @@ def insert_class_property(file_path_m):
     word_aar = []
     insert_property_list = []
     file_path_h = file_path_m.replace('.m', '.h')
-    file_data_h = file_util.read_file_data(file_path_h)
+    file_data_h = file_util.read_file_data_utf8(file_path_h)
 
     if file_data_h:
 
@@ -88,7 +88,7 @@ def insert_class_property(file_path_m):
     return insert_property_list
 
 def insert_method_extra_code(file_path, methods_list, property_list): #方法内插入垃圾代码
-    file_data = file_util.read_file_data(file_path)
+    file_data = file_util.read_file_data_utf8(file_path)
     # property_list = parse_property(file_data)
     # 读取方法内容
     text_lines = file_util.read_file_data_for_line(file_path)
@@ -308,8 +308,8 @@ def insert_methods(file_path_m, sdk_confuse_dir): #类内插入方法
 
     # 处理对应.h文件
     file_path_h = file_path_m.replace('.m', '.h')
-    file_data_h = file_util.read_file_data(file_path_h)
-    file_data_m = file_util.read_file_data(file_path_m)
+    file_data_h = file_util.read_file_data_utf8(file_path_h)
+    file_data_m = file_util.read_file_data_utf8(file_path_m)
 
     interface_content = ''
     if file_data_h:
@@ -541,6 +541,17 @@ def replace_code_placeholder(code_temple, condition_var):
         bool_value = oc_method_util.bool_value_arr[random.randint(0, len(oc_method_util.bool_value_arr) - 1)]  # 比较符号
         code_temple = code_temple.replace(boola, bool_value)
 
+
+    code_type_mumber_list = re.findall(r'type_mumber\d+_type', code_temple)  # 数字类型
+    for num_type in code_type_mumber_list:
+        type_value = oc_method_util.numbers_params_type[random.randint(0, len(oc_method_util.numbers_params_type) - 1)]
+        code_temple = code_temple.replace(num_type, type_value)
+
+    operator_list = re.findall(r'operator\d+_operator', code_temple)  # 数字运算符
+    for operator in operator_list:
+        operator_value = oc_method_util.operation_arr[random.randint(0, len(oc_method_util.operation_arr) - 1)]
+        code_temple = code_temple.replace(operator, operator_value)
+
     if 'case_content_case' in code_temple:
         w1, w2 = word_util.random_2words_not_same_inarr(word_aar)
         case_left_var = w1 + w2.capitalize()
@@ -687,7 +698,7 @@ def change_method_order(file_path):
 
     print '更换方法顺序中:' + file_path
     if os.path.exists(file_path) and file_path.endswith('.m'):
-        file_data = file_util.read_file_data(file_path)
+        file_data = file_util.read_file_data_utf8(file_path)
         implementation_content_list = re.findall(r'@implementation[\s\S]+?@end', file_data)  # 只处理一个文件只有一个类的情况，多个类的暂不处理
         if implementation_content_list and len(implementation_content_list) > 0:
             haschange = 0
@@ -738,7 +749,7 @@ def change_method_params_name(file_path):
 
     print '修改类方法参数中:' + file_path
     if os.path.exists(file_path) and file_path.endswith('.m'):
-        file_data = file_util.read_file_data(file_path)
+        file_data = file_util.read_file_data_utf8(file_path)
         implementation_content_list = re.findall(r'@implementation[\s\S]+?@end', file_data)  # 只处理一个文件只有一个类的情况，多个类的暂不处理
         if implementation_content_list and len(implementation_content_list) > 0:
             haschange = 0

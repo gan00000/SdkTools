@@ -2,7 +2,7 @@
         bool ppppp1_ppppp = bool1_bool;
         if (ppppp1_ppppp)
         {
-            ppppp2_ppppp = bool2_bool;
+            ppppp1_ppppp = bool2_bool;
         }
 
         
