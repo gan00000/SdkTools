@@ -1,0 +1,15 @@
+        
+        type_mumber1_type ppppp1_ppppp = iiiii1_iiiii;
+        int ppppp2_ppppp = int1_int;
+
+        for(int ppppp3_ppppp = int2_int; ppppp3_ppppp < int3_int; ppppp3_ppppp = ppppp3_ppppp + 1)
+        {    
+            ppppp1_ppppp = ppppp1_ppppp + ppppp2_ppppp;
+            if (ppppp1_ppppp numcop1_numcop ppppp3_ppppp){
+                break;
+            }
+            ppppp2_ppppp = ppppp2_ppppp++;
+        }
+        
+
+        

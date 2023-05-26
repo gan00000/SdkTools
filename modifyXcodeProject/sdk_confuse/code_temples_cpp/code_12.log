@@ -1,0 +1,17 @@
+        
+        type_mumber1_type ppppp1_ppppp = iiiii1_iiiii;
+        bool ppppp2_ppppp = bool1_bool;
+
+        for(int ppppp3_ppppp = int2_int; ppppp3_ppppp < int3_int; ppppp3_ppppp = ppppp3_ppppp + 1)
+        {    
+            if (ppppp2_ppppp){
+                break;
+            }
+            ppppp1_ppppp = ppppp1_ppppp operator1_operator int3_int;
+        }
+        if (ppppp1_ppppp)
+        {
+            ppppp2_ppppp = bool2_bool;
+        }
+
+        

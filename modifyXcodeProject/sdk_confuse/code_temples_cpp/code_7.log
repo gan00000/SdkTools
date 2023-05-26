@@ -1,0 +1,11 @@
+        
+        type_mumber1_type ppppp1_ppppp = iiiii1_iiiii;
+        bool ppppp2_ppppp = true;
+        if (ppppp1_ppppp numcop1_numcop iiiii2_iiiii){
+            
+            ppppp2_ppppp = false;
+        }else{
+            ppppp2_ppppp = true;
+        }
+
+        
