@@ -1,9 +1,9 @@
         
-        type_mumber1_type ppppp1_ppppp = iiiii1_iiiii;
+        type_mumber1_type ppppp1_ppppp = int1_int;
         bool ppppp2_ppppp = bool1_bool;
-        while (ppppp1_ppppp < iiiii3_iiiii)
+        while (ppppp1_ppppp < int2_int)
         {
-            ppppp1_ppppp = ppppp1_ppppp + iiiii2_iiiii;
+            ppppp1_ppppp = ppppp1_ppppp + int3_int;
             ppppp2_ppppp = bool2_bool;
         }
 

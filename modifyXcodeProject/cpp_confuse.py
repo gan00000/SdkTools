@@ -57,7 +57,7 @@ def deleteComments(src_dir_path, exclude_dirs, exclude_files):  # 删除注释
                     file_util.wite_data_to_file(file_path, file_data_1)
 
 
-def addNoUseMethodForCpp2(src_dir_path, exclude_dirs, exclude_files):
+def addNoUseMethodForCpp2(src_dir_path, exclude_dirs, exclude_files, is_retry):
     if not os.path.exists(src_dir_path):
         print("src_dir_path not exist")
         return
@@ -81,15 +81,32 @@ def addNoUseMethodForCpp2(src_dir_path, exclude_dirs, exclude_files):
             # if 'AFNetworking' in root or 'YYModel' in root:
             #     continue
 
-            if file_name.endswith('.cpp'):
+            if file_name.endswith('.mm') or file_name.endswith('.cpp'):
+                print '处理中  ' + file_name
                 file_path = os.path.join(root, file_name)
+                file_data = file_util.read_file_data_utf8(file_path)
 
-                f_obj = open(file_path, "r")
+                if is_retry:
+                    add_code_tag_list = re.findall(r'add my cpp code start', file_data)
+                    if add_code_tag_list:
+                        continue
+
+                print '修改中  ' + file_name
+                class_def_list = re.findall(r'(?=class [^;]+\n)class \w+[\s\S]*?(?:public:|protected:|private:)[\s\S]*?\};',file_data)
+                if class_def_list:
+                    for ia in range(len(class_def_list) - 1):
+                        class_def = class_def_list[ia]
+                        file_data = file_data.replace(class_def, 'CLASS_DEF_%s_CLASS' % str(ia))
+
+                tempLog_path = sdk_confuse_dir + 'temp/tempLog.log'
+                file_util.wite_data_to_file(tempLog_path, file_data)
+
+                f_obj = open(tempLog_path, "r")
                 text_lines = f_obj.readlines()
 
                 content = ''
                 has_implementation = 0
-                print '处理中  ' + file_name
+
                 start_insert_method = 0
                 pre_line = ''
                 for line in text_lines:
@@ -102,6 +119,7 @@ def addNoUseMethodForCpp2(src_dir_path, exclude_dirs, exclude_files):
                     line_strip = line.strip()
                     if(line_strip.endswith('{')):
                         start_insert_method = 1
+                    # if line_strip.startswith('struct'): #struct不分内不处理
 
                     if start_insert_method == 1 \
                             and line_strip.endswith(';') \
@@ -128,16 +146,16 @@ def addNoUseMethodForCpp2(src_dir_path, exclude_dirs, exclude_files):
                             code_temp = '\n\t//add my cpp code start\n\t{\n\t' + code_temp + '\n\t}\n\t//add my cpp code end\n\n'
 
                             if line_strip.startswith('return'):
-                                if (pre_line.endswith('else if') or pre_line.startswith('if')) and not pre_line.endswith('{') and not line_strip.startswith('{'):
+                                if (pre_line.startswith('else if') or pre_line.startswith('if')) and not pre_line.endswith('{') and not pre_line.endswith(';') and not '{' in pre_line and not line_strip.startswith('{'):
                                     content = content + '\n\t{//add brackets\n\t' + code_temp + '\n\t' + line + '\n\t}//add brackets end \n'
-                                elif pre_line.endswith('else') and not pre_line.endswith('#else') and not pre_line.endswith('{') and not line_strip.startswith('{'):
+                                elif pre_line.endswith('else') and not pre_line.endswith('#else') and not pre_line.endswith('{') and not pre_line.endswith(';') and not '{' in pre_line and not line_strip.startswith('{'):
                                     content = content + '\n\t{//add brackets\n\t' + code_temp + '\n\t' + line + '\n\t}//add brackets end \n'
                                 else:
                                     content = content + code_temp + '\n' + line
                             else:
-                                if (pre_line.endswith('else if') or pre_line.startswith('if')) and not pre_line.endswith('{') and not line_strip.startswith('{'):
+                                if (pre_line.startswith('else if') or pre_line.startswith('if')) and not pre_line.endswith('{') and not pre_line.endswith(';') and not '{' in pre_line and not line_strip.startswith('{'):
                                     content = content + '\n\t{//add brackets\n\t' + line + '\n' + code_temp + '\n\t}//add brackets end \n'
-                                elif pre_line.endswith('else') and not pre_line.endswith('#else') and not pre_line.endswith('{') and not line_strip.startswith('{'):
+                                elif pre_line.endswith('else') and not pre_line.endswith('#else') and not pre_line.endswith('{') and not pre_line.endswith(';') and not '{' in pre_line and not line_strip.startswith('{'):
                                     content = content + '\n\t{//add brackets\n\t' + line + '\n' + code_temp + '\n\t}//add brackets end \n'
                                 else:
                                     content = content + line + '\n' + code_temp
@@ -149,6 +167,10 @@ def addNoUseMethodForCpp2(src_dir_path, exclude_dirs, exclude_files):
                     if line_strip and not line_strip == '':
                         pre_line = line_strip
 
+                if class_def_list:
+                    for ia in range(len(class_def_list) - 1):
+                        class_def = class_def_list[ia]
+                        content = content.replace('CLASS_DEF_%s_CLASS' % str(ia), class_def)
                 file_util.wite_data_to_file(file_path, content)
 
 # def addNoUseMethodForCpp(src_dir_path, exclude_dirs, exclude_files):
@@ -236,7 +258,7 @@ def addNoUseMethodForCpp2(src_dir_path, exclude_dirs, exclude_files):
 #                 wite_data_to_file(file_path, content)
 #
 
-def changeClassForCpp(src_root, src_change_path, exclude_dirs, exclude_files):
+def changeClassForCpp(src_root, src_change_path, exclude_dirs, exclude_files,exclude_class_arr,class_tag):
     if not os.path.exists(src_change_path):
         print("src_dir_path not exist")
         return
@@ -251,15 +273,28 @@ def changeClassForCpp(src_root, src_change_path, exclude_dirs, exclude_files):
 
             if file_name in exclude_files:
                 continue
-            if file_name.endswith('.cpp'):
+            if file_name.endswith('.cpp') or file_name.endswith('.h') or file_name.endswith('.mm'):
                 file_path = os.path.join(root, file_name)
 
                 f_data = file_util.read_file_data_utf8(file_path)
                 class_c_list = re.findall(r'(?=\w+::~\w+\()\w+', f_data)
                 for i_class in class_c_list:
-                    if i_class not in class_arr :
+                    if i_class not in class_arr and class_tag not in i_class and i_class not in exclude_class_arr:
                         class_arr.append(i_class)
                         print i_class
+
+                class_def_list = re.findall(r'(?=class [^;]+\n)class \w+[\s\S]*?(?:public:|protected:|private:)[\s\S]*?\};', f_data)
+                if class_def_list:
+                    for class_def in class_def_list:
+                        class_aa = re.findall(r'class \w+\b', class_def)
+                        if class_aa:
+                            class_name = class_aa[0].replace('class','').replace(' ','')
+                            if class_name not in class_arr and class_tag not in class_name and class_name not in exclude_class_arr:
+                                class_arr.append(class_name)
+
+    print class_arr
+    if len(class_arr) == 0:
+        return
     list_dirs = os.walk(src_change_path)
     for root, dirs, files in list_dirs:
 
@@ -281,8 +316,16 @@ def changeClassForCpp(src_root, src_change_path, exclude_dirs, exclude_files):
 
                 f_data = file_util.read_file_data_utf8(file_path)
                 for class_a in class_arr:
-                    f_data = re.sub(r'\b%s\b' % class_a, class_a + 'MWan', f_data)
-                    print class_a + '->' + class_a + 'MWan'
+                    # f_data = re.sub(r'\b%s\b' % class_a, class_a + 'MWan', f_data)
+                    # print class_a + '->' + class_a + 'MWan'
+
+                    f_data = re.sub(r'\b%s\b.h' % class_a, 'MMMMMMMWWAN%s.h' % class_a, f_data)
+
+                    # f_data = re.sub(r'::\b%s\b' % class_a, '::' + class_a + 'MWan', f_data)
+                    f_data = re.sub(r'\b%s\b' % class_a, class_tag + class_a, f_data)
+                    # f_data = re.sub(r'\b%s\b::' % class_a, class_a + 'MWan::', f_data)
+
+                    f_data = re.sub(r'MMMMMMMWWAN%s.h' % class_a, '%s.h' % class_a, f_data)
 
                 file_util.wite_data_to_file(file_path, f_data)
 
@@ -311,11 +354,125 @@ def changeClassForCpp(src_root, src_change_path, exclude_dirs, exclude_files):
                 # f_data = cpp_code_util.removeAnnotate(f_data)
 
                 for class_a in class_arr:
+
+                    f_data = re.sub(r'\b%s\b.h' % class_a, 'MMMMMMMWWAN%s.h' % class_a, f_data)
+
                     # f_data = re.sub(r'::\b%s\b' % class_a, '::' + class_a + 'MWan', f_data)
-                    f_data = re.sub(r'\b%s\b' % class_a, class_a + 'MWan', f_data)
+                    f_data = re.sub(r'\b%s\b' % class_a, class_tag + class_a, f_data)
                     # f_data = re.sub(r'\b%s\b::' % class_a, class_a + 'MWan::', f_data)
 
-                    print '::%s' % class_a + '->' + '::' + class_a + 'MWan'
+                    f_data = re.sub(r'MMMMMMMWWAN%s.h' % class_a, '%s.h' % class_a, f_data)
+
+                    print class_a + '->' + class_tag + class_a
+
+                file_util.wite_data_to_file(file_path, f_data)
+
+def changeMethodNameForCpp(src_root, src_change_path, exclude_dirs, exclude_files, exclude_method_arr):
+    if not os.path.exists(src_change_path):
+        print("src_dir_path not exist")
+        return
+
+    class_arr = []
+    list_dirs = os.walk(src_change_path)
+    for root, dirs, files in list_dirs:
+
+        for file_name in files:
+            if file_name == ".DS_Store":
+                continue
+
+            if file_name in exclude_files:
+                continue
+            if file_name.endswith('.cpp') or file_name.endswith('.h'):
+                file_path = os.path.join(root, file_name)
+
+                f_data = file_util.read_file_data_utf8(file_path)
+                class_c_list = re.findall(r'(?=\w+::~\w+\()\w+', f_data)
+                for i_class in class_c_list:
+                    if i_class not in class_arr :
+                        class_arr.append(i_class)
+                        print i_class
+
+                class_def_list = re.findall(r'(?=class [^;]+\n)class \w+[\s\S]*?(?:public:|protected:|private:)[\s\S]*?\};', f_data)
+                if class_def_list:
+                    for class_def in class_def_list:
+                        class_aa = re.findall(r'class \w+ ', class_def)
+                        if class_aa:
+                            class_name = class_aa[0].replace('class','').replace(' ','')
+                            if class_name not in class_arr:
+                                class_arr.append(class_name)
+
+    method_name_aar = []
+    list_dirs = os.walk(src_change_path)
+    for root, dirs, files in list_dirs:
+
+        exclude_dir_flag = 0
+        for exclude_dir in exclude_dirs:
+            if exclude_dir in root:
+                exclude_dir_flag = 1
+        if exclude_dir_flag == 1:
+            continue
+
+        for file_name in files:
+            if file_name == ".DS_Store":
+                continue
+            print '文件处理中=' + file_name
+            if file_name in exclude_files:
+                continue
+            if file_name.endswith('.cpp'):
+
+                file_path = os.path.join(root, file_name)
+
+                f_data = file_util.read_file_data_utf8(file_path)
+                for class_a in class_arr:
+                    method_list = re.findall(r' %s::\w+\(' % class_a, f_data)
+                    if method_list:
+                        for method_name in method_list:
+                            method_name = method_name.replace(class_a,'').replace('::','').replace('(','').replace(' ','')
+                            if method_name not in method_name_aar \
+                                    and method_name not in exclude_method_arr \
+                                    and not method_name == class_a:
+                                print 'method name:' + method_name
+                                method_name_aar.append(method_name)
+
+    print method_name_aar
+    list_dirs = os.walk(src_root)
+    for root, dirs, files in list_dirs:
+
+        exclude_dir_flag = 0
+        for exclude_dir in exclude_dirs:
+            if exclude_dir in root:
+                exclude_dir_flag = 1
+        if exclude_dir_flag == 1:
+            continue
+
+        for file_name in files:
+            if file_name == ".DS_Store":
+                continue
+
+            if file_name in exclude_files:
+                continue
+
+            if file_name.endswith('.cpp') or file_name.endswith('.hpp') or file_name.endswith('.h') or file_name.endswith('.mm'):
+                # print '文件处理中=' + file_name
+                file_path = os.path.join(root, file_name)
+
+                f_data = file_util.read_file_data_utf8(file_path)
+                # f_data = cpp_code_util.removeAnnotate(f_data)
+
+                for method_name in method_name_aar:
+# 'std::'
+                    f_data = re.sub(r'std::%s' % method_name, 'MMMMM_MMMMMMMMM', f_data)
+                    f_data = re.sub(r'strings.%s' % method_name, 'BBBBB_BBBBB', f_data)
+
+                    method_name_new = 'sdop%sKida' % method_name
+                    f_data = re.sub(r'\b%s\b' % method_name, method_name_new, f_data)
+
+                    f_data = re.sub(r'MMMMM_MMMMMMMMM',  'std::%s' % method_name,  f_data)
+                    f_data = re.sub(r'BBBBB_BBBBB',  'strings.%s' % method_name,  f_data)
+
+                    print method_name + '->' + method_name_new
+
+
 
                 file_util.wite_data_to_file(file_path, f_data)
 
@@ -353,19 +510,21 @@ if __name__ == '__main__':
 
     # 处理cpp
 
-    # var_exclude_dirs = []
-    # var_exclude_files = []
-    # # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/'
-    # # src_path = '/Users/ganyuanrong/Downloads/seashhx/dongnyProject/'
+    var_exclude_dirs = []
+    var_exclude_files = []
+    # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/'
+    src_path = '/Users/ganyuanrong/Downloads/seashhx/dongnyProject/'
     # src_path = '/Users/ganyuanrong/Downloads/seashhx/main'
+    # src_path = '/Users/ganyuanrong/Downloads/seashhx/tools/libfairygui/Classes'
     # deleteComments(src_path, var_exclude_dirs, var_exclude_files)
 
     #cpp添加代码
-    # var_exclude_dirs = []
-    # var_exclude_files = []
-    # # src_path = '/Users/ganyuanrong/Downloads/seashhx/dongnyProject/'
+    var_exclude_dirs = []
+    var_exclude_files = []
+    src_path = '/Users/ganyuanrong/Downloads/seashhx/dongnyProject/'
     # src_path = '/Users/ganyuanrong/Downloads/seashhx/tools/libfairygui/Classes'
-    # addNoUseMethodForCpp2(src_path,var_exclude_dirs,var_exclude_files)
+    # src_path = '/Users/ganyuanrong/Downloads/seashhx/main'
+    # addNoUseMethodForCpp2(src_path,var_exclude_dirs,var_exclude_files, True)
 
     #修改类名
     var_exclude_dirs = ['cocos2d','libsimulator','MWSDK','ThirdSDK']
@@ -373,7 +532,20 @@ if __name__ == '__main__':
     src_path = '/Users/ganyuanrong/Downloads/seashhx/dongnyProject/'
     # src_path = '/Users/ganyuanrong/Downloads/seashhx/tools/libfairygui/Classes'
     src_root = '/Users/ganyuanrong/Downloads/seashhx'
-    changeClassForCpp(src_root,src_path,var_exclude_dirs,var_exclude_files)
+    exclude_class_arr = [ 'Node', 'OpenList', 'Searcher','FRHook','Point2D', 'Rectangle','GestureTemplate']
+    changeClassForCpp(src_root,src_path,var_exclude_dirs,var_exclude_files,exclude_class_arr,'SSHX')
 
+    # libfairygui是一个开源库
+    # 修改方法名
+    var_exclude_dirs = ['cocos2d', 'libsimulator', 'MWSDK', 'ThirdSDK']
+    var_exclude_files = []
+    src_path = '/Users/ganyuanrong/Downloads/seashhx/dongnyProject/'
+    # src_path = '/Users/ganyuanrong/Downloads/seashhx/tools/libfairygui/Classes'
+    src_root = '/Users/ganyuanrong/Downloads/seashhx'
+    exclude_method_arr = ['l_alloc','init', 'Init','getInstance','destroyInstance','stop','start','read','write','writeSize','readSize','reset','instance',
+                          'compare','send','delete','create','nothrow','resize','swap','clear','append','cancel','setup','_init','_reset','seek',
+                          'remove','add','contains','_to','touchDown','touchMove','active','startRecord', 'stopRecord', 'startPlay', 'stopPlay',
+                          'getDataSize', 'getData', 'popData', 'readFile','findPath','','','','','']
+    # changeMethodNameForCpp(src_root,src_path,var_exclude_dirs,var_exclude_files, exclude_method_arr)
 
     print 'end'
