@@ -401,6 +401,11 @@ def changeMethodNameForCpp(src_root, src_change_path, exclude_dirs, exclude_file
                             if class_name not in class_arr:
                                 class_arr.append(class_name)
 
+    print 'class_arr='
+    print class_arr
+    if len(class_arr) == 0:
+        print  'class_arr is empty'
+        return
     method_name_aar = []
     list_dirs = os.walk(src_change_path)
     for root, dirs, files in list_dirs:
@@ -430,11 +435,16 @@ def changeMethodNameForCpp(src_root, src_change_path, exclude_dirs, exclude_file
                             method_name = method_name.replace(class_a,'').replace('::','').replace('(','').replace(' ','')
                             if method_name not in method_name_aar \
                                     and method_name not in exclude_method_arr \
-                                    and not method_name == class_a:
+                                    and not method_name == class_a\
+                                    and not method_name.startswith('sdop'):
                                 print 'method name:' + method_name
                                 method_name_aar.append(method_name)
 
+    print 'method_name_aar='
     print method_name_aar
+    if len(method_name_aar) == 0:
+        print  'method_name_aar is empty'
+        return
     list_dirs = os.walk(src_root)
     for root, dirs, files in list_dirs:
 
@@ -475,6 +485,122 @@ def changeMethodNameForCpp(src_root, src_change_path, exclude_dirs, exclude_file
 
 
                 file_util.wite_data_to_file(file_path, f_data)
+
+
+def changeWordTag(src_root, exclude_dirs, exclude_files,repTag, disTag):
+    if not os.path.exists(src_root):
+        print("src_root not exist")
+        return
+
+    list_dirs = os.walk(src_root)
+    for root, dirs, files in list_dirs:
+
+        exclude_dir_flag = 0
+        for exclude_dir in exclude_dirs:
+            if exclude_dir in root:
+                exclude_dir_flag = 1
+        if exclude_dir_flag == 1:
+            continue
+
+        for file_name in files:
+            if file_name == ".DS_Store":
+                continue
+
+            if file_name in exclude_files:
+                continue
+            if file_name.endswith('.cpp') or file_name.endswith('.h') or file_name.endswith('.hpp') or file_name.endswith('.mm') or file_name.endswith('.m'):
+                file_path = os.path.join(root, file_name)
+
+                f_data = file_util.read_file_data_utf8(file_path)
+
+                f_data = re.sub(r'(?=%s\w+.h")%s' % (repTag, repTag), 'MMMMMMMWWAN', f_data)
+                f_data = re.sub(r'(?=%s\w+.hpp")%s' % (repTag, repTag), 'MMMMMMMWWAN', f_data)
+                f_data = re.sub(r'_NYdesqq', 'AAAAABBBBB', f_data)
+
+
+                f_data = f_data.replace(repTag, disTag)
+
+                f_data = re.sub(r'MMMMMMMWWAN', repTag, f_data)
+                f_data = re.sub(r'AAAAABBBBB', '_NYdesqq', f_data)
+
+                file_util.wite_data_to_file(file_path, f_data)
+
+
+def addPropertyAndVar(src_dir_path, exclude_dirs, exclude_files, is_retry):
+    if not os.path.exists(src_dir_path):
+        print("src_dir_path not exist")
+        return
+
+    list_dirs = os.walk(src_dir_path)
+    for root, dirs, files in list_dirs:
+
+        exclude_dir_flag = 0
+        for exclude_dir in exclude_dirs:
+            if exclude_dir in root:
+                exclude_dir_flag = 1
+        if exclude_dir_flag == 1:
+            continue
+
+        for file_name in files:
+            if file_name == ".DS_Store":
+                continue
+
+            if file_name in exclude_files:
+                continue
+            # if 'AFNetworking' in root or 'YYModel' in root:
+            #     continue
+
+            if file_name.endswith('.mm') or file_name.endswith('.cpp') or file_name.endswith('.hpp') or file_name.endswith('.h'):
+                print '处理中  ' + file_name
+                file_path = os.path.join(root, file_name)
+                # file_data = file_util.read_file_data_utf8(file_path)
+
+                # if is_retry:
+                #     add_code_tag_list = re.findall(r'add my cpp code start', file_data)
+                #     if add_code_tag_list:
+                #         continue
+
+
+                f_obj = open(file_path, "r")
+                text_lines = f_obj.readlines()
+
+                content = ''
+                has_implementation = 0
+
+                start_insert_method = 0
+                pre_line = ''
+
+                words_aar = []
+                for line in text_lines:
+
+                    line = line.decode('utf-8')
+                    line_strip = line.strip()
+                    if '//' not in line and len(line_strip) > 5 and '#include' not in line:
+
+                        def_var_list = re.findall(r'  \b(?:int|float|int|double|bool|unsigned) \w+;', line)
+                        if def_var_list and len(def_var_list) == 1:
+
+                            isAdd = random.randint(1,3)
+                            if isAdd > 2:
+                                add_count = random.randint(1, 5)
+                                add_data = ''
+                                for i in range(add_count):
+                                    type_a = random.randint(1,3)
+                                    w1, w2 = word_util.random_2words_not_same_inarr(words_aar)
+                                    if type_a == 1:
+                                        var_def_content = '\n\t\t%s %s = %s; \n' % ('bool', w1 + '_' + w2, cpp_code_util.bool_value_arr[random.randint(0, len(cpp_code_util.bool_value_arr) - 1)])
+                                    else:
+                                        var_def_content = '\n\t\t%s %s = %s; \n' % (cpp_code_util.numbers_params_type[random.randint(0,len(cpp_code_util.numbers_params_type) - 1)], w1 + '_' + w2, str(random.randint(1,9999)))
+                                    add_data = add_data + var_def_content
+                                content = content + line + add_data
+                            else:
+                                content = content + line
+                        else:
+                            content = content + line
+                    else:
+                        content = content + line
+
+                file_util.wite_data_to_file(file_path, content)
 
 if __name__ == '__main__':
 
@@ -533,7 +659,7 @@ if __name__ == '__main__':
     # src_path = '/Users/ganyuanrong/Downloads/seashhx/tools/libfairygui/Classes'
     src_root = '/Users/ganyuanrong/Downloads/seashhx'
     exclude_class_arr = [ 'Node', 'OpenList', 'Searcher','FRHook','Point2D', 'Rectangle','GestureTemplate']
-    changeClassForCpp(src_root,src_path,var_exclude_dirs,var_exclude_files,exclude_class_arr,'SSHX')
+    # changeClassForCpp(src_root,src_path,var_exclude_dirs,var_exclude_files,exclude_class_arr,'SSHX')
 
     # libfairygui是一个开源库
     # 修改方法名
@@ -548,4 +674,8 @@ if __name__ == '__main__':
                           'getDataSize', 'getData', 'popData', 'readFile','findPath','','','','','']
     # changeMethodNameForCpp(src_root,src_path,var_exclude_dirs,var_exclude_files, exclude_method_arr)
 
+    # changeWordTag(src_root,var_exclude_dirs, var_exclude_files, 'esqq', 'pactivePlay')
+    # changeWordTag(src_root, var_exclude_dirs, var_exclude_files, 'vvgb', 'hilYouFyws')
+
+    addPropertyAndVar(src_path, var_exclude_dirs, var_exclude_files, False)
     print 'end'
