@@ -4,7 +4,7 @@ import string
 import sys
 
 # from modifyXcodeProject import mw_ios_confuse
-from modifyXcodeProject import oc_method_util, oc_code_util
+from modifyXcodeProject import oc_method_util, oc_code_util, cpp_code_util
 from modifyXcodeProject.model.MethodInfo import MethodInfo
 from modifyXcodeProject.model.PropertyInfo import PropertyInfo
 from modifyXcodeProject.utils import file_util, word_util, datetime_util
@@ -432,17 +432,30 @@ def addCodeToSrcCode(code_method_temp_content, code_temple, insert_line_content,
 
 
     if method_assess == '-' and len(property_list) > 0: #调用属性
+        indexa = 0
         for property in property_list:
+            indexa = indexa + 1
             if property.propertyType in oc_method_util.numbers_params_type:
                 #赋值判断
                 if_code = oc_method_util.create_operation_expression_compare('self.%s' % (property.propertyName))
-                call_property = 'self.%s = %s;\n\tif(%s){}' % (property.propertyName, str(random.randint(1, 9999)), if_code)
+                abc = random.randint(1,4)
+                if abc == 2:#temple_code1_temple
+                    aa_temple = 'temple_code%s_temple' % str(indexa)
+                    call_property = 'self.%s = %s;\n\tif(%s){ \n%s\n }' % (property.propertyName, str(random.randint(1, 9999)), if_code, aa_temple)
+                else:
+                    call_property = 'self.%s = %s;\n\tif(%s){}' % (property.propertyName, str(random.randint(1, 9999)), if_code)
             else:
-                call_property = '\tif(self.%s){}' % property.propertyName
+                abc = random.randint(1, 3)
+                if abc == 2:  # temple_code1_temple
+                    aa_temple = 'temple_code%s_temple' % str(indexa)
+                    call_property = '\tif(self.%s){\n%s\n}' % (property.propertyName, aa_temple)
+                else:
+                    call_property = '\tif(self.%s){}' % property.propertyName
 
             call_property_content = call_property_content + '\n\t' + call_property
 
         if call_property_content != '':
+            call_property_content = replace_code_placeholder(call_property_content, '')
             call_property_content = call_property_content + '\n'
 
     code_temple = call_content + call_property_content + code_temple
@@ -497,7 +510,15 @@ def create_code_temple_condition():
 #代码模版处理
 def create_code_temples(condition_var):
 
-    code_temple = code_temples[random.randint(0, len(code_temples) - 1)]  # 随机抽出一个代码模版
+    temple_ran = random.randint(1, 10)
+    if temple_ran == 1:
+        vars, code_temple = cpp_code_util.cpp_code_auto_create1()
+    elif temple_ran == 2:
+        vars, code_temple = cpp_code_util.cpp_code_auto_create2()
+    elif temple_ran == 3:
+        vars, code_temple = cpp_code_util.cpp_switch_code()
+    else:
+        code_temple = code_temples[random.randint(0, len(code_temples) - 1)]  # 随机抽出一个代码模版
 
     code_temple = replace_code_placeholder(code_temple, condition_var)
 
@@ -592,6 +613,19 @@ def replace_code_placeholder(code_temple, condition_var):
                 val1 = '@"' + w1 + '_' + w2 + '", '
             arr_content = arr_content + val1
         code_temple = code_temple.replace('array_value_array', arr_content)
+
+    temple_list = re.findall(r'temple_code\d+_temple', code_temple)  # 需要插入代码块 temple_code1_temple
+    for codetemp in temple_list:
+        temple_ran = random.randint(1, 3)
+        if temple_ran == 1:
+            vars, code_block = cpp_code_util.cpp_code_auto_create1()
+        elif temple_ran == 2:
+            vars,code_block = cpp_code_util.cpp_code_auto_create2()
+        else:
+            vars,code_block = cpp_code_util.cpp_switch_code()
+
+        code_temple = code_temple.replace(codetemp, code_block)
+
     return code_temple
 
 

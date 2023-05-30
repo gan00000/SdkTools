@@ -508,9 +508,9 @@ def replace_data_by_word(data, old_content, new_content):
         new_data = data.replace(old_content, new_content)
     else:
 
-        old_content = '\\b' + old_content + '\\b'
-        png_old_name_re = re.compile(old_content)
-        new_data = re.sub(png_old_name_re, new_content, data)
+        # old_content = '\\b' + old_content + '\\b'
+        # png_old_name_re = re.compile(old_content)
+        new_data = re.sub(r'\b%s\b' % old_content, new_content, data)
     return new_data
 
 def replace_image_data(data, old_content, new_content):
@@ -1630,17 +1630,17 @@ if __name__ == '__main__':
     # deleteComments(src_path, var_exclude_dirs, var_exclude_files)
 
     # 5.修改类名
-    # oc_exclude_files.extend(
-    #     ['AppDelegate.h', 'MWSDK.h', 'PayData.h', 'LoginData.h', 'AccountModel.h', 'CreateOrderResp.h','UnityAppController.h','UnityAppController+Rendering.h'
-    #      ,'UnityViewControllerBase+iOS.h','UnityViewControllerBase+tvOS.h','UnityViewControllerBase.h','UnityView.h','UnityView+iOS.h','UnityView+tvOS.h'])
-    # oc_exclude_dirs.extend(['AFNetworking', 'Masonry', 'YYModel', 'Model', 'sdkFrameworks', "Resources",'ThirkLib'])
-    # # "ThirkLib", "Model", "YYModel", "AFNetworking", "Plat", "WorkProjResources", "Resources", "obfuscation", "Demo"
-    # oc_exclude_dirs_ref_modify = ['ThirkLib', "YYModel", "AFNetworking", "Resources"]
-    #
-    # xcode_project_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v6/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
-    # oc_modify_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v6/GamaSDK_iOS_Integration/FLSDK'
-    # oc_all_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v6/GamaSDK_iOS_Integration'
-    # modify_oc_class_name(oc_modify_path, xcode_project_path, oc_all_path,oc_exclude_dirs_ref_modify)
+    oc_exclude_files.extend(
+        ['AppDelegate.h', 'MWSDK.h', 'PayData.h', 'LoginData.h', 'AccountModel.h', 'CreateOrderResp.h','UnityAppController.h','UnityAppController+Rendering.h'
+         ,'UnityViewControllerBase+iOS.h','UnityViewControllerBase+tvOS.h','UnityViewControllerBase.h','UnityView.h','UnityView+iOS.h','UnityView+tvOS.h'])
+    oc_exclude_dirs.extend(['AFNetworking', 'Masonry', 'YYModel', 'Model', 'sdkFrameworks', "Resources",'ThirkLib','ThirdSrc'])
+    # "ThirkLib", "Model", "YYModel", "AFNetworking", "Plat", "WorkProjResources", "Resources", "obfuscation", "Demo"
+    oc_exclude_dirs_ref_modify = ['ThirkLib', "YYModel", "AFNetworking", "Resources",'ThirdSrc']
+
+    xcode_project_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
+    oc_modify_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/FLSDK'
+    oc_all_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration'
+    modify_oc_class_name(oc_modify_path, xcode_project_path, oc_all_path,oc_exclude_dirs_ref_modify)
 
 
     #找出所有方法名字并修改
@@ -1711,7 +1711,7 @@ if __name__ == '__main__':
     # src_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v41/GamaSDK_iOS_Integration/FLSDK/'
     src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/FLSDK'
     # # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/FLSDK'
-    add_code(src_path, var_exclude_dirs, var_exclude_files)
+    # add_code(src_path, var_exclude_dirs, var_exclude_files)
 
     # xcode_project_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
     # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn'
