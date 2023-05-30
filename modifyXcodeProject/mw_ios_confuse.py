@@ -3,7 +3,7 @@ import imp
 import sys
 import uuid
 
-from modifyXcodeProject import oc_class_parser, oc_method_util, cpp_code_util
+from modifyXcodeProject import oc_class_parser, oc_method_util, cpp_code_util, oc_code_util
 from modifyXcodeProject.utils import file_util, word_util, datetime_util
 from modifyXcodeProject.utils.PrpCrypt import PrpCrypt
 
@@ -624,11 +624,16 @@ def deleteComments(src_dir_path, exclude_dirs, exclude_files):  # 删除注释
                     # file_data_3 = replace_data_content(file_data_2,'/\\*{1,2}[\\s\\S]*?\\*/', '')
                     # file_data_4 = replace_data_content(file_data_3,'\\s*\\n', '\\n')
 
-                    file_data_0 = re.sub(r'//[\s\S]*?\n', '\n', file_data)
-                    # method_data_temp = re.sub(r'^ *//.*', '', method_data_temp)  #//[\s\S]*?\n
-                    file_data_1 = re.sub(r'/\*{1,2}[\s\S]*?\*/', '', file_data_0)  # 非贪婪模式
+                    # link_list = re.findall('@"\w+://\w*',file_data)
+                    # if link_list:
+                    #     for link in link_list:
+                    #         link_temp = link.replace('://', 'KKKKKK')
+                    #         file_data = file_data.replace(link, link_temp)
 
-                    wite_data_to_file(file_path, file_data_1)
+                    file_data = oc_code_util.removeAnnotate(file_data)
+
+                    # file_data = file_data.replace('KKKKKK', '://')
+                    wite_data_to_file(file_path, file_data)
 
 
 def addNewComments(src_dir_path,comment_exclude_dirs, comment_file_path):
@@ -1604,24 +1609,24 @@ if __name__ == '__main__':
     #                              image_ref_path, image_exclude_files)
 
     # 1.1. 修改已经定义好的defind图片名称
-    # changeImageNameForDefindHeader('/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v6/GamaSDK_iOS_Integration/Resources/V6/SDKResourcesV6.bundle',
-    #                                '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v6/GamaSDK_iOS_Integration/obfuscation/imageNameHeader.h')
+    # changeImageNameForDefindHeader('/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/Resources/VN/SDKResourcesVN.bundle',
+    #                                '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/obfuscation/imageNameHeader.h')
 
     #2. 修改已经定义好的defind中的方法名称
-    # method_header_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v6/GamaSDK_iOS_Integration/obfuscation/codeObfuscationForMethodName.h'
+    # method_header_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/obfuscation/codeObfuscationForMethodName.h'
     # changeMethodHeaderValue(method_header_path)
 
-    #3.添加随机注释
+    #3.添加随机注释，一般不用
     # oc_all_path = '/Users/ganyuanrong/Desktop/Default-moqumiaowan_9.27-Release-1.0_scussce/Classes/'
     # comment_exclude_dirs = ['sdkFrameworks','Native']
     # addNewComments(oc_all_path, comment_exclude_dirs, '/Users/ganyuanrong/Desktop/sdk_confuse/ofc.log')
 
     # 4.删除注释
-    # var_exclude_dirs = ['AFNetworking', 'YYModel']
+    # var_exclude_dirs = ['AFNetworking', 'YYModel', 'ThirdSrc']
     # var_exclude_files = []
     # # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/'
-    # src_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v41/GamaSDK_iOS_Integration/FLSDK/'
-    # src_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v6/GamaSDK_iOS_Integration/FLSDK'
+    # # src_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v41/GamaSDK_iOS_Integration/FLSDK/'
+    # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/FLSDK'
     # deleteComments(src_path, var_exclude_dirs, var_exclude_files)
 
     # 5.修改类名
@@ -1660,15 +1665,6 @@ if __name__ == '__main__':
     #
     # modify_class_method('/Users/ganyuanrong/Desktop/Default-moqumiaowan_9.27-Release-1.0_scussce/Classes/',var_exclude_dirs,var_exclude_change_dirs,var_exclude_files,var_exclude_name)
 
-
-
-    #找出所有被特别标记的方法，并且生成宏
-    # find_method_name_by_tag('/Users/ganyuanrong/Desktop/Default-moqumiaowan_9.27-Release-1.0_scussce/Libraries/')
-
-    #给cpp添加随机方法
-    # var_exclude_dirs = []
-    # var_exclude_files = []
-    # addNoUseMethodForCpp('/Users/ganyuanrong/Desktop/Default-moqumiaowan_9.27-Release-1.0_scussce/Classes/Native', var_exclude_dirs, var_exclude_files)
 
     # xxxresult = []
     # dataxxx = read_file_data('/Users/ganyuanrong/Desktop/关联文件2.txt')
@@ -1709,37 +1705,20 @@ if __name__ == '__main__':
 
     # oc_class_parser.parse('/Users/ganyuanrong/Desktop/AdDelegate.m')
     #6.添加垃圾代码
-    # var_exclude_dirs = ['AFNetworking', 'YYModel']
-    # var_exclude_files = []
-    # # # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/'
-    # # src_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v41/GamaSDK_iOS_Integration/FLSDK/'
-    # src_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v6/GamaSDK_iOS_Integration/FLSDK'
-    # # # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/FLSDK'
-    # add_code(src_path, var_exclude_dirs, var_exclude_files)
+    var_exclude_dirs = ['AFNetworking', 'YYModel', 'ThirdSrc']
+    var_exclude_files = []
+    # # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/'
+    # src_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v41/GamaSDK_iOS_Integration/FLSDK/'
+    src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/FLSDK'
+    # # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/FLSDK'
+    add_code(src_path, var_exclude_dirs, var_exclude_files)
 
-    # xcode_project_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v41/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
-    # src_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v41'
-    # modify_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v41/GamaSDK_iOS_Integration/FLSDK'
-    # #指定目录下面的目录加前缀
+    # xcode_project_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
+    # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn'
+    # modify_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/FLSDK'
+    #指定目录下面的目录加前缀
     # changeXcodeProjectDir(xcode_project_path, src_path, modify_path, 'OPEN')
-    # #修改所有uuid
+    #修改所有uuid
     # changeXcodeProjectUUid(xcode_project_path)
-
-
-    # 处理cpp
-
-    var_exclude_dirs = []
-    var_exclude_files = []
-    # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/'
-    # src_path = '/Users/ganyuanrong/Downloads/seashhx/dongnyProject/'
-    src_path = '/Users/ganyuanrong/Downloads/seashhx/tools/libfairygui/Classes'
-    deleteComments(src_path, var_exclude_dirs, var_exclude_files)
-
-    #cpp添加代码
-    var_exclude_dirs = []
-    var_exclude_files = []
-    # src_path = '/Users/ganyuanrong/Downloads/seashhx/dongnyProject/'
-    src_path = '/Users/ganyuanrong/Downloads/seashhx/tools/libfairygui/Classes'
-    addNoUseMethodForCpp2(src_path,var_exclude_dirs,var_exclude_files)
 
     print 'end'

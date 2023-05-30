@@ -4,7 +4,7 @@ import string
 import sys
 
 # from modifyXcodeProject import mw_ios_confuse
-from modifyXcodeProject import oc_method_util
+from modifyXcodeProject import oc_method_util, oc_code_util
 from modifyXcodeProject.model.MethodInfo import MethodInfo
 from modifyXcodeProject.model.PropertyInfo import PropertyInfo
 from modifyXcodeProject.utils import file_util, word_util, datetime_util
@@ -150,7 +150,7 @@ def insert_method_extra_code(file_path, methods_list, property_list): #方法内
 
                 for code_line in code_method_temp_lines:
 
-                    code_line_1_temp = removeAnnotate(code_line)
+                    code_line_1_temp = oc_code_util.removeAnnotate(code_line)
                     code_line_1_temp = code_line_1_temp.strip()
                     code_line_pre_1_tmp = code_line_pre.strip()
 
@@ -334,7 +334,7 @@ def insert_methods(file_path_m, sdk_confuse_dir): #类内插入方法
     # print ref_class_list
     ref_class_list = []
     if file_data_h:
-        file_data_h_no_anno = removeAnnotate(file_data_h)
+        file_data_h_no_anno = oc_code_util.removeAnnotate(file_data_h)
         ref_class_list_in_h = re.findall(r'(?=[ (][A-Z]\w+ \*\)?\w+\b)[ (][A-Z]\w+ \*', file_data_h_no_anno)
         if ref_class_list_in_h:
             for class_a in ref_class_list_in_h:
@@ -615,7 +615,7 @@ def parse_property(file_data):
 def parse_method_local_params(method_data): #解析方法局部变量
     if method_data:
         method_data_temp = method_data
-        method_data_temp = removeAnnotate(method_data_temp)
+        method_data_temp = oc_code_util.removeAnnotate(method_data_temp)
         params_list = []
 
         result_list = re.findall(r'\b[A-Z]\w+ (?:\*|\* )?[A-Za-z_]\w+ ?=', method_data_temp) #提取类似 NSString * timeStamp=   NSArray *responseArray =
@@ -641,19 +641,6 @@ def parse_method_local_params(method_data): #解析方法局部变量
         return params_list
 
     return None
-
-#删除注释
-def removeAnnotate(code_data):
-    # file_data_0 = replace_data_content(src_data, '/\\*\\*/', '')
-    # file_data_1 = replace_data_content(file_data_0, '([^:/])//.*', '\\1')
-    # file_data_2 = replace_data_content(file_data_1, '^//.*', '')
-    # file_data_3 = replace_data_content(file_data_2, '/\\*{1,2}[\\s\\S]*?\\*/', '')
-    # 先删掉注释，不然会拿到注释的变量
-    # method_data_temp = re.sub(r'^//.*', '', method_data_temp)
-    code_data = re.sub(r'//[\s\S]*?\n', '\n', code_data)
-    # method_data_temp = re.sub(r'^ *//.*', '', method_data_temp)  #//[\s\S]*?\n
-    code_data = re.sub(r'/\*{1,2}[\s\S]*?\*/', '', code_data)  # 非贪婪模式
-    return code_data
 
 
 def parse_method_defind_params(method_data): #解析方法前面变量
