@@ -1,4 +1,4 @@
-          int ppppp10_ppppp = int1_int;
+          int ppppp10_ppppp = int1_int; //temple23
           int ppppp9_ppppp = int2_int;
           NSMutableDictionary * ppppp1_ppppp = [[NSMutableDictionary alloc] init];
 

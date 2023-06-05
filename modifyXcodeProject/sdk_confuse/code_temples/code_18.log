@@ -1,4 +1,4 @@
         
-        double ppppp1_ppppp = int1_int.0;
+        double ppppp1_ppppp = int1_int.0;   //temple18
         if (@(ppppp1_ppppp).doubleValue >= int2_int) {}
         

@@ -1,4 +1,4 @@
-        NSString *ppppp1_ppppp = @"";
+        NSString *ppppp1_ppppp = @"";   //temple1
         if(var_temp){
             if([ppppp1_ppppp isEqualToString:@"ppppp2_ppppp"]){
                 ppppp1_ppppp = @"ppppp3_ppppp";

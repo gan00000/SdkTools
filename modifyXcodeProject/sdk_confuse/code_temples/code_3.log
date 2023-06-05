@@ -1,4 +1,4 @@
-        int ppppp1_ppppp = iiiii1_iiiii;
+        int ppppp1_ppppp = iiiii1_iiiii;   //temple3
         int case_left_var = iiiii188_iiiii;
         int case_right_var = iiiii182_iiiii;
         switch (ppppp1_ppppp) {

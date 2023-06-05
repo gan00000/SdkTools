@@ -1,5 +1,5 @@
         
-        type_mumber1_type ppppp1_ppppp = iiiii1_iiiii;
+        type_mumber1_type ppppp1_ppppp = iiiii1_iiiii;  //commontemple12
         bool ppppp2_ppppp = bool1_bool;
 
         for(int ppppp3_ppppp = int2_int; ppppp3_ppppp < int3_int; ppppp3_ppppp = ppppp3_ppppp + 1)

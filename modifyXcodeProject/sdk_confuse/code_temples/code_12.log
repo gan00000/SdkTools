@@ -1,5 +1,5 @@
         
-        int ppppp1_ppppp = int1_int;
+        int ppppp1_ppppp = int1_int;    //temple12
         NSString *ppppp3_ppppp = @"ppppp4_ppppp";
         while(ppppp3_ppppp.length > ppppp1_ppppp) {
             break; 

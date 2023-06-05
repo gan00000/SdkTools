@@ -1,5 +1,5 @@
         
-        NSDictionary *ppppp1_ppppp = @{dic_value_dic};
+        NSDictionary *ppppp1_ppppp = @{dic_value_dic};  //temple13
         for (NSString *ppppp2_ppppp in ppppp1_ppppp){
             break;
         }

@@ -1,4 +1,4 @@
-        NSArray * ppppp1_ppppp = [NSArray arrayWithObjects:@(int1_int), @(int2_int), @"ppppp3_ppppp", @"ppppp4_ppppp", nil];
+        NSArray * ppppp1_ppppp = [NSArray arrayWithObjects:@(int1_int), @(int2_int), @"ppppp3_ppppp", @"ppppp4_ppppp", nil];    //temple21
         if ([ppppp1_ppppp containsObject:@"ppppp2_ppppp"]) {
             BOOL ppppp5_ppppp = bool1_bool;
             if (ppppp5_ppppp){

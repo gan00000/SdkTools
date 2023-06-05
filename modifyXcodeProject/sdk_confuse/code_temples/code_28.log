@@ -1,4 +1,4 @@
-    NSArray *ppppp1_ppppp = @[array_value_array];
+    NSArray *ppppp1_ppppp = @[array_value_array]; //temple28
 
           int ppppp2_ppppp = ppppp1_ppppp.count;
          int ppppp3_ppppp = (int)ppppp2_ppppp;

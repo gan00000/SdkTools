@@ -1,4 +1,4 @@
-        NSString *ppppp1_ppppp = @"";
+        NSString *ppppp1_ppppp = @"";   //temple2
         if(var_temp){
             ppppp1_ppppp = @"ppppp3_ppppp";
         }

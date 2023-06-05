@@ -1,2 +1,2 @@
-        NSDictionary *ppppp1_ppppp = [NSDictionary dictionaryWithObjectsAndKeys:@"ppppp2_ppppp",@(int1_int), nil];
+        NSDictionary *ppppp1_ppppp = [NSDictionary dictionaryWithObjectsAndKeys:@"ppppp2_ppppp",@(int1_int), nil]; //temple29
              if (ppppp1_ppppp.count > int2_int) {}

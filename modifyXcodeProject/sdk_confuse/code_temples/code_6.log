@@ -1,5 +1,5 @@
         
-        NSDictionary *ppppp1_ppppp = @{dic_value_dic};
+        NSDictionary *ppppp1_ppppp = @{dic_value_dic};  //temple6
         if (ppppp1_ppppp.count numcop1_numcop iiiii1_iiiii){
             NSLog(@"ppppp4_ppppp");
         }else{

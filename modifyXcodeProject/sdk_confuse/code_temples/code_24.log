@@ -1,4 +1,4 @@
-      int ppppp1_ppppp = int1_int;
+      int ppppp1_ppppp = int1_int;  //temple24
       NSMutableDictionary *ppppp2_ppppp = [NSMutableDictionary dictionaryWithCapacity:int2_int];
       ppppp1_ppppp += int3_int;
       [ppppp2_ppppp setObject: @(ppppp1_ppppp) forKey:@"ppppp3_ppppp"];

@@ -1,5 +1,5 @@
         
-        type_mumber1_type ppppp1_ppppp = int1_int;
+        type_mumber1_type ppppp1_ppppp = int1_int;  //commontemple3
         bool ppppp2_ppppp = bool1_bool;
         while (ppppp1_ppppp < int2_int)
         {
