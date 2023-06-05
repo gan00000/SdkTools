@@ -1600,6 +1600,7 @@ if __name__ == '__main__':
             cpp_code_temp_aar.append(code_data)
 
     for code_data in cpp_code_temp_aar:
+        code_data = re.sub(r'\bbool\b', 'BOOL', code_data)
         oc_class_parser.code_temples.append(code_data)
 
     #1.修改图片  图片md5需要额外处理
@@ -1640,7 +1641,7 @@ if __name__ == '__main__':
     xcode_project_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
     oc_modify_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/FLSDK'
     oc_all_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration'
-    modify_oc_class_name(oc_modify_path, xcode_project_path, oc_all_path,oc_exclude_dirs_ref_modify)
+    # modify_oc_class_name(oc_modify_path, xcode_project_path, oc_all_path,oc_exclude_dirs_ref_modify)
 
 
     #找出所有方法名字并修改
@@ -1716,9 +1717,10 @@ if __name__ == '__main__':
     # xcode_project_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
     # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn'
     # modify_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/FLSDK'
-    #指定目录下面的目录加前缀
+    #7.指定目录下面的目录加前缀
     # changeXcodeProjectDir(xcode_project_path, src_path, modify_path, 'OPEN')
-    #修改所有uuid
+    #8.修改所有uuid
     # changeXcodeProjectUUid(xcode_project_path)
-
+    #修改函数顺序
+    #修改变量名称
     print 'end'
