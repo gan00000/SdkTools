@@ -1,0 +1,2 @@
+          BOOL ppppp1_ppppp = bool1_bool;    ////temple31
+          if (ppppp1_ppppp) { __asm__("NOP"); }
