@@ -1,0 +1,9 @@
+        
+        bool ppppp1_ppppp = bool1_bool;/commontemple16
+        while (!ppppp1_ppppp)
+        {
+            ppppp1_ppppp = bool2_bool;
+            break;
+        }
+
+        
