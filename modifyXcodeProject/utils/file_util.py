@@ -17,7 +17,7 @@ def read_file_data_utf8(file_path):
     return None
 
 def read_file_data(file_path):
-    print 'read_file_data=' + file_path
+    # print 'read_file_data=' + file_path
     if os.path.exists(file_path):
         f_obj = open(file_path, mode="rb")  # 首先先创建一个文件对象
         f_data = f_obj.read()#.decode("UTF-8")  # 用read()方法读取文件内容  contents = f.read().decode("UTF-8")
@@ -37,5 +37,11 @@ def read_file_data_for_line(file_path):
 def wite_data_to_file(file_path, data):
     f_obj = open(file_path, mode='wb')  # 首先先创建一个文件对象   f.write(contents.encode("UTF-8"))
     f_obj.write(data.encode("UTF-8"))
+    f_obj.flush()
+    f_obj.close()
+
+def wite_data_to_file_noencode(file_path, data):
+    f_obj = open(file_path, mode='wb')  # 首先先创建一个文件对象   f.write(contents.encode("UTF-8"))
+    f_obj.write(data)
     f_obj.flush()
     f_obj.close()
