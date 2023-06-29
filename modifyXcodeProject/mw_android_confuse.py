@@ -413,7 +413,7 @@ if __name__ == '__main__':
     # getDimenKey(src_path)
     # change_res_file_name(src_path, src_path)
 
-    exclude_string = ['sdk_inner_version','scheme','facebook_app_id','facebook_client_token',
+    exclude_string = ['default_web_client_id','sdk_inner_version','scheme','facebook_app_id','facebook_client_token',
                       'facebook_authorities','fb_login_protocol_scheme','facebook_app_name','line_channelId','channel_platform','sdk_name']
     change_id_tag_file_name(src_path, src_path)
 
