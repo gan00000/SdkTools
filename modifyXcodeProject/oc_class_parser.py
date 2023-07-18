@@ -32,20 +32,20 @@ def parse(file_name, sdk_confuse_dir): #.m文件
     mthod_arr = []
     mthod_arr2 = []
 
-    if os.path.exists(file_name) and (file_name.endswith('.m') or file_name.endswith('.mm') or file_name.endswith('.h')):
+    if os.path.exists(file_name) and (file_name.endswith('.m') or file_name.endswith('.mm')):
 
-        if file_name.endswith('.m'):  #
-            file_path = file_name
-            # print 'handle file = ' + file_path
-            print '正在处理: ' + file_name
+        # if file_name.endswith('.m'):  #
+        file_path = file_name
+        # print 'handle file = ' + file_path
+        print '正在处理: ' + file_name
 
-            # change_method_order(file_path)
-            #插入属性
-            property_list_add = insert_class_property(file_path)
-            # 插入方法
-            methods_list = insert_methods(file_path, sdk_confuse_dir)
-            #插入垃圾代码，调用属性和函数
-            insert_method_extra_code(file_path, methods_list, property_list_add)
+        # change_method_order(file_path)
+        #插入属性
+        property_list_add = insert_class_property(file_path)
+        # 插入方法
+        methods_list = insert_methods(file_path, sdk_confuse_dir)
+        #插入垃圾代码，调用属性和函数
+        insert_method_extra_code(file_path, methods_list, property_list_add)
 
     print '一共插入的代码数量为：' + str(insert_code_sum)
 
@@ -307,7 +307,8 @@ def insert_methods(file_path_m, sdk_confuse_dir): #类内插入方法
     methods_list = []
 
     # 处理对应.h文件
-    file_path_h = file_path_m.replace('.m', '.h')
+    file_path_h = file_path_m.replace('.mm', '.h')
+    file_path_h = file_path_h.replace('.m', '.h')
     file_data_h = file_util.read_file_data_utf8(file_path_h)
     file_data_m = file_util.read_file_data_utf8(file_path_m)
 

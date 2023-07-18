@@ -1,5 +1,5 @@
         
-        bool ppppp1_ppppp = bool1_bool;/commontemple16
+        bool ppppp1_ppppp = bool1_bool;//commontemple19
         while (!ppppp1_ppppp)
         {
             ppppp1_ppppp = bool2_bool;

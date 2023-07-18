@@ -1243,7 +1243,7 @@ def find_string_tag(src_dir_path,exclude_dirs,exclude_strings, encrpty_key,encrp
 
             for file_name in files:
 
-                if file_name.endswith('.m') or file_name.endswith('.h'):
+                if file_name.endswith('.m') or file_name.endswith('.mm') or file_name.endswith('.h'):
                     file_path = os.path.join(root, file_name)  # 头文件路径
                     file_data = read_file_data(file_path)
                     file_data = unicode(file_data)
@@ -1299,12 +1299,12 @@ def find_string_tag(src_dir_path,exclude_dirs,exclude_strings, encrpty_key,encrp
 
                     for file_name in files:
 
-                        if file_name.endswith('.m') or file_name.endswith('.h'):
+                        if file_name.endswith('.m') or file_name.endswith('.mm') or file_name.endswith('.h'):
                             file_path = os.path.join(root, file_name)  # 头文件路径
                             file_data = read_file_data(file_path)
                             if xssss in file_data:
-                                file_data = file_data.replace(xssss,ssa)
-                                wite_data_to_file(file_path,file_data)
+                                file_data = file_data.replace(xssss, ssa)
+                                wite_data_to_file(file_path, file_data)
 
 def replace_string_tag(src_dir_path,exclude_dirs,exclude_strings, re_pr, encrpty_key,encrpty_iv):
 
@@ -1472,7 +1472,7 @@ def add_code(src_dir_path,exclude_dirs,exclude_files):#添加垃圾代码
             for file_name in files:
                 if file_name in exclude_files:
                     continue
-                if file_name.endswith('.m'):
+                if file_name.endswith('.m') or file_name.endswith('.mm') or file_name.endswith('.h'):
                     file_path = os.path.join(root, file_name)
                     oc_class_parser.parse(file_path, sdk_confuse_dir)
                     # oc_class_parser.change_method_params_name(file_path)
@@ -1614,7 +1614,7 @@ if __name__ == '__main__':
     #                                '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/obfuscation/imageNameHeader.h')
 
     #2. 修改已经定义好的defind中的方法名称
-    # method_header_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/obfuscation/codeObfuscationForMethodName.h'
+    method_header_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/obfuscation/codeObfuscationForMethodName.h'
     # changeMethodHeaderValue(method_header_path)
 
     #3.添加随机注释，一般不用
@@ -1677,13 +1677,13 @@ if __name__ == '__main__':
     # for xxxd in xxxresult:
     #     print xxxd
 
-    # find_string_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK'
-    # exclude_dirs = ['AFNetworking', 'YYModel','Common','Res','CoreSecurity']
-    # exclude_strings = ['AccountListViewCellID','%@%@','%d','%ld','%@','.']
 
-    # wanxianmzxqKEY = 'SeaSdkV6-20230427KEY'
-    # wanxianmzxqIV = 'SeaSdkV6-20230427IV'
-    #找出所有字符使用宏替代
+    # find_string_path = '/Users/ganyuanrong/xzgame/jianghu_ftcs/jianghu_ft/ocSrc'
+    # exclude_dirs = ['AFNetworking', 'YYModel','Common','Res','utils']
+    # exclude_strings = ['AccountListViewCellID','%@%@','%d','%ld','%@','.']
+    # wanxianmzxqKEY = 'xiezongxiezong0717key'
+    # wanxianmzxqIV = 'xiezongxiezong0717iv'
+    # 找出所有字符使用宏替代
     # find_string_tag(find_string_path, exclude_dirs, exclude_strings, wanxianmzxqKEY, wanxianmzxqIV)
 
     # eKey=mplaywlzhsKEY,eIV=mplaywlzhsIV
@@ -1701,8 +1701,8 @@ if __name__ == '__main__':
     #
     # mmxx = pc.decrypt(mmxx)
     # print mmxx
-
-    # changeStringHeaderValue('/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v6/GamaSDK_iOS_Integration/obfuscation/MWStringHeaders.h')
+    pc = PrpCrypt('xiezong717KEY', 'xiezong717IV')
+    # changeStringHeaderValue('/Users/ganyuanrong/xzgame/jianghu_ftcs/jianghu_ft/MyStringOfc.h')
 
     # oc_class_parser.parse('/Users/ganyuanrong/Desktop/AdDelegate.m')
     #6.添加垃圾代码
@@ -1710,9 +1710,11 @@ if __name__ == '__main__':
     var_exclude_files = []
     # # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/'
     # src_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v41/GamaSDK_iOS_Integration/FLSDK/'
-    src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/FLSDK'
-    # # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/FLSDK'
-    # add_code(src_path, var_exclude_dirs, var_exclude_files)
+    # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/FLSDK'
+    # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/FLSDK'
+    src_path = '/Users/ganyuanrong/xzgame/jianghu_ftcs/jianghu_ft/ocSrc'
+    # src_path = '/Users/ganyuanrong/xzgame/jianghu_ftcs/jianghu_ft/iap'
+    add_code(src_path, var_exclude_dirs, var_exclude_files)
 
     # xcode_project_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
     # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn'
