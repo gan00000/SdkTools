@@ -265,10 +265,10 @@ def rename_res_file(src_dir_path):
 def change_res_file_name(src_path, res_path):
 
     res_dic = rename_res_file(src_path)
-    ids_aar = getIds(res_path)
-    str_aar = getStringKey(res_path)
-    color_aar = getColorKey(res_path)
-    dimen_aar = getDimenKey(res_path)
+    # ids_aar = getIds(res_path)
+    # str_aar = getStringKey(res_path)
+    # color_aar = getColorKey(res_path)
+    # dimen_aar = getDimenKey(res_path)
     if res_dic:
 
         if os.path.exists(src_path):
@@ -394,6 +394,117 @@ def rename_dimen(file_data, dimen_aar):
 
     return file_data
 
+def find_R_in_code(src_path):
+    #修改id
+    # ids_aar = getIds(res_path)
+    # # 修改string key
+    # str_aar = getStringKey(res_path)
+    # color_aar = getColorKey(res_path)
+    # dimen_aar = getDimenKey(res_path)
+
+    # r_layout_aar = []
+    # r_layout_stem = []
+    #
+    # r_id_aar = []
+    # r_id_stem = []
+    #
+    # r_string_aar = []
+    # r_string_stem = []
+    #
+    # r_color_aar = []
+    # r_color_stem = []
+
+    R_statem_list = []
+
+
+    if os.path.exists(src_path):
+        list_dirs = os.walk(src_path)
+        for root, dirs, files in list_dirs:
+            for file_name in files:
+
+                if not file_name.endswith('.java') and root.endswith('myr'):
+                    continue
+
+                file_path = os.path.join(root, file_name)
+                file_data = file_util.read_file_data(file_path)
+                file_data = oc_code_util.removeAnnotate(file_data)
+                has_change = 0
+
+                # layout
+                layout_list = re.findall(r'[^android\.]R.layout.\w+\b', file_data)
+                if layout_list and len(layout_list) > 0:
+                    has_change = 1
+                    file_data = replce_R_xxx(file_data, layout_list, 'RLayout')
+                # id
+                id_list = re.findall(r'[^android\.]R.id.\w+\b', file_data)
+                if id_list and len(id_list) > 0:
+                    has_change = 1
+                    file_data = replce_R_xxx(file_data, id_list, 'RId')
+
+                # string
+                string_list = re.findall(r'[^android\.]R.string.\w+\b', file_data)
+                if string_list and len(string_list) > 0:
+                    has_change = 1
+                    file_data = replce_R_xxx(file_data, string_list,  'RString')
+
+                # color
+                color_list = re.findall(r'[^android\.]R.color.\w+\b', file_data)
+                if color_list and len(color_list) > 0:
+                    has_change = 1
+                    file_data = replce_R_xxx(file_data, color_list, 'RColor')
+
+                # dimen
+                dimen_list = re.findall(r'[^android\.]R.dimen.\w+\b', file_data)
+                if dimen_list and len(dimen_list) > 0:
+                    has_change = 1
+                    file_data = replce_R_xxx(file_data, dimen_list, 'RDimen')
+
+                # drawable
+                drawable_list = re.findall(r'[^android\.]R.drawable.\w+\b', file_data)
+                if drawable_list and len(drawable_list) > 0:
+                    has_change = 1
+                    file_data = replce_R_xxx(file_data, drawable_list, 'RDrawable')
+
+                # mipmap
+                mipmap_list = re.findall(r'[^android\.]R.mipmap.\w+\b', file_data)
+                if mipmap_list and len(mipmap_list) > 0:
+                    has_change = 1
+                    file_data = replce_R_xxx(file_data, mipmap_list, 'RMipmap')
+
+                if has_change == 1:
+                    file_util.wite_data_to_file_noencode(file_path, file_data)
+
+
+def replce_R_xxx(file_data, xxx_list, class_name):
+
+    if xxx_list and len(xxx_list) > 0:
+
+        r_xxx_stem_list = []
+        r_xxx_aar = []
+        for id in xxx_list:
+
+            id_new = id.replace('.', '_').replace('R_', '%s.' % class_name)
+            file_data = re.sub(r'%s\b' % id, id_new, file_data)
+
+            if id not in r_xxx_aar:
+                new_def = id_new.replace('%s.' % class_name, '')
+                stem = 'public static final int %s = %s;' % (new_def, id)
+                r_xxx_aar.append(id)
+                r_xxx_stem_list.append(stem)
+
+        import_list = re.findall(r'import com\..+;', file_data)
+        if import_list:
+            last_import = import_list[len(import_list) - 1]
+            last_import_add = last_import + '\n' + ('import com.mw.myr.%s;\n' % class_name)
+            file_data = file_data.replace(last_import, last_import_add)
+
+        print '=========start=========='
+        for stem in r_xxx_stem_list:
+            print stem
+        print '=========end=========='
+
+    return file_data
+
 
 if __name__ == '__main__':
 
@@ -407,15 +518,19 @@ if __name__ == '__main__':
     word_util.words_dong = words_dong
     word_util.genest_word = genest_word
 
-    src_path = '/Users/ganyuanrong/AndroidProject/MWSDK/GamaSDK/src/'
-    res_path = '/Users/ganyuanrong/AndroidProject/MWSDK/GamaSDK/src/'
-    # getColorKey(src_path)
-    # getDimenKey(src_path)
+    src_path = '/Users/ganyuanrong/AndroidProject/DYSDK/SDKModule/src'
+    res_path = '/Users/ganyuanrong/AndroidProject/DYSDK/SDKModule/src'
+
+    #1.修改res下面的文件名字
     # change_res_file_name(src_path, src_path)
 
-    exclude_string = ['default_web_client_id','sdk_inner_version','scheme','facebook_app_id','facebook_client_token',
+    exclude_string = ['sdk_game_code','sdk_app_key','sdk_more_language','sdk_af_dev_key','sdk_default_server_language',
+                      'default_web_client_id','sdk_inner_version','scheme','facebook_app_id','facebook_client_token',
                       'facebook_authorities','fb_login_protocol_scheme','facebook_app_name','line_channelId','channel_platform','sdk_name']
-    change_id_tag_file_name(src_path, src_path)
+    #1.修改资源 id值
+    # change_id_tag_file_name(src_path, src_path)
+
+    # find_R_in_code(src_path)
 
     print 'end'
 
