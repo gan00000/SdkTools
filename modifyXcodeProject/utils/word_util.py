@@ -48,7 +48,7 @@ def random_2word():#随机生成两个单词
 
     return word_aar[0], word_aar[1]
 
-
+w_count = 0
 def random_1word():
 
     w_index = random.randint(0, len(genest_word) - 1)
@@ -57,7 +57,9 @@ def random_1word():
     #     first_index = random.randint(0, len(genest_word) - 1)
     #     first_word = genest_word[first_index]
     # words_name_alary.append(first_word)
-    return first_word
+    global w_count
+    w_count = w_count + 1
+    return first_word + str(w_count)
 
 
 def random_2words_not_same_inarr(word_aar):

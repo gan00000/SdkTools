@@ -55,6 +55,7 @@ def create_operation_expression_compare2(rightVar):
     content = rightVar + ' ' + bijiao_s + ' ' + str(right_value)
     return content
 
+
 def cpp_code_auto_create1():
     var_arr = []
     var1 = word_util.random_1words_not_same_inarr(var_arr)

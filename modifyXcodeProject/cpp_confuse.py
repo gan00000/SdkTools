@@ -2,6 +2,7 @@
 import imp
 import sys
 import uuid
+from threading import Thread
 
 from modifyXcodeProject import oc_class_parser, oc_method_util, cpp_code_util
 from modifyXcodeProject.utils import file_util, word_util, datetime_util
@@ -602,6 +603,181 @@ def addPropertyAndVar(src_dir_path, exclude_dirs, exclude_files, is_retry):
 
                 file_util.wite_data_to_file(file_path, content)
 
+def unity_change_struct(src_dir_path, exclude_dirs, exclude_files, is_retry):
+
+        struct_arr = []
+        if not os.path.exists(src_dir_path):
+            print("src_dir_path not exist")
+            return
+
+        list_dirs = os.walk(src_dir_path)
+        for root, dirs, files in list_dirs:
+
+            exclude_dir_flag = 0
+            for exclude_dir in exclude_dirs:
+                if exclude_dir in root:
+                    exclude_dir_flag = 1
+            if exclude_dir_flag == 1:
+                continue
+
+            for file_name in files:
+                if file_name == ".DS_Store":
+                    continue
+
+                if file_name in exclude_files:
+                    continue
+                # if 'AFNetworking' in root or 'YYModel' in root:
+                #     continue
+                mm = 0
+                if file_name.endswith('.mm') or file_name.endswith('.cpp') or file_name.endswith(
+                        '.hpp') or file_name.endswith('.h'):
+                    print '处理中  ' + file_name
+                    mm = mm + 1
+                    file_path = os.path.join(root, file_name)
+                    file_data = file_util.read_file_data(file_path)
+                    if file_data:
+                        struct_list = re.findall(r'struct (\w+).*\n\{', file_data)
+                        for name in struct_list:
+                            if name not in struct_arr:
+                                struct_arr.append(name)
+
+        print '查找结束'
+        print struct_arr
+        start_new_list = {}
+        if len(struct_arr) > 0:
+            index = 1
+            for s_name in struct_arr:
+                w1,w2 = word_util.random_2word()
+
+                w = w1.capitalize() + '_' + str(index) + '_' + w2.capitalize()
+                start_new_list[s_name] = w
+                index = index + 1
+
+        print '开始替换->' + str(len(struct_arr))
+        list_dirs = os.walk(src_dir_path)
+        for root, dirs, files in list_dirs:
+
+            for file_name in files:
+                if file_name.endswith('.mm') or file_name.endswith('.cpp') or file_name.endswith('.hpp') or file_name.endswith('.h'):
+
+                    struct_replace(file_name, root, start_new_list)
+                    # global thread_count
+                    # if thread_count < 10:
+                    #     t_name = 't_' + str(thread_count)
+                    #     t = Thread(target=struct_replace, name=t_name, args=(file_name, root, start_new_list))
+                    #     t.start()
+                    # else:
+                    #     struct_replace(file_name, root, start_new_list)
+        print '处理结束'
+
+thread_count = 0
+def struct_replace(file_name, root, start_new_list):
+
+    global thread_count
+    thread_count = thread_count + 1
+
+    start_new_list_temp = {}
+    for k, v in start_new_list.items():
+        start_new_list_temp[k] = v
+
+    print '替换中中...  ' + file_name
+
+    file_path = os.path.join(root, file_name)
+    file_data = file_util.read_file_data(file_path)
+    if file_data:
+
+        for k, v in start_new_list_temp.items():
+            # print 're.sub start'
+            if k in file_data:
+                file_data = re.sub(r'\b%s\b' % k, v, file_data)
+            # print 're.sub end'
+
+
+        file_util.wite_data_to_file(file_path, file_data)
+        print '替换完成...' + file_name
+        thread_count = thread_count - 1
+
+
+def unity_addNoUseMethodForCpp2(src_dir_path, exclude_dirs, exclude_files, is_retry):
+    if not os.path.exists(src_dir_path):
+        print("src_dir_path not exist")
+        return
+
+    list_dirs = os.walk(src_dir_path)
+    for root, dirs, files in list_dirs:
+
+        exclude_dir_flag = 0
+        for exclude_dir in exclude_dirs:
+            if exclude_dir in root:
+                exclude_dir_flag = 1
+        if exclude_dir_flag == 1:
+            continue
+
+        for file_name in files:
+            if file_name == ".DS_Store":
+                continue
+
+            if file_name in exclude_files:
+                continue
+            # if 'AFNetworking' in root or 'YYModel' in root:
+            #     continue
+
+            if file_name.endswith('.mm') or file_name.endswith('.cpp'):
+                print '处理中  ' + file_name
+                file_path = os.path.join(root, file_name)
+                file_data = file_util.read_file_data_utf8(file_path)
+
+                # if is_retry:
+                #     add_code_tag_list = re.findall(r'add my cpp code start', file_data)
+                #     if add_code_tag_list:
+                #         continue
+
+                print '修改中  ' + file_name
+                inline_def_list_temp = re.findall(r'inline .+\n\t\{([\s\S]*?)\}', file_data)
+
+                # inline_def_list_temp = re.findall(r'inline .+\{([\s\S]*?)\}', file_data)
+
+                inline_def_list = []
+                if inline_def_list_temp:
+                    for itema in inline_def_list_temp:
+                        if itema not in inline_def_list:
+                            inline_def_list.append(itema)
+
+                total = len(inline_def_list)
+                if inline_def_list and len(inline_def_list) > 0:
+                    for ia in range(len(inline_def_list) - 1):
+                        class_def = inline_def_list[ia]
+                        print '处理中file_name=%s total=%s, index=%s' % (file_name, str(total), str(ia))
+                        isneed = random.randint(1, 10)  # 随机决定是否改行需要添加代码
+                        if isneed > 7:  # 添加
+                            code_temp = ''
+                            aType = random.randint(1, 6)
+                            if aType == 1:
+                                vars, code_temp = cpp_code_util.cpp_code_auto_create1()
+                            elif aType == 2:
+                                vars, code_temp = cpp_code_util.cpp_code_auto_create2()
+                            elif aType == 3:
+                                vars, code_temp = cpp_code_util.cpp_switch_code()
+                            else:
+                                code_temp = cpp_code_temp_aar[random.randint(0, len(cpp_code_temp_aar) - 1)]
+                            code_temp = cpp_code_util.replace_code_placeholder(code_temp, '')
+                            code_temp = '\n\t//add my cpp code start\n\t{\n\t' + code_temp + '\n\t}\n\t//add my cpp code end\n\n'
+
+                            aa_list = class_def.split(';')
+                            class_def_new = ''
+                            if len(aa_list) > 2:
+                                code_0 = aa_list[0] + ';'
+                                code_0_rep = code_0 + code_temp
+                                class_def_new = class_def.replace(code_0, code_0_rep)
+
+                            else:
+                                class_def_new = code_temp + class_def
+
+                            file_data = file_data.replace(class_def, class_def_new)
+
+
+                    file_util.wite_data_to_file(file_path, file_data)
+
 if __name__ == '__main__':
 
     sdk_confuse_dir = '/Users/ganyuanrong/PycharmProjects/SdkTools/modifyXcodeProject/sdk_confuse/'
@@ -648,8 +824,6 @@ if __name__ == '__main__':
     var_exclude_dirs = []
     var_exclude_files = []
     src_path = '/Users/ganyuanrong/Downloads/seashhx/dongnyProject/'
-    # src_path = '/Users/ganyuanrong/Downloads/seashhx/tools/libfairygui/Classes'
-    # src_path = '/Users/ganyuanrong/Downloads/seashhx/main'
     # addNoUseMethodForCpp2(src_path,var_exclude_dirs,var_exclude_files, True)
 
     #修改类名
@@ -677,5 +851,14 @@ if __name__ == '__main__':
     # changeWordTag(src_root,var_exclude_dirs, var_exclude_files, 'esqq', 'pactivePlay')
     # changeWordTag(src_root, var_exclude_dirs, var_exclude_files, 'vvgb', 'hilYouFyws')
 
-    addPropertyAndVar(src_path, var_exclude_dirs, var_exclude_files, False)
+    # addPropertyAndVar(src_path, var_exclude_dirs, var_exclude_files, False)
+
+    var_exclude_dirs = []
+    var_exclude_files = []
+    src_path = '/Users/ganyuanrong/cpGames/vn_sdk_zkb/Classes/Native'
+    # unity_change_struct(src_path, var_exclude_dirs, var_exclude_files, 1)
+
+
+    unity_addNoUseMethodForCpp2(src_path,var_exclude_dirs,var_exclude_files, True)
+
     print 'end'
