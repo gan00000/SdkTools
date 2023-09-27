@@ -1,0 +1,13 @@
+   
+      // 局部变量声明
+      int ppppp2_ppppp = int1_int;
+      int ppppp2_ppppp = int2_int;
+      int ppppp3_ppppp;
+      
+      if(ppppp2_ppppp numcop1_numcop ppppp1_ppppp){
+         // 调用函数来获取最大值
+         ppppp3_ppppp = max(ppppp2_ppppp, ppppp1_ppppp);
+      }else{
+         ppppp3_ppppp = min(ppppp2_ppppp, ppppp1_ppppp);
+      }
+     

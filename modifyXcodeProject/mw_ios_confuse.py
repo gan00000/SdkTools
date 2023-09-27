@@ -989,7 +989,7 @@ def haveOfforceInSources(oc_path, xofforce):
 #找出方法名字，修改方法名
 def modify_class_method(src_dir, exclude_dirs,var_exclude_change_dirs, exclude_files, exclude_method_name):
 
-    mthod_arr = []
+    mthod_params_list = []
     mthod_arr2 = []
     property_list = []
     if os.path.exists(src_dir):
@@ -1009,102 +1009,66 @@ def modify_class_method(src_dir, exclude_dirs,var_exclude_change_dirs, exclude_f
                 if file_name == ".DS_Store" or file_name in exclude_files:
                     continue
 
-                if file_name.endswith('.m') or file_name.endswith('.mm') or file_name.endswith('.h'):#
+                if file_name.endswith('.m') or file_name.endswith('.mm'):#
                     file_path = os.path.join(root, file_name)  # 头文件路径
-                    file_data = read_file_data(file_path)
-                    if file_data:
-                        property_result_list = re.findall('@property ?\\(.+;', file_data)  # 正则匹配出所有属性
-                        if property_result_list:
-                            for property_def in property_result_list:
-                                # if 'recording' in property_def:
-                                #     print 'xxxx'
-                                property_names = re.findall(' \\b\\w+;', property_def)
-                                if property_names:
-                                    for property_name in property_names:
-                                        property_name = property_name.replace(' ', '').replace('*', '').replace(';', '')
-                                        property_list.append(property_name)
 
-                    if file_name.endswith('.h'):
-                        continue
+                    # 找出这个类的属性，包含.h
+                    class_property_list = []
+                    file_path_h = file_path.replace('.mm', '.h')
+                    file_path_h = file_path_h.replace('.m', '.h')
+                    if os.path.exists(file_path_h):
 
-                    # 读取方法内容
-                    f_obj = open(file_path, "r")
-                    text_lines = f_obj.readlines()
+                        file_data_h = file_util.read_file_data(file_path_h)
+                        if file_data_h:
+                            property_list_h = re.findall(r'@property.+ \*?(\w+);', file_data_h)
+                            if property_list_h:  # 存在属性
+                                for property_h in property_list_h:
+                                    print property_h
+                                    if property_h not in class_property_list:
+                                        class_property_list.append(property_h)
 
-                    method_content = ''
+                    file_data_m = read_file_data(file_path)
+                    property_list_m = re.findall(r'@property.+ \*?(\w+);', file_data_m)
+                    if property_list_m:  # 存在属性
+                        for property_m in property_list_m:
+                            print property_m
+                            if property_m not in class_property_list:
+                                class_property_list.append(property_m)
 
-                    is_in_method = 0
-                    is_in_implementation = 0
-                    for line in text_lines:
-                        # print chardet.detect(line)
-                        line = line.decode('utf-8')
-                        # line = line.strip()
+                    method_def_list = re.findall(r'[-+] {0,3}\(\w+\) {0,2}\w+[\s\S]*?\{', file_data_m) #找出所有该文件方法
+                    if method_def_list:
+                        for method_content in method_def_list:
+                            print method_content
+                            if 'IBAction' in method_content: #犹豫别人工程的原因，这里先忽略这种
+                                continue
 
-                        #//system_method为标致系统方法或者实现的系统方法，不可改(自己在代码中标记)
-                        if '//system_method' in line:
-                            continue
-
-                        if '@implementation' in line:
-                            is_in_implementation = 1
-                        if is_in_implementation != 1:
-                            continue
-                        # 方法声明开始
-                        if line.strip().startswith('- (') or line.strip().startswith('+ (') or line.strip().startswith('-  (') or line.strip().startswith('+  (') \
-                                or line.strip().startswith('-(') or line.strip().startswith('+('):
-                            is_in_method = 1
-                            method_content = ''
-
-                        if is_in_method == 1:
-                            method_content = method_content + line
-
-                        line_temp = line.strip()
-
-                        if is_in_method == 1 and (line_temp.endswith('{') or line_temp.endswith('{\n')): #方法内容开始
-                            is_in_method = 0
-                            # print method_content
-                            local_m_temp = []
-                            method_content_temp = method_content
-                            # print method_content_temp
-
-                            aresults = re.findall('\\b\\w+\\b:', method_content) #函数名称
-                            if aresults:
-
-                                for method_name in aresults:
-                                    method_name = method_name.strip()
-
-                                    isShuzi = re.findall('^[0-9]', method_name) #是否数字开头
-                                    if isShuzi:
-                                        continue
-
-                                    method_name_exclude_temp = method_name.replace(':','')
-                                    method_name_exclude_temp = method_name_exclude_temp.strip()
-                                    if '_Nullable' in method_name or method_name_exclude_temp in exclude_method_name:
-                                        continue
-
-                                    local_m_temp.append(method_name)
-                                    if method_name not in mthod_arr2:
-                                        mthod_arr2.append(method_name)
-
-
-                            else: #无参数函数
-                                method_content_1 = method_content.replace(' ','').replace('\n', '').replace('{','')
-                                method_name = re.sub('^[-+]\\(.+\\)','', method_content_1) #去除前面的类型
-                                method_name = re.sub('//.+', '', method_name) #去除注释
-
-                                if method_name not in exclude_method_name:
-                                    local_m_temp.append(method_name)
-
-                                    if method_name not in mthod_arr2:
-                                        mthod_arr2.append(method_name)
-
-                            mthod_arr.append(local_m_temp)
-                            method_content = ''
-                            # print 'local_m_temp: %s filename: %s' % (local_m_temp, file_path)
+                            mthod_params_list2 = []
+                            if ':' in method_content:
+                                method_params = re.findall(r'\b\w+:', method_content)
+                                for param in method_params:
+                                    param_1 = param.replace(':','').replace(' ','')
+                                    mthod_params_list2.append(param_1)
+                                    if param_1 not in mthod_params_list and param_1 not in exclude_method_name and param_1 not in class_property_list:
+                                        mthod_params_list.append(param_1)
+                            else:
+                                method_params = re.findall(r'\) {0,3}\b\w+\b', method_content) #其实只会有一个
+                                for param in method_params:
+                                    param_1 = param.replace(')', '').replace(' ', '')
+                                    mthod_params_list2.append(param_1)
+                                    if param_1 not in mthod_params_list and param_1 not in exclude_method_name and param_1 not in class_property_list:
+                                        mthod_params_list.append(param_1)
+                            print mthod_params_list2
 
 
 
-        # wite_data_to_file(project_content_path, project_content)
-
+    print '=============================='
+    print '=============================='
+    print mthod_params_list
+    print '=============================='
+    print '=============================='
+    iii = 1
+    if iii==1:
+        return
     method_property_same_temp = []
     method_property_have_tag = []
     for xa in mthod_arr2:
@@ -1385,10 +1349,10 @@ def changeStringHeaderValue(header_path):
     for line in text_lines:
         line = line.decode('utf-8')
         if 'wwwww_tag_wwwww' in line:
-            str_result = re.findall('//@".+"', line)  # @"[\\w.]+"
+            str_result = re.findall('//@"(.+)"', line)  # @"[\\w.]+"
             if str_result:
                 str_result_1 = str_result[0]
-                str_result_1 = str_result_1[4: len(str_result_1) - 1]
+                # str_result_1 = str_result_1[4: len(str_result_1) - 1]
                 aes_encrypt_result = pc.aes_encrypt(str_result_1)
                 defineVale = 'Decrypt_AllStringContent(@"%s")' % (aes_encrypt_result)
 
@@ -1610,11 +1574,12 @@ if __name__ == '__main__':
     #                              image_ref_path, image_exclude_files)
 
     # 1.1. 修改已经定义好的defind图片名称
-    # changeImageNameForDefindHeader('/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/Resources/VN/SDKResourcesVN.bundle',
-    #                                '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/obfuscation/imageNameHeader.h')
+    # changeImageNameForDefindHeader('/Users/ganyuanrong/iOSProject/flsdk_ios_kr/GamaSDK_iOS_Integration/Resources/KR/SDKResourcesKR.bundle',
+    #                                '/Users/ganyuanrong/iOSProject/flsdk_ios_kr/GamaSDK_iOS_Integration/obfuscation/imageNameHeader.h')
+    # 1.2  改变md5:find . -iname "*.png" -exec echo {} \; -exec convert {} {} \;
 
     #2. 修改已经定义好的defind中的方法名称
-    method_header_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/obfuscation/codeObfuscationForMethodName.h'
+    method_header_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_kr/GamaSDK_iOS_Integration/obfuscation/codeObfuscationForMethodName.h'
     # changeMethodHeaderValue(method_header_path)
 
     #3.添加随机注释，一般不用
@@ -1623,11 +1588,10 @@ if __name__ == '__main__':
     # addNewComments(oc_all_path, comment_exclude_dirs, '/Users/ganyuanrong/Desktop/sdk_confuse/ofc.log')
 
     # 4.删除注释
-    # var_exclude_dirs = ['AFNetworking', 'YYModel', 'ThirdSrc']
-    # var_exclude_files = []
-    # # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/'
-    # # src_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v41/GamaSDK_iOS_Integration/FLSDK/'
-    # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/FLSDK'
+    var_exclude_dirs = ['AFNetworking', 'YYModel', 'ThirdSrc','ThirdResources']
+    var_exclude_files = []
+    # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/'
+    src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_kr/GamaSDK_iOS_Integration/FLSDK/'
     # deleteComments(src_path, var_exclude_dirs, var_exclude_files)
 
     # 5.修改类名
@@ -1638,10 +1602,10 @@ if __name__ == '__main__':
     # "ThirkLib", "Model", "YYModel", "AFNetworking", "Plat", "WorkProjResources", "Resources", "obfuscation", "Demo"
     oc_exclude_dirs_ref_modify = ['ThirkLib', "YYModel", "AFNetworking", "Resources",'ThirdSrc']
 
-    xcode_project_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
-    oc_modify_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/FLSDK'
-    oc_all_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration'
-    # modify_oc_class_name(oc_modify_path, xcode_project_path, oc_all_path,oc_exclude_dirs_ref_modify)
+    xcode_project_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_kr/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
+    oc_modify_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_kr/GamaSDK_iOS_Integration/FLSDK'
+    oc_all_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_kr/GamaSDK_iOS_Integration'
+    # modify_oc_class_name(oc_modify_path, xcode_project_path, oc_all_path, oc_exclude_dirs_ref_modify)
 
 
     #找出所有方法名字并修改
@@ -1655,7 +1619,7 @@ if __name__ == '__main__':
     #                     'forKey','objectForKey','setObject','length','presentingViewController','action','completion','onFrameResolved','keyboardDidShow','keyboardWillHide'
     #                     ,'touchesBegan','touchesEnded','touchesCancelled','touchesMoved','withEvent','layoutSubviews','initWithFrame','didRotate']
     #
-    # woords_file_path = '/Users/ganyuanrong/Desktop/sdk_confuse/not_obs_method.log'
+    # woords_file_path = '/Users/ganyuanrong/PycharmProjects/SdkTools/modifyXcodeProject/sdk_confuse/not_obs_method.log'
     #
     # f_obj = open(woords_file_path, "r")
     # text_lines = f_obj.readlines()
@@ -1663,8 +1627,7 @@ if __name__ == '__main__':
     #     line = line.decode('utf-8')
     #     method_name = line.strip().replace(' ', '').replace(':', '')
     #     var_exclude_name.append(method_name)
-    #
-    # modify_class_method('/Users/ganyuanrong/Desktop/Default-moqumiaowan_9.27-Release-1.0_scussce/Classes/',var_exclude_dirs,var_exclude_change_dirs,var_exclude_files,var_exclude_name)
+    # modify_class_method('/Users/ganyuanrong/Downloads/益乐互动_iOS源码/YLFunSDK/FunctionModule',var_exclude_dirs,var_exclude_change_dirs,var_exclude_files,var_exclude_name)
 
 
     # xxxresult = []
@@ -1701,8 +1664,8 @@ if __name__ == '__main__':
     #
     # mmxx = pc.decrypt(mmxx)
     # print mmxx
-    pc = PrpCrypt('xiezong717KEY', 'xiezong717IV')
-    # changeStringHeaderValue('/Users/ganyuanrong/xzgame/jianghu_ftcs/jianghu_ft/MyStringOfc.h')
+    pc = PrpCrypt('mwsdk-kr-0828KEY', 'mwsdk-kr-0828IV')
+    changeStringHeaderValue('/Users/ganyuanrong/iOSProject/flsdk_ios_kr/GamaSDK_iOS_Integration/obfuscation/MWStringHeaders.h')
 
     # oc_class_parser.parse('/Users/ganyuanrong/Desktop/AdDelegate.m')
     #6.添加垃圾代码
@@ -1712,17 +1675,20 @@ if __name__ == '__main__':
     # src_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v41/GamaSDK_iOS_Integration/FLSDK/'
     # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/FLSDK'
     # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/FLSDK'
-    src_path = '/Users/ganyuanrong/xzgame/jianghu_ftcs/jianghu_ft/ocSrc'
-    # src_path = '/Users/ganyuanrong/xzgame/jianghu_ftcs/jianghu_ft/iap'
-    add_code(src_path, var_exclude_dirs, var_exclude_files)
+    src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_kr/GamaSDK_iOS_Integration/FLSDK'
+    # add_code(src_path, var_exclude_dirs, var_exclude_files)
 
     # xcode_project_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
     # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn'
     # modify_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/FLSDK'
     #7.指定目录下面的目录加前缀
     # changeXcodeProjectDir(xcode_project_path, src_path, modify_path, 'OPEN')
-    #8.修改所有uuid
+    # 8.修改所有uuid
+    # xcode_project_path = '/Users/ganyuanrong/cpGames/vn_sdk_zkb/Unity-iPhone.xcodeproj'
+    xcode_project_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_kr/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
     # changeXcodeProjectUUid(xcode_project_path)
     #修改函数顺序
     #修改变量名称
+
+
     print 'end'

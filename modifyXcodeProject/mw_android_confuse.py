@@ -1,5 +1,6 @@
 #coding=utf-8
 import imp
+import string
 import sys
 import uuid
 
@@ -531,6 +532,18 @@ if __name__ == '__main__':
     # change_id_tag_file_name(src_path, src_path)
 
     # find_R_in_code(src_path)
+
+    alla = []
+    for i in range(10000):
+        msg = ''
+        letter_count = random.randint(2, 10)
+        for m in range(letter_count):
+            lett = string.letters[random.randint(0, len(string.letters) - 1)]
+            msg = msg + lett
+        msg = 'abc' + msg.lower()
+        if msg not in alla:
+            alla.append(msg)
+            print msg
 
     print 'end'
 

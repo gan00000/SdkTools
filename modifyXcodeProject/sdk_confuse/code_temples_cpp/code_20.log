@@ -1,0 +1,13 @@
+      
+      
+    int ppppp1_ppppp;   //commontemple20
+    int ppppp2_ppppp = int1_int;
+    int ppppp3_ppppp = int2_int;
+
+    if (ppppp2_ppppp numcop1_numcop ppppp3_ppppp){
+        ppppp1_ppppp = ppppp2_ppppp;
+    }else{
+        ppppp1_ppppp = ppppp3_ppppp;
+    }
+        
+

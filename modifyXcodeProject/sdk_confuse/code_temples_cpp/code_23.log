@@ -1,0 +1,22 @@
+      
+      
+    int ppppp1_ppppp;   //commontemple23
+    int ppppp2_ppppp = int1_int;
+    int ppppp3_ppppp = int2_int;
+
+    if (ppppp2_ppppp numcop1_numcop ppppp3_ppppp){
+        ppppp1_ppppp = ppppp2_ppppp;
+
+        int ppppp4_ppppp[ ppppp1_ppppp ]; 
+    
+          // 初始化数组元素          
+          for ( int i = 0; i < ppppp1_ppppp; i++ )
+          {
+             ppppp4_ppppp[ i ] = i + int3_int; // 设置元素 i 为 i + 100
+             break;
+          }
+    }else{
+        ppppp1_ppppp = ppppp3_ppppp;
+    }
+        
+

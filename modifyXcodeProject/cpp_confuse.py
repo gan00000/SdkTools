@@ -855,6 +855,7 @@ if __name__ == '__main__':
 
     var_exclude_dirs = []
     var_exclude_files = []
+    # src_path = '/Users/ganyuanrong/cpGames/xcodeproject/Classes/Native'
     src_path = '/Users/ganyuanrong/cpGames/vn_sdk_zkb/Classes/Native'
     # unity_change_struct(src_path, var_exclude_dirs, var_exclude_files, 1)
 
