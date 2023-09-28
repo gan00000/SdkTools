@@ -1,0 +1,15 @@
+
+        bool ppppp1_ppppp = bool1_bool;  //commontemple14
+        if (ppppp1_ppppp){
+            ppppp1_ppppp = bool2_bool;
+            type_mumber1_type ppppp2_ppppp = iiiii1_iiiii;
+            if (ppppp2_ppppp numcop1_numcop iiiii2_iiiii){
+                ppppp2_ppppp = ppppp2_ppppp operator1_operator int3_int;
+            }
+            CodeTemplate1_CodeTemplate
+        }else{
+            ppppp1_ppppp = !ppppp1_ppppp;
+            CodeTemplate2_CodeTemplate
+        }
+
+        

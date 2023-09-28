@@ -174,7 +174,7 @@ def cpp_switch_code():
     var_return.append(var2)
     return var_return,content
 
-def replace_code_placeholder(code_temple, condition_var):
+def replace_code_placeholder(code_temple_index, code_temple, condition_var, code_temples, again_count=1):
 
     word_aar = []
 
@@ -261,6 +261,24 @@ def replace_code_placeholder(code_temple, condition_var):
                 val1 = '@"' + w1 + '_' + w2 + '", '
             arr_content = arr_content + val1
         code_temple = code_temple.replace('array_value_array', arr_content)
+
+    codeTemplate_list = re.findall(r'CodeTemplate\d+_CodeTemplate', code_temple)  # 数字运算符
+    for codeTemplate in codeTemplate_list:
+        if again_count == 1:
+            isInsert = random.randint(1, 6)
+            if isInsert > 2:
+                aa_index = random.randint(0, len(code_temples) - 1)
+                if code_temple_index != aa_index:
+                    aa_code_temp = code_temples[aa_index]
+                    a2_code_temple = replace_code_placeholder(aa_index, aa_code_temp, '', code_temples, 2)
+                    code_temple = code_temple.replace(codeTemplate, a2_code_temple)
+                else:
+                    code_temple = code_temple.replace(codeTemplate, '')
+            else:
+                code_temple = code_temple.replace(codeTemplate, '')
+        else:
+            code_temple = code_temple.replace(codeTemplate, '')
+
     return code_temple
 
 #删除注释

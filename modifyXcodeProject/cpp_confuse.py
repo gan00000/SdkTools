@@ -135,6 +135,7 @@ def addNoUseMethodForCpp2(src_dir_path, exclude_dirs, exclude_files, is_retry):
                         if 4 <= isneed <= 8:#添加
                             code_temp = ''
                             aType = random.randint(1,6)
+                            a_index = 0
                             if aType == 1:
                                 vars, code_temp = cpp_code_util.cpp_code_auto_create1()
                             elif aType == 2:
@@ -142,8 +143,9 @@ def addNoUseMethodForCpp2(src_dir_path, exclude_dirs, exclude_files, is_retry):
                             elif aType == 3:
                                 vars, code_temp = cpp_code_util.cpp_switch_code()
                             else:
-                                code_temp = cpp_code_temp_aar[random.randint(0, len(cpp_code_temp_aar) -1)]
-                            code_temp = cpp_code_util.replace_code_placeholder(code_temp,'')
+                                a_index = random.randint(0, len(cpp_code_temp_aar) - 1)
+                                code_temp = cpp_code_temp_aar[a_index]
+                            code_temp = cpp_code_util.replace_code_placeholder(a_index, code_temp,'', cpp_code_temp_aar)
                             code_temp = '\n\t//add my cpp code start\n\t{\n\t' + code_temp + '\n\t}\n\t//add my cpp code end\n\n'
 
                             if line_strip.startswith('return'):
@@ -752,6 +754,7 @@ def unity_addNoUseMethodForCpp2(src_dir_path, exclude_dirs, exclude_files, is_re
                         if isneed > 7:  # 添加
                             code_temp = ''
                             aType = random.randint(1, 6)
+                            a_index = 0
                             if aType == 1:
                                 vars, code_temp = cpp_code_util.cpp_code_auto_create1()
                             elif aType == 2:
@@ -759,8 +762,9 @@ def unity_addNoUseMethodForCpp2(src_dir_path, exclude_dirs, exclude_files, is_re
                             elif aType == 3:
                                 vars, code_temp = cpp_code_util.cpp_switch_code()
                             else:
-                                code_temp = cpp_code_temp_aar[random.randint(0, len(cpp_code_temp_aar) - 1)]
-                            code_temp = cpp_code_util.replace_code_placeholder(code_temp, '')
+                                a_index = random.randint(0, len(cpp_code_temp_aar) - 1)
+                                code_temp = cpp_code_temp_aar[a_index]
+                            code_temp = cpp_code_util.replace_code_placeholder(a_index, code_temp, '', cpp_code_temp_aar)
                             code_temp = '\n\t//add my cpp code start\n\t{\n\t' + code_temp + '\n\t}\n\t//add my cpp code end\n\n'
 
                             aa_list = class_def.split(';')
@@ -800,11 +804,21 @@ if __name__ == '__main__':
         if code_data:
             oc_class_parser.code_if_temples.append(code_data)
 
-    cpp_code_temp_aar = []
-    for code_i in range(50):
-        code_data = file_util.read_file_data_utf8(sdk_confuse_dir + 'code_temples_cpp/code_%s.log' % code_i)
-        if code_data:
-            cpp_code_temp_aar.append(code_data)
+    cpp_code_temp_aar = [] #读取cpp代码模版
+    list_dirs = os.walk(sdk_confuse_dir + 'code_temples_cpp')
+    for root, dirs, files in list_dirs:
+        for file_name in files:
+            if file_name == ".DS_Store":
+                continue
+            file_path = os.path.join(root, file_name)
+            code_data = file_util.read_file_data_utf8(file_path)
+            if code_data:
+                cpp_code_temp_aar.append(code_data)
+
+    # for code_i in range(50):
+    #     code_data = file_util.read_file_data_utf8(sdk_confuse_dir + 'code_temples_cpp/code_%s.log' % code_i)
+    #     if code_data:
+    #         cpp_code_temp_aar.append(code_data)
 
     for code_data in cpp_code_temp_aar:
         oc_class_parser.code_temples.append(code_data)
@@ -860,6 +874,8 @@ if __name__ == '__main__':
     # unity_change_struct(src_path, var_exclude_dirs, var_exclude_files, 1)
 
 
-    unity_addNoUseMethodForCpp2(src_path,var_exclude_dirs,var_exclude_files, True)
+    # unity_addNoUseMethodForCpp2(src_path,var_exclude_dirs,var_exclude_files, True)
 
+    var1, c1 = cpp_code_util.cpp_code_auto_create2()
+    print c1
     print 'end'

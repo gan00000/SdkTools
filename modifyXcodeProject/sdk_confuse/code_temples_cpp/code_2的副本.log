@@ -1,0 +1,17 @@
+        
+        type_mumber1_type ppppp1_ppppp = int1_int;  //commontemple2
+        type_mumber1_type ppppp3_ppppp = int2_int;
+
+        bool ppppp2_ppppp = bool1_bool;
+        while (ppppp1_ppppp < int3_int)
+        {
+            ppppp1_ppppp = ppppp1_ppppp + int4_int;
+            ppppp2_ppppp = bool2_bool;
+            if(ppppp2_ppppp){
+                break;
+            }
+        }
+
+        ppppp1_ppppp = ppppp3_ppppp + int5_int ;
+        ppppp2_ppppp = bool3_bool;
+        CodeTemplate1_CodeTemplate

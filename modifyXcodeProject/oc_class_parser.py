@@ -421,7 +421,7 @@ def code_temp_call_method(mehtod, method_assess): #调用插入的函数
         if len(call_content) > 0:
             call_content = call_content + '\tif(%s){}\n' % param_name
     if len(call_content) > 0:
-        call_content = replace_code_placeholder(call_content, '')
+        call_content = replace_code_placeholder(-1, call_content, '')
     return call_content
 
 def addCodeToSrcCode(code_method_temp_content, code_temple, insert_line_content, method_assess, property_list, is_later=False, insert_methods_list=None):
@@ -456,7 +456,7 @@ def addCodeToSrcCode(code_method_temp_content, code_temple, insert_line_content,
             call_property_content = call_property_content + '\n\t' + call_property
 
         if call_property_content != '':
-            call_property_content = replace_code_placeholder(call_property_content, '')
+            call_property_content = replace_code_placeholder(-1, call_property_content, '')
             call_property_content = call_property_content + '\n'
 
     code_temple = call_content + call_property_content + code_temple
@@ -506,11 +506,11 @@ def create_code_temple_condition():
     #     method_param_insert_code = method_param_insert_code.replace(code_int_temple_param, str(int_value))
     #
     # return method_param_insert_code
-    return replace_code_placeholder(code_if_temple, '')
+    return replace_code_placeholder(-1, code_if_temple, '')
 
 #代码模版处理
 def create_code_temples(condition_var):
-
+    a_index = 0
     temple_ran = random.randint(1, 10)
     if temple_ran == 1:
         vars, code_temple = cpp_code_util.cpp_code_auto_create1()
@@ -519,14 +519,15 @@ def create_code_temples(condition_var):
     elif temple_ran == 3:
         vars, code_temple = cpp_code_util.cpp_switch_code()
     else:
-        code_temple = code_temples[random.randint(0, len(code_temples) - 1)]  # 随机抽出一个代码模版
+        a_index = random.randint(0, len(code_temples) - 1)
+        code_temple = code_temples[a_index]  # 随机抽出一个代码模版
 
-    code_temple = replace_code_placeholder(code_temple, condition_var)
+    code_temple = replace_code_placeholder(a_index, code_temple, condition_var)
 
     return code_temple
 
 
-def replace_code_placeholder(code_temple, condition_var):
+def replace_code_placeholder(code_temple_index, code_temple, condition_var, again_count=1):
 
     word_aar = []
 
@@ -626,6 +627,24 @@ def replace_code_placeholder(code_temple, condition_var):
             vars,code_block = cpp_code_util.cpp_switch_code()
 
         code_temple = code_temple.replace(codetemp, code_block)
+
+    if code_temple_index != -1:
+        codeTemplate_list = re.findall(r'CodeTemplate\d+_CodeTemplate', code_temple)  # 数字运算符
+        for codeTemplate in codeTemplate_list:
+            if again_count == 1:
+                isInsert = random.randint(1, 6)
+                if isInsert > 2:
+                    aa_index = random.randint(0, len(code_temples) - 1)
+                    if code_temple_index != aa_index:
+                        aa_code_temp = code_temples[aa_index]
+                        a2_code_temple = replace_code_placeholder(aa_index, aa_code_temp, '', code_temples, 2)
+                        code_temple = code_temple.replace(codeTemplate, a2_code_temple)
+                    else:
+                        code_temple = code_temple.replace(codeTemplate, '')
+                else:
+                    code_temple = code_temple.replace(codeTemplate, '')
+            else:
+                code_temple = code_temple.replace(codeTemplate, '')
 
     return code_temple
 

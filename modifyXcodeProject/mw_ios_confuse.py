@@ -843,9 +843,11 @@ def addNoUseMethodForCpp2(src_dir_path, exclude_dirs, exclude_files):
                             and not line_strip.startswith('//') and not line_strip.startswith('#define'): #无效代码插入位置
 
                         isneed = random.randint(1, 20) #随机决定是否改行需要添加代码
+
                         if 4 <= isneed <= 8:#添加
                             code_temp = ''
                             aType = random.randint(1,6)
+                            a_index = 0
                             if aType == 1:
                                 vars, code_temp = cpp_code_util.cpp_code_auto_create1()
                             elif aType == 2:
@@ -853,8 +855,9 @@ def addNoUseMethodForCpp2(src_dir_path, exclude_dirs, exclude_files):
                             elif aType == 3:
                                 vars, code_temp = cpp_code_util.cpp_switch_code()
                             else:
-                                code_temp = cpp_code_temp_aar[random.randint(0, len(cpp_code_temp_aar) -1)]
-                            code_temp = cpp_code_util.replace_code_placeholder(code_temp,'')
+                                a_index = random.randint(0, len(cpp_code_temp_aar) - 1)
+                                code_temp = cpp_code_temp_aar[a_index]
+                            code_temp = cpp_code_util.replace_code_placeholder(a_index, code_temp, '', cpp_code_temp_aar)
                             code_temp = '\n\t//add my cpp code start\n\t{\n\t' + code_temp + '\n\t}\n\t//add my cpp code end\n\n'
 
                             if line_strip.startswith('return'):

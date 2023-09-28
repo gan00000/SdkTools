@@ -1,0 +1,9 @@
+        
+        bool ppppp1_ppppp = bool1_bool;  //commontemple5
+        if (ppppp1_ppppp)
+        {
+            CodeTemplate1_CodeTemplate
+            ppppp1_ppppp = bool2_bool;
+        }
+
+        

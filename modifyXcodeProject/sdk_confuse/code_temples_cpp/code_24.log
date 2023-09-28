@@ -1,6 +1,6 @@
    
       // 局部变量声明
-      int ppppp2_ppppp = int1_int;
+      int ppppp1_ppppp = int1_int;
       int ppppp2_ppppp = int2_int;
       int ppppp3_ppppp;
       

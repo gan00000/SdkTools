@@ -1,0 +1,11 @@
+        
+        bool ppppp1_ppppp = bool1_bool;  //commontemple8
+        if (ppppp1_ppppp){
+            ppppp1_ppppp = bool2_bool;
+        }else{
+            CodeTemplate1_CodeTemplate
+            ppppp1_ppppp = !ppppp1_ppppp;
+        }
+        CodeTemplate2_CodeTemplate
+
+        

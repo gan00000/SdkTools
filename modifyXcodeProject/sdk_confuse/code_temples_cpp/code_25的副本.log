@@ -7,7 +7,8 @@
       if(ppppp2_ppppp numcop1_numcop ppppp1_ppppp){
          // 调用函数来获取最大值
          ppppp3_ppppp = fmax(ppppp2_ppppp, ppppp1_ppppp);
+         CodeTemplate1_CodeTemplate
       }else{
          ppppp3_ppppp = fmin(ppppp2_ppppp, ppppp1_ppppp);
       }
-     
+     CodeTemplate2_CodeTemplate
