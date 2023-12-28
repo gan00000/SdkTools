@@ -82,7 +82,7 @@ def words_reader(word_file_path):
     for line in text_lines:
         line = line.decode('utf-8')
         word = line.strip().replace(' ', '')
-        if len(word) > 2:  # 太短的单词去掉
+        if len(word) > 1:  # 太短的单词去掉
             words.append(word)
     return words
 
@@ -1197,7 +1197,7 @@ def find_method_name_by_tag(src_dir_path):
 
             print '#define ' + xssss + '   ' + ww
 
-def find_string_tag(src_dir_path,exclude_dirs,exclude_strings, encrpty_key,encrpty_iv):
+def find_string_tag(src_dir_path,exclude_dirs, exclude_strings):
 
     xxxresult = []
     if os.path.exists(src_dir_path):
@@ -1216,25 +1216,33 @@ def find_string_tag(src_dir_path,exclude_dirs,exclude_strings, encrpty_key,encrp
 
                 if file_name.endswith('.m') or file_name.endswith('.mm') or file_name.endswith('.h'):
                     file_path = os.path.join(root, file_name)  # 头文件路径
-                    file_data = read_file_data(file_path)
-                    file_data = unicode(file_data)
-                    compile_pp = re.compile(u'@"[\\w.#\u4e00-\u9fa5]+"')  #中文 ：\u4e00-\u9fa5
-                    method_tag_results = compile_pp.findall(file_data)
+                    file_data = file_util.read_file_data(file_path)
+                    # file_data = unicode(file_data)
+                    method_tag_results = re.findall(r'@".*?"', file_data)  #中文 ：\u4e00-\u9fa5
+                    # method_tag_results = compile_pp.findall(file_data)
                     # method_tag_results = re.findall(r'@"[\w.#]+"', file_data)
-                    for xxxd in method_tag_results:
-                        if xxxd not in xxxresult:
-                            xxxresult.append(xxxd)
+
+                    if method_tag_results:
+                        for xxxd in method_tag_results:
+
+                            if len(xxxd) <= 2:#小于3的去掉
+                                continue
+
+                            if xxxd in exclude_strings:
+                                continue
+
+                            if xxxd not in xxxresult:
+                                xxxresult.append(xxxd)
 
     if xxxresult:
-        # wanxianmzxqKEY, eIV = wanxianmzxqIV
-        pc = PrpCrypt(encrpty_key, encrpty_iv)  # 初始化密钥
+
+        def_arr = []
         for xssss in xxxresult:
 
             xssss_vale = xssss[2 : len(xssss)-1]
 
-            # defineVale_test = '#define %s Decrypt_AllStringContent(@"%s")  //%s' % (xssss, xssss_vale, xssss)
-            # print defineVale_test
-
+            if len(xssss_vale) <= 2:  # 小于3的去掉
+                continue
             if xssss_vale in exclude_strings:
                 continue
 
@@ -1242,19 +1250,28 @@ def find_string_tag(src_dir_path,exclude_dirs,exclude_strings, encrpty_key,encrp
             # 匹配所有汉字
             # print(re.findall(u'[\u4e00-\u9fa5]', xssss_vale))
             # if re.match(u'[\u4e00-\u9fa5]', xssss_vale):
-            if re.findall(u'[\u4e00-\u9fa5]', xssss_vale):
+
+            xssss_vale22 = xssss_vale
+            xssss_vale22 = re.sub(r'[-#.:/ 0-9a-zA-Z_]+', '', xssss_vale22)
+            xssss_vale22 = xssss_vale22.replace(' ', '')
+            if len(xssss_vale22) > 0:
 
                 ssa = "wwwww_tag_wwwww_" + w1 + '_' + w2
             else:
                 ssa = "wwwww_tag_wwwww_" + xssss_vale
-            ssa = ssa.replace(".","_").replace("#","_CC_")
-            encryptValue = pc.aes_encrypt(xssss_vale)
-            if encryptValue.endswith('\n'):
-                encryptValue = encryptValue[0:len(encryptValue)-1]
+
+            ssa = ssa.replace(".","_").replace("#","_CC_").replace("-","_").replace(" ","_").replace(":","_")\
+                .replace("/", "_")
+            if ssa in def_arr:
+                ssa = ssa + '_' + len(def_arr)
+            # encryptValue = pc.aes_encrypt(xssss_vale)
+            # if encryptValue.endswith('\n'):
+            #     encryptValue = encryptValue[0:len(encryptValue)-1]
 
             # defineVale = '#define %s        Decrypt_AllStringContent_2(@"%s")  //%s' % (ssa, encryptValue, xssss)
             defineVale = '#define %s        %s  //%s' % (ssa, xssss, xssss)
             print defineVale
+            def_arr.append(ssa)
 
             if os.path.exists(src_dir_path):
                 list_dirs = os.walk(src_dir_path)
@@ -1545,7 +1562,8 @@ if __name__ == '__main__':
     handle_file_count = 0
     file_count = 0
     sdk_confuse_dir = '/Users/ganyuanrong/PycharmProjects/SdkTools/modifyXcodeProject/sdk_confuse/'
-    woords_file_path = sdk_confuse_dir + 'confuse_words_2.log'
+    woords_file_path = sdk_confuse_dir + 'confuse_words_dy.log'
+    # woords_file_path = sdk_confuse_dir + 'confuse_words_2.log'
     genest_word = words_reader(woords_file_path)
 
     words_dong = words_reader(sdk_confuse_dir + 'word_dong.log')
@@ -1586,12 +1604,12 @@ if __name__ == '__main__':
     #                              image_ref_path, image_exclude_files)
 
     # 1.1. 修改已经定义好的defind图片名称
-    # changeImageNameForDefindHeader('/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/Resources/V5/SDKResourcesV5.bundle',
-    #                                '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/obfuscation/imageNameHeader.h')
+    # changeImageNameForDefindHeader('/Users/ganyuanrong/iOSProject/DySdk_iOS/SDK_MAIN/Resources/KR/SDKResourcesKR.bundle',
+    #                                '/Users/ganyuanrong/iOSProject/DySdk_iOS/SDK_MAIN/obfuscation/imageNameHeader.h')
     # 1.2  改变md5:find . -iname "*.png" -exec echo {} \; -exec convert {} {} \;
 
     #2. 修改已经定义好的defind中的方法名称
-    # method_header_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/obfuscation/codeObfuscationForMethodName.h'
+    method_header_path = '/Users/ganyuanrong/iOSProject/DySdk_iOS/SDK_MAIN/obfuscation/codeObfuscationForMethodName.h'
     # changeMethodHeaderValue(method_header_path)
 
     #3.添加随机注释，一般不用
@@ -1603,20 +1621,30 @@ if __name__ == '__main__':
     var_exclude_dirs = ['AFNetworking', 'YYModel', 'ThirdSrc','ThirdResources']
     var_exclude_files = []
     # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/'
-    src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/FLSDK/'
+    src_path = '/Users/ganyuanrong/iOSProject/DySdk_iOS/SDK_MAIN/FLSDK/'
     # deleteComments(src_path, var_exclude_dirs, var_exclude_files)
 
+    #用于查找字符使用def宏定义替换
+    # var_exclude_dirs = ['AFNetworking', 'YYModel', 'ThirdSrc', 'ThirdResources']
+    # exclude_strings = ['com',"%2ld",'YES','POST','UTF-8','SELF MATCHES %@','UIInputWindowController','<UIInputSetHostView','<UIInputSetContainerView',']','\\n\\n','\\n','\n','','%@','%d', '%ld', '%@-%@', 'true', 'false', 'txt', 'bundle', '.', 'plist', '#', 'USD','yyyy-MM-dd','%02x', '-', '%@(%d)', '+', '_', 'lproj', 'json', '%s', '?']
+    # find_string_tag(src_path, var_exclude_dirs, exclude_strings)
+
     # 5.修改类名
+    # oc_exclude_files.extend(
+    #     ['AppDelegate.h', 'MWSDK.h', 'PayData.h', 'LoginData.h', 'AccountModel.h', 'CreateOrderResp.h','UnityAppController.h','UnityAppController+Rendering.h'
+    #      ,'UnityViewControllerBase+iOS.h','UnityViewControllerBase+tvOS.h','UnityViewControllerBase.h','UnityView.h','UnityView+iOS.h','UnityView+tvOS.h'])
+    # oc_exclude_dirs.extend(['AFNetworking', 'Masonry', 'YYModel', 'Model', 'sdkFrameworks', "Resources",'ThirkLib','ThirdSrc'])
+    # oc_exclude_dirs_ref_modify = ['ThirkLib', "YYModel", "AFNetworking", "Resources",'ThirdSrc']
+
     oc_exclude_files.extend(
-        ['AppDelegate.h', 'MWSDK.h', 'PayData.h', 'LoginData.h', 'AccountModel.h', 'CreateOrderResp.h','UnityAppController.h','UnityAppController+Rendering.h'
+        ['AppDelegate.h', 'MWSDK.h', 'PayData.h', 'LoginData.h', 'UnityAppController.h','UnityAppController+Rendering.h'
          ,'UnityViewControllerBase+iOS.h','UnityViewControllerBase+tvOS.h','UnityViewControllerBase.h','UnityView.h','UnityView+iOS.h','UnityView+tvOS.h'])
-    oc_exclude_dirs.extend(['AFNetworking', 'Masonry', 'YYModel', 'Model', 'sdkFrameworks', "Resources",'ThirkLib','ThirdSrc'])
-    # "ThirkLib", "Model", "YYModel", "AFNetworking", "Plat", "WorkProjResources", "Resources", "obfuscation", "Demo"
+    oc_exclude_dirs.extend(['AFNetworking', 'Masonry', 'YYModel', 'sdkFrameworks', "Resources",'ThirkLib','ThirdSrc'])
     oc_exclude_dirs_ref_modify = ['ThirkLib', "YYModel", "AFNetworking", "Resources",'ThirdSrc']
 
-    xcode_project_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
-    oc_modify_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/FLSDK/'
-    oc_all_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration'
+    xcode_project_path = '/Users/ganyuanrong/iOSProject/DySdk_iOS/SDK_MAIN/DY_SDK.xcodeproj'
+    oc_modify_path = '/Users/ganyuanrong/iOSProject/DySdk_iOS/SDK_MAIN/FLSDK/'
+    oc_all_path = '/Users/ganyuanrong/iOSProject/DySdk_iOS/SDK_MAIN'
     # modify_oc_class_name(oc_modify_path, xcode_project_path, oc_all_path, oc_exclude_dirs_ref_modify)
 
 
@@ -1688,30 +1716,32 @@ if __name__ == '__main__':
     #                     print image_name_no_extension
 
     arc_path = '/Users/ganyuanrong/iOSProject/DySdk_iOS/SDK_MAIN/FLSDK'
-    if os.path.exists(arc_path):
-        list_dirs = os.walk(arc_path)
-        # src_data = read_file_data(arc_path)
+    # if os.path.exists(arc_path):
+    #     list_dirs = os.walk(arc_path)
+    #     # src_data = read_file_data(arc_path)
+    #
+    #     property_list = []
+    #     for root, dirs, files in list_dirs:
+    #         for file_name in files:
+    #             if file_name.endswith('.h') or file_name.endswith('.m'):
+    #                 src_data = read_file_data(os.path.join(root, file_name))
+    #                 # @property (nonatomic,weak) id<WKNavigationDelegate> webViewDelegate_MMMPRO;
+    #                 pro_list = re.findall(r'@property.+\b(\w+_MMMPRO);', src_data)
+    #                 if pro_list:
+    #                     for pro in pro_list:
+    #                         if pro not in property_list:
+    #                             property_list.append(pro)
+    #                             # property_list.append('_' + pro)
+    #
+    #
+    #     print property_list
+    #     aaw = []
+    #     for pp in property_list:
+    #         w1, w2 = word_util.random_2words_not_same_inarr(aaw)
+    #         wwwa = w1.lower()+ w2.capitalize()
+    #         print '#define  ' + pp + '      ' + wwwa
+    #         print '#define  _' + pp + '      _' + wwwa
 
-        property_list = []
-        for root, dirs, files in list_dirs:
-            for file_name in files:
-                if file_name.endswith('.h') or file_name.endswith('.m'):
-                    src_data = read_file_data(os.path.join(root, file_name))
-                    # @property (nonatomic,weak) id<WKNavigationDelegate> webViewDelegate_MMMPRO;
-                    pro_list = re.findall(r'@property.+\b(\w+_MMMPRO);', src_data)
-                    if pro_list:
-                        for pro in pro_list:
-                            if pro not in property_list:
-                                property_list.append(pro)
-                                # property_list.append('_' + pro)
 
-
-        print property_list
-        aaw = []
-        for pp in property_list:
-            w1, w2 = word_util.random_2words_not_same_inarr(aaw)
-            wwwa = w1.lower()+ w2.capitalize()
-            print '#define  ' + pp + '      ' + wwwa
-            print '#define  _' + pp + '      _' + wwwa
 
     print 'end'
