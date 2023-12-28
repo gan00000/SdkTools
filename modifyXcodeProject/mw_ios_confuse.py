@@ -206,9 +206,6 @@ def modify_oc_class_name(oc_path, xcode_project_path, oc_all_path, oc_exclude_di
                             fia = file_name_no_extension.split('+')
                             file_new_name = fia[0] + "+" + new_word + file_extension
                             header_file_new_name = fia[0] + "+" + new_word + '.h'
-
-
-
                         else:
                             file_new_name = new_word + file_extension
                             header_file_new_name = new_word + '.h'
@@ -226,12 +223,16 @@ def modify_oc_class_name(oc_path, xcode_project_path, oc_all_path, oc_exclude_di
                         try:
 
                             header_file_new_path = os.path.join(root, header_file_new_name)
-
                             os.rename(header_file_path, header_file_new_path)  # 更改头文件名
 
                         except:
                             print '文件无法更改名称：' + header_file_path
                             continue
+
+                        xib_path = os.path.join(root, file_name_no_extension + '.xib')
+                        if os.path.exists(xib_path):
+                            xib_path_new = os.path.join(root, new_word + '.xib')
+                            os.rename(xib_path, xib_path_new)
 
                         if '+' in file_name:  # 分类
                             file_new_name_no_extension = fia[0] + "+" + new_word
@@ -246,6 +247,9 @@ def modify_oc_class_name(oc_path, xcode_project_path, oc_all_path, oc_exclude_di
 
                         # 更改xproject文件中的.h
                         project_content = replace_xproject_data_reference(project_content, header_file_name, header_file_new_name)
+
+                        project_content = replace_xproject_data_reference(project_content, file_name_no_extension + '.xib',
+                                                                          new_word + '.xib')
 
                         handle_file_count = handle_file_count + 1
                         print '处理完成' + file_name
@@ -1560,11 +1564,16 @@ if __name__ == '__main__':
         if code_data:
             oc_class_parser.code_if_temples.append(code_data)
 
-    cpp_code_temp_aar = []
-    for code_i in range(50):
-        code_data = file_util.read_file_data_utf8(sdk_confuse_dir + 'code_temples_cpp/code_%s.log' % code_i)
-        if code_data:
-            cpp_code_temp_aar.append(code_data)
+    cpp_code_temp_aar = []  # 读取cpp代码模版
+    list_dirs = os.walk(sdk_confuse_dir + 'code_temples_cpp')
+    for root, dirs, files in list_dirs:
+        for file_name in files:
+            if file_name == ".DS_Store":
+                continue
+            file_path = os.path.join(root, file_name)
+            code_data = file_util.read_file_data_utf8(file_path)
+            if code_data:
+                cpp_code_temp_aar.append(code_data)
 
     for code_data in cpp_code_temp_aar:
         code_data = re.sub(r'\bbool\b', 'BOOL', code_data)
@@ -1577,12 +1586,12 @@ if __name__ == '__main__':
     #                              image_ref_path, image_exclude_files)
 
     # 1.1. 修改已经定义好的defind图片名称
-    # changeImageNameForDefindHeader('/Users/ganyuanrong/iOSProject/flsdk_ios_kr/GamaSDK_iOS_Integration/Resources/KR/SDKResourcesKR.bundle',
-    #                                '/Users/ganyuanrong/iOSProject/flsdk_ios_kr/GamaSDK_iOS_Integration/obfuscation/imageNameHeader.h')
+    # changeImageNameForDefindHeader('/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/Resources/V5/SDKResourcesV5.bundle',
+    #                                '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/obfuscation/imageNameHeader.h')
     # 1.2  改变md5:find . -iname "*.png" -exec echo {} \; -exec convert {} {} \;
 
     #2. 修改已经定义好的defind中的方法名称
-    method_header_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_kr/GamaSDK_iOS_Integration/obfuscation/codeObfuscationForMethodName.h'
+    # method_header_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/obfuscation/codeObfuscationForMethodName.h'
     # changeMethodHeaderValue(method_header_path)
 
     #3.添加随机注释，一般不用
@@ -1594,7 +1603,7 @@ if __name__ == '__main__':
     var_exclude_dirs = ['AFNetworking', 'YYModel', 'ThirdSrc','ThirdResources']
     var_exclude_files = []
     # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/'
-    src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_kr/GamaSDK_iOS_Integration/FLSDK/'
+    src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/FLSDK/'
     # deleteComments(src_path, var_exclude_dirs, var_exclude_files)
 
     # 5.修改类名
@@ -1605,9 +1614,9 @@ if __name__ == '__main__':
     # "ThirkLib", "Model", "YYModel", "AFNetworking", "Plat", "WorkProjResources", "Resources", "obfuscation", "Demo"
     oc_exclude_dirs_ref_modify = ['ThirkLib', "YYModel", "AFNetworking", "Resources",'ThirdSrc']
 
-    xcode_project_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_kr/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
-    oc_modify_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_kr/GamaSDK_iOS_Integration/FLSDK'
-    oc_all_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_kr/GamaSDK_iOS_Integration'
+    xcode_project_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
+    oc_modify_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/FLSDK/'
+    oc_all_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration'
     # modify_oc_class_name(oc_modify_path, xcode_project_path, oc_all_path, oc_exclude_dirs_ref_modify)
 
 
@@ -1633,42 +1642,10 @@ if __name__ == '__main__':
     # modify_class_method('/Users/ganyuanrong/Downloads/益乐互动_iOS源码/YLFunSDK/FunctionModule',var_exclude_dirs,var_exclude_change_dirs,var_exclude_files,var_exclude_name)
 
 
-    # xxxresult = []
-    # dataxxx = read_file_data('/Users/ganyuanrong/Desktop/关联文件2.txt')
-    # method_tag_results = re.findall('ui/baseui/[/\\w]*\\.png', dataxxx)
-    # for xxxd in method_tag_results:
-    #     if xxxd not in xxxresult:
-    #         xxxresult.append(xxxd)
-    #
-    # for xxxd in xxxresult:
-    #     print xxxd
 
-
-    # find_string_path = '/Users/ganyuanrong/xzgame/jianghu_ftcs/jianghu_ft/ocSrc'
-    # exclude_dirs = ['AFNetworking', 'YYModel','Common','Res','utils']
-    # exclude_strings = ['AccountListViewCellID','%@%@','%d','%ld','%@','.']
-    # wanxianmzxqKEY = 'xiezongxiezong0717key'
-    # wanxianmzxqIV = 'xiezongxiezong0717iv'
-    # 找出所有字符使用宏替代
-    # find_string_tag(find_string_path, exclude_dirs, exclude_strings, wanxianmzxqKEY, wanxianmzxqIV)
-
-    # eKey=mplaywlzhsKEY,eIV=mplaywlzhsIV
-    # dataxxx = read_file_data('/Users/ganyuanrong/Desktop/73d30001bc0f27f512ed3afa30f2feb3.txt')
-    # pc = PrpCrypt('SdkV6202304KEY', 'SdkV6202304IV')  # 初始化密钥
-    # mmxx = pc.aes_decrypt(dataxxx)
-    # print mmxx
-    # dataxxx = read_file_data('/Users/ganyuanrong/iOSProject/game_mw_sdk_ios_v3/MW_OBS_V3/Resources/GOT/com_mplay_wlzhs.json')
-    # mmxx = pc.aes_encrypt(dataxxx)
-    # print mmxx
-    # print pc.aes_decrypt(mmxx)
-
-    # mmxx = pc.encrypt(dataxxx)
-    # print mmxx
-    #
-    # mmxx = pc.decrypt(mmxx)
-    # print mmxx
-    pc = PrpCrypt('mwsdk-kr-0828KEY', 'mwsdk-kr-0828IV')
-    changeStringHeaderValue('/Users/ganyuanrong/iOSProject/flsdk_ios_kr/GamaSDK_iOS_Integration/obfuscation/MWStringHeaders.h')
+    # 加密字符串
+    pc = PrpCrypt('smw-tw5-1213KEY', 'smw-tw5-1213IV')
+    # changeStringHeaderValue('/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/obfuscation/MWStringHeaders.h')
 
     # oc_class_parser.parse('/Users/ganyuanrong/Desktop/AdDelegate.m')
     #6.添加垃圾代码
@@ -1678,7 +1655,7 @@ if __name__ == '__main__':
     # src_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v41/GamaSDK_iOS_Integration/FLSDK/'
     # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/FLSDK'
     # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/FLSDK'
-    src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_kr/GamaSDK_iOS_Integration/FLSDK'
+    src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/FLSDK'
     # add_code(src_path, var_exclude_dirs, var_exclude_files)
 
     # xcode_project_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
@@ -1688,10 +1665,53 @@ if __name__ == '__main__':
     # changeXcodeProjectDir(xcode_project_path, src_path, modify_path, 'OPEN')
     # 8.修改所有uuid
     # xcode_project_path = '/Users/ganyuanrong/cpGames/vn_sdk_zkb/Unity-iPhone.xcodeproj'
-    xcode_project_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_kr/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
+    xcode_project_path = '/Users/ganyuanrong/cpGames/twmxw_iosproj/iospro/Unity-iPhone.xcodeproj'
     # changeXcodeProjectUUid(xcode_project_path)
     #修改函数顺序
     #修改变量名称
 
+    # imageDir = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn_v3/GamaSDK_iOS_Integration/Resources/VN/SDKResourcesVN.bundle/'
+    # header_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn_v3/GamaSDK_iOS_Integration/obfuscation/imageNameHeader.h'
+    # if os.path.exists(imageDir):
+    #     list_dirs = os.walk(imageDir)
+    #     header_data = read_file_data(header_path)
+    #     isChange = 0
+    #     for root, dirs, files in list_dirs:
+    #         for file_name in files:
+    #             if file_name.endswith('.png') or file_name.endswith('.jpg'):
+    #
+    #                 image_name_no_extension = os.path.splitext(file_name)[0]
+    #                 file_extension = os.path.splitext(file_name)[1]
+    #
+    #                 aa = re.findall(r'@"%s"' % image_name_no_extension, header_data)
+    #                 if aa is None or len(aa) == 0:
+    #                     print image_name_no_extension
+
+    arc_path = '/Users/ganyuanrong/iOSProject/DySdk_iOS/SDK_MAIN/FLSDK'
+    if os.path.exists(arc_path):
+        list_dirs = os.walk(arc_path)
+        # src_data = read_file_data(arc_path)
+
+        property_list = []
+        for root, dirs, files in list_dirs:
+            for file_name in files:
+                if file_name.endswith('.h') or file_name.endswith('.m'):
+                    src_data = read_file_data(os.path.join(root, file_name))
+                    # @property (nonatomic,weak) id<WKNavigationDelegate> webViewDelegate_MMMPRO;
+                    pro_list = re.findall(r'@property.+\b(\w+_MMMPRO);', src_data)
+                    if pro_list:
+                        for pro in pro_list:
+                            if pro not in property_list:
+                                property_list.append(pro)
+                                # property_list.append('_' + pro)
+
+
+        print property_list
+        aaw = []
+        for pp in property_list:
+            w1, w2 = word_util.random_2words_not_same_inarr(aaw)
+            wwwa = w1.lower()+ w2.capitalize()
+            print '#define  ' + pp + '      ' + wwwa
+            print '#define  _' + pp + '      _' + wwwa
 
     print 'end'

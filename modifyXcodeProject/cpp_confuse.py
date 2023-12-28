@@ -870,12 +870,10 @@ if __name__ == '__main__':
     var_exclude_dirs = []
     var_exclude_files = []
     # src_path = '/Users/ganyuanrong/cpGames/xcodeproject/Classes/Native'
-    src_path = '/Users/ganyuanrong/cpGames/vn_sdk_zkb/Classes/Native'
+    # src_path = '/Users/ganyuanrong/cpGames/kr_zkb_37/Classes/Native'
+    # src_path = '/Users/ganyuanrong/cpGames/vn_sdk_zkb/Classes/Native'
     # unity_change_struct(src_path, var_exclude_dirs, var_exclude_files, 1)
+    src_path = '/Users/ganyuanrong/cpGames/twmxw_iosproj/iospro/Classes/Native'
 
+    unity_addNoUseMethodForCpp2(src_path,var_exclude_dirs,var_exclude_files, True)
 
-    # unity_addNoUseMethodForCpp2(src_path,var_exclude_dirs,var_exclude_files, True)
-
-    var1, c1 = cpp_code_util.cpp_code_auto_create2()
-    print c1
-    print 'end'

@@ -486,6 +486,27 @@ def insert_no_param_code():
     # 替换代码模版中的内容end
     return code_temple
 
+def get_no_param_code_temps_before_replace_tag():
+    print '自动生成条件判断插入code'
+    #条件表达式替换start
+    condition_var = create_code_temple_condition()  #条件变量
+
+    # 条件表达式替换end
+
+    a_index = 0
+    temple_ran = random.randint(1, 10)
+    if temple_ran == 1:
+        vars, code_temple = cpp_code_util.cpp_code_auto_create1()
+    elif temple_ran == 2:
+        vars, code_temple = cpp_code_util.cpp_code_auto_create2()
+    elif temple_ran == 3:
+        vars, code_temple = cpp_code_util.cpp_switch_code()
+    else:
+        a_index = random.randint(0, len(code_temples) - 1)
+        code_temple = code_temples[a_index]  # 随机抽出一个代码模版
+
+    return code_temple, a_index , condition_var
+
 
 #处理条件表达式模版
 def create_code_temple_condition():
@@ -634,10 +655,10 @@ def replace_code_placeholder(code_temple_index, code_temple, condition_var, agai
             if again_count == 1:
                 isInsert = random.randint(1, 6)
                 if isInsert > 2:
-                    aa_index = random.randint(0, len(code_temples) - 1)
+                    aa_code_temp, aa_index , condition_var = get_no_param_code_temps_before_replace_tag()
                     if code_temple_index != aa_index:
-                        aa_code_temp = code_temples[aa_index]
-                        a2_code_temple = replace_code_placeholder(aa_index, aa_code_temp, '', code_temples, 2)
+                        # aa_code_temp = insert_no_param_code()#code_temples[aa_index]
+                        a2_code_temple = replace_code_placeholder(aa_index, aa_code_temp, condition_var, 2)
                         code_temple = code_temple.replace(codeTemplate, a2_code_temple)
                     else:
                         code_temple = code_temple.replace(codeTemplate, '')

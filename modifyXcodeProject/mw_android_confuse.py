@@ -107,7 +107,7 @@ def rename_res_file(src_dir_path):
     drawable_file_aar = []
     layout_file_aar = []
     mipmap_file_aar = []
-    values_file_aar = []
+    # values_file_aar = []
     anim_file_aar = []
 
     old_new_map_drawable = {}
@@ -115,6 +115,8 @@ def rename_res_file(src_dir_path):
     old_new_map_mipmap = {}
     old_new_map_values = {}
     old_new_map_anim = {}
+
+
 
     word_arr = []
     if os.path.exists(src_dir_path):
@@ -137,10 +139,17 @@ def rename_res_file(src_dir_path):
                 file_name_no_extension = os.path.splitext(file_name)[0]
                 file_extension = os.path.splitext(file_name)[1]
 
-                file_info.file_name_no_extension = file_name_no_extension
+
                 file_info.file_extension = file_extension
 
-                pref = 'okokok_'
+                if '.9' in file_name_no_extension:
+                    file_info.file_name_no_extension = file_name_no_extension.replace('.9', '')
+                    print 'is .9'
+                else:
+                    file_info.file_name_no_extension = file_name_no_extension
+
+                pref = 'cal_'
+
                 if 'res/drawable' in root:
 
                     if old_new_map_drawable.has_key(file_name_key):
@@ -149,14 +158,22 @@ def rename_res_file(src_dir_path):
 
                         w1, w2 = word_util.random_2words_not_same_inarr(word_arr)
                         w1 = w1.lower()
-                        file_new_name = pref + w1 + file_extension
+
                         file_name_no_extension_new = pref + w1
+
+                        if file_name_no_extension.endswith('.9'):
+                            file_new_name = file_name_no_extension_new + '.9' + file_extension
+                        else:
+                            file_new_name = file_name_no_extension_new + file_extension
+
                         file_info.type = 'drawable'
                         file_info.file_name_no_extension_new = file_name_no_extension_new
                         file_info.name_new = file_new_name
                         file_new_path = os.path.join(root, file_new_name)
                         file_info.file_path_new = file_new_path
+
                         drawable_file_aar.append(file_info)
+
                         old_new_map_drawable[file_name_key] = file_new_name
 
                     file_new_path = os.path.join(root, file_new_name)
@@ -208,27 +225,27 @@ def rename_res_file(src_dir_path):
                     os.rename(file_info.file_path, file_new_path)
 
 
-                if 'res/values' in root:
-
-                    if old_new_map_values.has_key(file_name_key):
-                        file_new_name = old_new_map_values[file_name_key]
-                    else:
-
-                        w1, w2 = word_util.random_2words_not_same_inarr(word_arr)
-                        w1 = w1.lower()
-                        file_new_name = pref + w1 + file_extension
-                        file_name_no_extension_new = pref + w1
-
-                        file_info.type = 'values'
-                        file_info.file_name_no_extension_new = file_name_no_extension_new
-                        file_info.name_new = file_new_name
-                        file_new_path = os.path.join(root, file_new_name)
-                        file_info.file_path_new = file_new_path
-                        values_file_aar.append(file_info)
-                        old_new_map_values[file_name_key] = file_new_name
-
-                    file_new_path = os.path.join(root, file_new_name)
-                    os.rename(file_info.file_path, file_new_path)
+                # if 'res/values' in root:
+                #
+                #     if old_new_map_values.has_key(file_name_key):
+                #         file_new_name = old_new_map_values[file_name_key]
+                #     else:
+                #
+                #         w1, w2 = word_util.random_2words_not_same_inarr(word_arr)
+                #         w1 = w1.lower()
+                #         file_new_name = pref + w1 + file_extension
+                #         file_name_no_extension_new = pref + w1
+                #
+                #         file_info.type = 'values'
+                #         file_info.file_name_no_extension_new = file_name_no_extension_new
+                #         file_info.name_new = file_new_name
+                #         file_new_path = os.path.join(root, file_new_name)
+                #         file_info.file_path_new = file_new_path
+                #         values_file_aar.append(file_info)
+                #         old_new_map_values[file_name_key] = file_new_name
+                #
+                #     file_new_path = os.path.join(root, file_new_name)
+                #     os.rename(file_info.file_path, file_new_path)
 
 
                 if 'res/anim' in root:
@@ -256,10 +273,10 @@ def rename_res_file(src_dir_path):
     print drawable_file_aar
     print layout_file_aar
     print mipmap_file_aar
-    print values_file_aar
+    # print values_file_aar
     print anim_file_aar
     res_dic = {'drawable': drawable_file_aar, 'layout': layout_file_aar, 'mipmap': mipmap_file_aar,
-               'values': values_file_aar, 'anim': anim_file_aar}
+                'anim': anim_file_aar}
     # return drawable_file_aar, layout_file_aar, mipmap_file_aar, values_file_aar, anim_file_aar
     return res_dic
 
@@ -519,8 +536,8 @@ if __name__ == '__main__':
     word_util.words_dong = words_dong
     word_util.genest_word = genest_word
 
-    src_path = '/Users/ganyuanrong/AndroidProject/DYSDK/SDKModule/src'
-    res_path = '/Users/ganyuanrong/AndroidProject/DYSDK/SDKModule/src'
+    src_path = '/Users/ganyuanrong/MyAndroid/AutoCalc/app/src/mon_jisuan'
+    res_path = '/Users/ganyuanrong/MyAndroid/AutoCalc/app/src/mon_jisuan/res'
 
     #1.修改res下面的文件名字
     # change_res_file_name(src_path, src_path)
@@ -528,7 +545,7 @@ if __name__ == '__main__':
     exclude_string = ['sdk_game_code','sdk_app_key','sdk_more_language','sdk_af_dev_key','sdk_default_server_language',
                       'default_web_client_id','sdk_inner_version','scheme','facebook_app_id','facebook_client_token',
                       'facebook_authorities','fb_login_protocol_scheme','facebook_app_name','line_channelId','channel_platform','sdk_name']
-    #1.修改资源 id值
+    #2.修改资源 id值
     # change_id_tag_file_name(src_path, src_path)
 
     # find_R_in_code(src_path)
@@ -536,11 +553,11 @@ if __name__ == '__main__':
     alla = []
     for i in range(10000):
         msg = ''
-        letter_count = random.randint(2, 10)
+        letter_count = random.randint(2, 6)
         for m in range(letter_count):
             lett = string.letters[random.randint(0, len(string.letters) - 1)]
             msg = msg + lett
-        msg = 'abc' + msg.lower()
+        msg = 'ath' + msg.lower()
         if msg not in alla:
             alla.append(msg)
             print msg
