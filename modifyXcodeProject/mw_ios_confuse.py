@@ -1386,7 +1386,7 @@ def changeStringHeaderValue(header_path):
                         line = line.replace('\n', '')
                     print line
                 else:
-                    line = re.sub('  @".+" ', "  " + defineVale + " ", line)
+                    line = re.sub('  @".+?" ', "  " + defineVale + "     ", line)
                     if line.endswith('\n'):
                         line = line.replace('\n', '')
                     print line
@@ -1545,6 +1545,33 @@ def changeXcodeProjectDir(xcode_project_path, src_dir_path, change_dir_path, dir
         file_util.wite_data_to_file(project_content_path, project_data)
 
 
+def change_pro_name(arc_path):
+    global list_dirs, root, dirs, files, file_name
+    if os.path.exists(arc_path):
+        list_dirs = os.walk(arc_path)
+        # src_data = read_file_data(arc_path)
+
+        property_list = []
+        for root, dirs, files in list_dirs:
+            for file_name in files:
+                if file_name.endswith('.h') or file_name.endswith('.m'):
+                    src_data = read_file_data(os.path.join(root, file_name))
+                    # @property (nonatomic,weak) id<WKNavigationDelegate> webViewDelegate_MMMPRO;
+                    pro_list = re.findall(r'@property.+\b(\w+_MMMPRO);', src_data)
+                    if pro_list:
+                        for pro in pro_list:
+                            if pro not in property_list:
+                                property_list.append(pro)
+                                # property_list.append('_' + pro)
+
+        print property_list
+        aaw = []
+        for pp in property_list:
+            w1, w2 = word_util.random_2words_not_same_inarr(aaw)
+            wwwa = w1.lower() + w2.capitalize()
+            print '#define  ' + pp + '      ' + wwwa
+            print '#define  _' + pp + '      _' + wwwa
+
 
 if __name__ == '__main__':
 
@@ -1621,7 +1648,7 @@ if __name__ == '__main__':
     var_exclude_dirs = ['AFNetworking', 'YYModel', 'ThirdSrc','ThirdResources']
     var_exclude_files = []
     # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/'
-    src_path = '/Users/ganyuanrong/iOSProject/DySdk_iOS/SDK_MAIN/FLSDK/'
+    src_path = '/Users/ganyuanrong/iOSProject/DySdk_iOS_OFS_V1/SDK_MAIN/FLSDK/'
     # deleteComments(src_path, var_exclude_dirs, var_exclude_files)
 
     #用于查找字符使用def宏定义替换
@@ -1629,7 +1656,11 @@ if __name__ == '__main__':
     # exclude_strings = ['com',"%2ld",'YES','POST','UTF-8','SELF MATCHES %@','UIInputWindowController','<UIInputSetHostView','<UIInputSetContainerView',']','\\n\\n','\\n','\n','','%@','%d', '%ld', '%@-%@', 'true', 'false', 'txt', 'bundle', '.', 'plist', '#', 'USD','yyyy-MM-dd','%02x', '-', '%@(%d)', '+', '_', 'lproj', 'json', '%s', '?']
     # find_string_tag(src_path, var_exclude_dirs, exclude_strings)
 
-    # 5.修改类名
+    #5. 加密字符串，上面查找
+    pc = PrpCrypt('ldy-sdk-1228KEY', 'ldy-sdk-1228IV')
+    # changeStringHeaderValue('/Users/ganyuanrong/iOSProject/DySdk_iOS_OFS_V1/SDK_MAIN/obfuscation/MWStringHeaders.h')
+
+    # 6.修改类名
     # oc_exclude_files.extend(
     #     ['AppDelegate.h', 'MWSDK.h', 'PayData.h', 'LoginData.h', 'AccountModel.h', 'CreateOrderResp.h','UnityAppController.h','UnityAppController+Rendering.h'
     #      ,'UnityViewControllerBase+iOS.h','UnityViewControllerBase+tvOS.h','UnityViewControllerBase.h','UnityView.h','UnityView+iOS.h','UnityView+tvOS.h'])
@@ -1642,9 +1673,9 @@ if __name__ == '__main__':
     oc_exclude_dirs.extend(['AFNetworking', 'Masonry', 'YYModel', 'sdkFrameworks', "Resources",'ThirkLib','ThirdSrc'])
     oc_exclude_dirs_ref_modify = ['ThirkLib', "YYModel", "AFNetworking", "Resources",'ThirdSrc']
 
-    xcode_project_path = '/Users/ganyuanrong/iOSProject/DySdk_iOS/SDK_MAIN/DY_SDK.xcodeproj'
-    oc_modify_path = '/Users/ganyuanrong/iOSProject/DySdk_iOS/SDK_MAIN/FLSDK/'
-    oc_all_path = '/Users/ganyuanrong/iOSProject/DySdk_iOS/SDK_MAIN'
+    xcode_project_path = '/Users/ganyuanrong/iOSProject/DySdk_iOS_OFS_V1/SDK_MAIN/DY_SDK.xcodeproj'
+    oc_modify_path = '/Users/ganyuanrong/iOSProject/DySdk_iOS_OFS_V1/SDK_MAIN/FLSDK/'
+    oc_all_path = '/Users/ganyuanrong/iOSProject/DySdk_iOS_OFS_V1/SDK_MAIN'
     # modify_oc_class_name(oc_modify_path, xcode_project_path, oc_all_path, oc_exclude_dirs_ref_modify)
 
 
@@ -1670,33 +1701,31 @@ if __name__ == '__main__':
     # modify_class_method('/Users/ganyuanrong/Downloads/益乐互动_iOS源码/YLFunSDK/FunctionModule',var_exclude_dirs,var_exclude_change_dirs,var_exclude_files,var_exclude_name)
 
 
-
-    # 加密字符串
-    pc = PrpCrypt('smw-tw5-1213KEY', 'smw-tw5-1213IV')
-    # changeStringHeaderValue('/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/obfuscation/MWStringHeaders.h')
-
     # oc_class_parser.parse('/Users/ganyuanrong/Desktop/AdDelegate.m')
-    #6.添加垃圾代码
+    #7.添加垃圾代码
     var_exclude_dirs = ['AFNetworking', 'YYModel', 'ThirdSrc']
     var_exclude_files = []
     # # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/'
     # src_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v41/GamaSDK_iOS_Integration/FLSDK/'
     # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/FLSDK'
     # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/FLSDK'
-    src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/FLSDK'
+    src_path = '/Users/ganyuanrong/iOSProject/DySdk_iOS_OFS_V1/SDK_MAIN/FLSDK/'
     # add_code(src_path, var_exclude_dirs, var_exclude_files)
 
     # xcode_project_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
     # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn'
     # modify_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/FLSDK'
-    #7.指定目录下面的目录加前缀
+    #8.指定目录下面的目录加前缀
     # changeXcodeProjectDir(xcode_project_path, src_path, modify_path, 'OPEN')
-    # 8.修改所有uuid
+    # 9.修改所有uuid
     # xcode_project_path = '/Users/ganyuanrong/cpGames/vn_sdk_zkb/Unity-iPhone.xcodeproj'
-    xcode_project_path = '/Users/ganyuanrong/cpGames/twmxw_iosproj/iospro/Unity-iPhone.xcodeproj'
+    xcode_project_path = '/Users/ganyuanrong/iOSProject/DySdk_iOS_OFS_V1/SDK_MAIN/DY_SDK.xcodeproj'
     # changeXcodeProjectUUid(xcode_project_path)
-    #修改函数顺序
-    #修改变量名称
+    #11.修改函数顺序
+    #12.修改变量名称 proNameHeader.h
+    arc_path = '/Users/ganyuanrong/iOSProject/DySdk_iOS/SDK_MAIN/FLSDK'
+    # change_pro_name(arc_path)
+
 
     # imageDir = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn_v3/GamaSDK_iOS_Integration/Resources/VN/SDKResourcesVN.bundle/'
     # header_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn_v3/GamaSDK_iOS_Integration/obfuscation/imageNameHeader.h'
@@ -1715,32 +1744,6 @@ if __name__ == '__main__':
     #                 if aa is None or len(aa) == 0:
     #                     print image_name_no_extension
 
-    arc_path = '/Users/ganyuanrong/iOSProject/DySdk_iOS/SDK_MAIN/FLSDK'
-    # if os.path.exists(arc_path):
-    #     list_dirs = os.walk(arc_path)
-    #     # src_data = read_file_data(arc_path)
-    #
-    #     property_list = []
-    #     for root, dirs, files in list_dirs:
-    #         for file_name in files:
-    #             if file_name.endswith('.h') or file_name.endswith('.m'):
-    #                 src_data = read_file_data(os.path.join(root, file_name))
-    #                 # @property (nonatomic,weak) id<WKNavigationDelegate> webViewDelegate_MMMPRO;
-    #                 pro_list = re.findall(r'@property.+\b(\w+_MMMPRO);', src_data)
-    #                 if pro_list:
-    #                     for pro in pro_list:
-    #                         if pro not in property_list:
-    #                             property_list.append(pro)
-    #                             # property_list.append('_' + pro)
-    #
-    #
-    #     print property_list
-    #     aaw = []
-    #     for pp in property_list:
-    #         w1, w2 = word_util.random_2words_not_same_inarr(aaw)
-    #         wwwa = w1.lower()+ w2.capitalize()
-    #         print '#define  ' + pp + '      ' + wwwa
-    #         print '#define  _' + pp + '      _' + wwwa
 
 
 
