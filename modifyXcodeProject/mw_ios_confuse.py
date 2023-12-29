@@ -34,26 +34,26 @@ file_count = 0
 oc_exclude_files = []
 oc_exclude_dirs = []
 
-words_dong_s = []
-def random_word_dong():
-    temp_int = random.randint(0, len(words_dong) - 1)
-    temp = words_dong[temp_int]
-    while temp in words_dong_s:
-        temp_int = random.randint(0, len(words_dong) - 1)
-        temp = words_dong[temp_int]
-    words_dong_s.append(temp)
-    return temp
+# words_dong_s = []
+# def random_word_dong():
+#     temp_int = random.randint(0, len(words_dong) - 1)
+#     temp = words_dong[temp_int]
+#     while temp in words_dong_s:
+#         temp_int = random.randint(0, len(words_dong) - 1)
+#         temp = words_dong[temp_int]
+#     words_dong_s.append(temp)
+#     return temp
 
 
-words_name_s = []
-def random_word_name():
-    temp_int = random.randint(0, len(words_name) - 1)
-    temp = words_name[temp_int]
-    while temp in words_name_s:
-        temp_int = random.randint(0, len(words_name) - 1)
-        temp = words_name[temp_int]
-    words_name_s.append(temp)
-    return temp
+# words_name_s = []
+# def random_word_name():
+#     temp_int = random.randint(0, len(words_name) - 1)
+#     temp = words_name[temp_int]
+#     while temp in words_name_s:
+#         temp_int = random.randint(0, len(words_name) - 1)
+#         temp = words_name[temp_int]
+#     words_name_s.append(temp)
+#     return temp
 
 def random_2word():#随机生成两个单词
 
@@ -1403,8 +1403,8 @@ def changeMethodHeaderValue(header_path):
             if str_result:
                 str_result_1 = str_result[0]
                 method_name = str_result_1.replace('#define ', '').strip()
-                w1_dong = random_word_dong()
-                w1_name = random_word_name()
+                w1_dong = word_util.random_word_dong()
+                w1_name = word_util.random_word_name()
                 if method_name.startswith('initWith'):
                     method_rep = str_result_1 + "         " + 'initWith' + w1_dong.capitalize() + w1_name.capitalize()
                 elif method_name.startswith('init'):
@@ -1557,7 +1557,7 @@ def change_pro_name(arc_path):
                 if file_name.endswith('.h') or file_name.endswith('.m'):
                     src_data = read_file_data(os.path.join(root, file_name))
                     # @property (nonatomic,weak) id<WKNavigationDelegate> webViewDelegate_MMMPRO;
-                    pro_list = re.findall(r'@property.+\b(\w+_MMMPRO);', src_data)
+                    pro_list = re.findall(r'@property.+\b(\w+_MMMPRO);', src_data) #get set应该也要查找  set\w+_MMMPRO   get\w+_MMMPRO
                     if pro_list:
                         for pro in pro_list:
                             if pro not in property_list:
@@ -1567,8 +1567,8 @@ def change_pro_name(arc_path):
         print property_list
         aaw = []
         for pp in property_list:
-            w1, w2 = word_util.random_2words_not_same_inarr(aaw)
-            wwwa = w1.lower() + w2.capitalize()
+            wwwa = word_util.random_property()
+            # wwwa = w1.lower() + w2.capitalize()
             print '#define  ' + pp + '      ' + wwwa
             print '#define  _' + pp + '      _' + wwwa
 
@@ -1724,7 +1724,7 @@ if __name__ == '__main__':
     #11.修改函数顺序
     #12.修改变量名称 proNameHeader.h
     arc_path = '/Users/ganyuanrong/iOSProject/DySdk_iOS/SDK_MAIN/FLSDK'
-    # change_pro_name(arc_path)
+    change_pro_name(arc_path)
 
 
     # imageDir = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn_v3/GamaSDK_iOS_Integration/Resources/VN/SDKResourcesVN.bundle/'

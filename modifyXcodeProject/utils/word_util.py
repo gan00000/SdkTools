@@ -36,6 +36,29 @@ def random_word_name():
     words_name_s.append(temp)
     return temp
 
+def random_property():
+
+    ww = ''
+    aa = random.randint(0, 6)
+    if aa <= 2:
+        w1_name = random_word_name()
+        w1_dong = random_word_dong()
+        ww = w1_dong.lower() + w1_name.capitalize()
+    elif aa == 3:
+        w1_name = random_word_name()
+        w2_name = random_word_name()
+        ww = w1_name.lower() + w2_name.capitalize()
+    elif aa == 4:
+        w1_name = random_word_name()
+        w2_name = random_word_name()
+        ww = w1_name.lower() + w2_name
+    else:
+        w1_name = random_word_name()
+        w1_dong = random_word_dong()
+        ww = w1_dong.lower() + w1_name
+
+    return ww
+
 # words_name_alary = []
 def random_2word():#随机生成两个单词
 
