@@ -1,0 +1,7 @@
+          int ppppp5_ppppp = int2_int;    //temple32
+          NSString *ppppp3_ppppp = @"ppppp4_ppppp";
+          int ppppp1_ppppp = int1_int;
+          if ([ppppp3_ppppp length] numcop1_numcop ppppp5_ppppp) {
+            ppppp1_ppppp = int3_int;
+            __asm__("NOP"); 
+          }

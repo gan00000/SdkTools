@@ -376,7 +376,7 @@ def insert_methods(file_path_m, sdk_confuse_dir): #类内插入方法
                         method = create_method_boj(method_access, ref_class_list)
                         method.class_name = class_name
                         methods_list.append(method)
-                        line = ('\n//===insert my method start=== %s\n' % insert_time) + method.methodContent + ('\n//===insert my method end=== %s\n' % insert_time) + line
+                        line = ('\n//===insert my method start=== %s\n' % insert_time) + method.methodContent + ('\n// %s ===insert my method end===\n' % insert_time) + line
                         # method_def_content = method_def_content + '\n//insert my method def start\n' + method.method_def + '\n//insert my method def end\n'
 
             method_imp_content = method_imp_content + line
@@ -387,7 +387,7 @@ def insert_methods(file_path_m, sdk_confuse_dir): #类内插入方法
         if methods_list:
             insert_m_content = ''
             for m in methods_list:
-                insert_m_content = insert_m_content + m.method_def + '//insert method def\n'
+                insert_m_content = insert_m_content + m.method_def + '//===insert my method def\n'
 
             if len(insert_m_content) > 0:
                 interface_content_new = interface_content.replace("@end", insert_m_content + "@end")
@@ -466,11 +466,11 @@ def addCodeToSrcCode(code_method_temp_content, code_temple, insert_line_content,
     insert_time = datetime_util.get_current_time()
     if is_later:
         print '前面插入：' + insert_line_content
-        code_method_temp_content = code_method_temp_content + ('\n\t\t//====insert my code start===  %s\n\t\t{\n\t\t' % (insert_time)) + code_temple + ('\n\t\t}\n\t\t//====insert my code end===  %s\n\n' % (insert_time)) + insert_line_content
+        code_method_temp_content = code_method_temp_content + ('\n\t\t//===insert my code start===  %s\n\t\t{\n\t\t' % (insert_time)) + code_temple + ('\n\t\t}\n\t\t// %s ===insert my code end=== \n\n' % (insert_time)) + insert_line_content
     else:
         print '后面插入' + insert_line_content
         code_method_temp_content = code_method_temp_content + insert_line_content
-        code_method_temp_content = code_method_temp_content + ('\n\t\t//====insert my code start===  %s\n\t\t{\n\t\t' % (insert_time)) + code_temple + ('\n\t\t}\n\t\t//====insert my code end===  %s\n\n' % (insert_time))
+        code_method_temp_content = code_method_temp_content + ('\n\t\t//===insert my code start===  %s\n\t\t{\n\t\t' % (insert_time)) + code_temple + ('\n\t\t}\n\t\t// %s ===insert my code end=== \n\n' % (insert_time))
     return code_method_temp_content
 
 

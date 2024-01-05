@@ -1,0 +1,11 @@
+          NSString *ppppp1_ppppp = @"ppppp2_ppppp";    //temple33
+          NSString *ppppp3_ppppp = @"ppppp4_ppppp";
+          NSString *ppppp5_ppppp = [NSString stringWithFormat:@"ppppp12_ppppp%@",ppppp1_ppppp];
+          if ([ppppp5_ppppp length] numcop1_numcop int1_int) {
+            ppppp5_ppppp = [NSString stringWithFormat:@"ppppp13_ppppp%@",ppppp3_ppppp];
+          }else{
+            ppppp5_ppppp = [NSString stringWithFormat:@"ppppp14_ppppp%@",ppppp3_ppppp];
+          }
+          if(ppppp5_ppppp){
+            __asm__("NOP");
+          }

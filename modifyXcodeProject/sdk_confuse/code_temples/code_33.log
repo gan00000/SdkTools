@@ -1,0 +1,6 @@
+          NSString *ppppp1_ppppp = @"ppppp2_ppppp";    //temple33
+          NSString *ppppp3_ppppp = @"ppppp4_ppppp";
+          NSString *ppppp5_ppppp = nil;
+          if ([ppppp1_ppppp length] numcop1_numcop int1_int) {
+            ppppp5_ppppp =[ppppp1_ppppp stringByReplacingOccurrencesOfString:@"ppppp6_ppppp" withString:ppppp3_ppppp];
+          }
