@@ -6,6 +6,7 @@ import sys
 # from modifyXcodeProject import mw_ios_confuse
 from modifyXcodeProject import oc_method_util, oc_code_util, cpp_code_util
 from modifyXcodeProject.model.MethodInfo import MethodInfo
+from modifyXcodeProject.model.OCClassInfo import OCClassInfo
 from modifyXcodeProject.model.PropertyInfo import PropertyInfo
 from modifyXcodeProject.utils import file_util, word_util, datetime_util
 
@@ -75,7 +76,7 @@ def insert_class_property(file_path_m):
                             w1, w2 = word_util.random_2words_not_same_inarr(word_aar)
                             propertyName = w1.lower() + w2.capitalize()
                             if '*' in add_property_type:
-                                add_property_content = '@property (nonatomic, strong) %s%s;//===insert my property===' %(add_property_type, propertyName)
+                                add_property_content = '@property (nonatomic, strong) %s%s;//===insert my property===' % (add_property_type, propertyName)
                             else:
                                 add_property_content = '@property (nonatomic, assign) %s %s;//===insert my property===' % (add_property_type, propertyName)
                             pi.propertyName = propertyName
@@ -676,15 +677,132 @@ def parse_property(file_data):
         if property_result_list:
             property_list = []
             for property_def in property_result_list:
-                property_name = re.findall(r' \\*?\\w+;', property_def)
-                if property_name:
-                    mPropertyInfo = PropertyInfo()
-                    property_name = property_name.replace(' ','').replace('*','').replace(';','')
-                    mPropertyInfo.propertyName = property_name
-                    property_list.append(mPropertyInfo)
+                property_name_list = re.findall(r' \*?\w+;', property_def)
+                if property_name_list:
+                    # mPropertyInfo = PropertyInfo()
+                    property_name = property_name_list[0].replace(' ','').replace('*','').replace(';','')
+                    # mPropertyInfo.propertyName = property_name
+                    property_list.append(property_name)
 
             return property_list
     return None
+
+oc_class_s = {}
+def parse_oc_class(src_dir_path, exclude_dirs, exclude_files): #解析方法前面变量
+
+    if os.path.exists(src_dir_path):
+        list_dirs = os.walk(src_dir_path)
+        for root, dirs, files in list_dirs:
+
+            has_exclude_dir = 0
+            for exclude_dir in exclude_dirs:
+                if exclude_dir in root:
+                    has_exclude_dir = 1
+
+            if has_exclude_dir == 1:
+                continue
+
+            for file_name in files:
+                if file_name in exclude_files:
+                    continue
+                if file_name.endswith('.m') or file_name.endswith('.h'):
+                    file_path = os.path.join(root, file_name)
+                    file_data = file_util.read_file_data_utf8(file_path)
+                    if file_data:
+
+                        classInfo = OCClassInfo()
+
+                        if file_name.endswith('.h'):
+                            class_content_list = re.findall(r'@interface \w+ :[\s\S]+?@end', file_data) #查找类声明部分
+                            for class_content in class_content_list:
+                                class_nameaa = re.findall(r'@interface (\w+) :', class_content)
+                                class_name = class_nameaa[0]
+                                if '@property' in class_content:
+                                    property_list = parse_property(class_content)
+                                    if property_list and len(property_list) > 0:
+                                        classInfo.name = class_name
+                                        classInfo.propertyList = property_list
+                                        if oc_class_s.has_key(class_name):
+                                            classInfo_exist = oc_class_s[class_name]
+                                            classInfo_exist.propertyList.append(property_list)
+                                        else:
+                                            oc_class_s[class_name] = classInfo
+                        elif file_name.endswith('.m'):
+
+                            class_content_list = re.findall(r'@interface \w+ {0,2}\(\)[\s\S]+?@end', file_data)  # 查找类声明部分
+                            for class_content in class_content_list:
+                                class_content_temp = class_content
+                                class_content_temp = oc_code_util.removeAnnotate(class_content_temp) #去掉注释，方便处理
+                                class_nameaa = re.findall(r'@interface (\w+) {0,2}\(\)', class_content_temp) #查找类内部
+                                class_name = class_nameaa[0]
+                                if '@property' in class_content_temp:
+                                    property_list = parse_property(class_content_temp) #内部属性
+                                    if property_list and len(property_list) > 0:
+                                        classInfo.name = class_name
+                                        classInfo.priPropertyList = property_list
+                                        for property in property_list:
+                                            class_content_temp = re.sub(r'%s' % property, property + '_PPPROPERTY', class_content_temp)
+                                        file_data = file_data.replace(class_content, class_content_temp)
+
+                            if 'AccountLoginViewV2' in file_name:
+                                print '...'
+                            implementation_content_list = re.findall(r'@implementation[\s\S]+?@end', file_data)
+                            if implementation_content_list and len(implementation_content_list) > 0:
+                                for impl_content in implementation_content_list:
+                                    impl_content_temp = impl_content
+                                    if len(classInfo.priPropertyList) > 0:
+                                        for pri_property in classInfo.priPropertyList:
+                                            pri_property_new = pri_property + '_PPPROPERTY'
+                                            impl_content_temp = re.sub(r'\bself\.%s\b' % pri_property, 'self.' + pri_property_new, impl_content_temp)
+                                            impl_content_temp = re.sub(r'\bweakSelf\.%s\b' % pri_property, 'weakSelf.' + pri_property_new, impl_content_temp)
+                                            impl_content_temp = re.sub(r'\b\[weakSelf %s\]\b' % pri_property, '[weakSelf %s]' % pri_property_new, impl_content_temp)
+                                            impl_content_temp = re.sub(r'\[self %s]' % pri_property, '[self %s]' % pri_property_new, impl_content_temp)
+
+                                            impl_content_temp = re.sub(r'\b_%s\b' % pri_property, '_' + pri_property_new, impl_content_temp)
+
+                                            get_set_a = "".join(pri_property[:1].upper() + pri_property[1:])
+                                            impl_content_temp = re.sub(r'\bset%s\b' % get_set_a, 'set' + get_set_a, impl_content_temp)
+                                            impl_content_temp = re.sub(r'\bget%s\b' % get_set_a, 'get' + get_set_a, impl_content_temp)
+                                            # impl_content_temp = re.sub(r'\[\[%s shared\w+?\]\.%s' % (classInfo.name, pri_property), '', impl_content_temp)
+
+                                            pri_property_method_def = re.findall(r'- {0,3}\(.{1,25}\) {0,3}%s {0,3}[\{\n]' % pri_property, impl_content_temp) #属性方法
+                                            if pri_property_method_def and len(pri_property_method_def) > 0:  #  - {0,3}\(.+?\)wkwebView[\{\n]
+                                                pri_property_method_def_new = pri_property_method_def[0].replace(pri_property, pri_property_new)
+                                                impl_content_temp = impl_content_temp.replace(pri_property_method_def[0], pri_property_method_def_new)
+
+                                            instances = re.findall(r'\b%s {1,3}\*(\w+) {0,2};' % classInfo.name, impl_content_temp) #查找该类声明的变量 HttpServiceEngineAd *instance;
+                                            if instances:
+                                                instance = instances[0]
+                                                impl_content_temp = re.sub(r'\b%s\.%s\b' % (instance, pri_property), '%s.%s' % (instance, pri_property_new),
+                                                                           impl_content_temp)
+                                            instances_2 = re.findall(r'\+ {0,3}\(instancetype\) {0,2}(\w+) {0,3}[\n\{]', impl_content_temp)  #+ (instancetype)sharedInstance {
+                                            if instances_2:
+                                                for instance_2 in instances_2:
+                                                    # instance_2 = instances_2[0]
+                                                    impl_content_temp = re.sub(r'\b%s].%s\b' % (instance_2, pri_property), '%s].%s' % (instance_2, pri_property_new), impl_content_temp)
+
+                                    impl_var_content_list = re.findall('@implementation[\w\+\n ]+?\{[\s\S]+?\}', impl_content_temp) #处理@implementation内部声明的变量
+                                    if impl_var_content_list and len(impl_var_content_list) > 0:
+                                        for impl_var_content in impl_var_content_list:
+                                            impl_var_content_temp = impl_var_content
+                                            impl_var_content_temp = oc_code_util.removeAnnotate(impl_var_content_temp)
+                                            impl_var_list = re.findall(r' \w+ {1,3}\*?(\w+);', impl_var_content_temp) #查找implementation内部变量
+                                            if impl_var_list and len(impl_var_list) > 0:
+                                                for impl_var in impl_var_list: #内部变量变量替换
+                                                    impl_var_new = impl_var + '_IMPLVAR'
+                                                    impl_var_content_temp = re.sub(r'\b%s\b' % (impl_var), impl_var_new, impl_var_content_temp)
+                                                    # impl_content_temp = re.sub(r'\b%s\b' % (impl_var), impl_var_new, impl_content_temp)
+                                                impl_content_temp = impl_content_temp.replace(impl_var_content, impl_var_content_temp)
+                                                for impl_var in impl_var_list: #内部变量变量替换
+                                                    impl_var_new = impl_var + '_IMPLVAR'
+                                                    impl_content_temp = re.sub(r'\b%s\b' % (impl_var), impl_var_new, impl_content_temp)
+
+
+                                    file_data = file_data.replace(impl_content, impl_content_temp)
+
+                                file_util.wite_data_to_file(file_path, file_data)
+
+
 
 # '\w+ \*\w+ ?='
 def parse_method_local_params(method_data): #解析方法局部变量

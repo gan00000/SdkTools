@@ -1724,7 +1724,7 @@ if __name__ == '__main__':
     #11.修改函数顺序
     #12.修改变量名称 proNameHeader.h
     arc_path = '/Users/ganyuanrong/iOSProject/DySdk_iOS/SDK_MAIN/FLSDK'
-    change_pro_name(arc_path)
+    # change_pro_name(arc_path)
 
 
     # imageDir = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn_v3/GamaSDK_iOS_Integration/Resources/VN/SDKResourcesVN.bundle/'
@@ -1744,7 +1744,8 @@ if __name__ == '__main__':
     #                 if aa is None or len(aa) == 0:
     #                     print image_name_no_extension
 
-
+    src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK'
+    oc_class_parser.parse_oc_class(src_path, [], [])
 
 
     print 'end'
