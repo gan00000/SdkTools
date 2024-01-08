@@ -9,5 +9,6 @@ class OCClassInfo:
         self.methodList = []    #类方法集合
         self.name = ''  #类名
         self.protocolNameList = None  #实现的协议名称
+        self.instMethodList = [] #返回实例的方法
         
 

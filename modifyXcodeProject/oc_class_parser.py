@@ -688,10 +688,12 @@ def parse_property(file_data):
     return None
 
 oc_class_s = {}
-def parse_oc_class(src_dir_path, exclude_dirs, exclude_files): #解析方法前面变量
+def parse_oc_property(src_dir_path, exclude_dirs, exclude_files): #解析方法前面变量
 
     if os.path.exists(src_dir_path):
         list_dirs = os.walk(src_dir_path)
+        pri_property_new_list = []
+        pri_property_new_list_impl = []
         for root, dirs, files in list_dirs:
 
             has_exclude_dir = 0
@@ -705,103 +707,324 @@ def parse_oc_class(src_dir_path, exclude_dirs, exclude_files): #解析方法前�
             for file_name in files:
                 if file_name in exclude_files:
                     continue
-                if file_name.endswith('.m') or file_name.endswith('.h'):
-                    file_path = os.path.join(root, file_name)
-                    file_data = file_util.read_file_data_utf8(file_path)
-                    if file_data:
+                # if file_name.endswith('.m') or file_name.endswith('.h'):
+                if file_name.endswith('.m'):
+                    file_path_m = os.path.join(root, file_name)
+                    file_data_m = file_util.read_file_data_utf8(file_path_m)
+                    if file_data_m:
 
-                        classInfo = OCClassInfo()
+                        file_path_h = file_path_m.replace('.m', '.h')
+                        if os.path.exists(file_path_h):
+                            file_data_h = file_util.read_file_data_utf8(file_path_h)
+                            class_content_list = re.findall(r'@interface \w+ :[\s\S]+?@end', file_data_h)  # 查找类声明部分
 
-                        if file_name.endswith('.h'):
-                            class_content_list = re.findall(r'@interface \w+ :[\s\S]+?@end', file_data) #查找类声明部分
                             for class_content in class_content_list:
                                 class_nameaa = re.findall(r'@interface (\w+) :', class_content)
                                 class_name = class_nameaa[0]
+
+                                if oc_class_s.has_key(class_name):
+                                    classInfo_h = oc_class_s[class_name]
+                                else:
+                                    classInfo_h = OCClassInfo()
+                                    classInfo_h.name = class_name
+                                    oc_class_s[class_name] = classInfo_h
+
                                 if '@property' in class_content:
-                                    property_list = parse_property(class_content)
+                                    property_list = parse_property(class_content) #.h中声明的属性
                                     if property_list and len(property_list) > 0:
-                                        classInfo.name = class_name
-                                        classInfo.propertyList = property_list
-                                        if oc_class_s.has_key(class_name):
-                                            classInfo_exist = oc_class_s[class_name]
-                                            classInfo_exist.propertyList.append(property_list)
-                                        else:
-                                            oc_class_s[class_name] = classInfo
-                        elif file_name.endswith('.m'):
+                                        classInfo_h.propertyList = property_list
+                                        # if oc_class_s.has_key(class_name):
+                                        #     classInfo_exist = oc_class_s[class_name]
+                                        #     classInfo_exist.propertyList.append(property_list)
+                                        # else:
+                                        #     oc_class_s[class_name] = classInfo
 
-                            class_content_list = re.findall(r'@interface \w+ {0,2}\(\)[\s\S]+?@end', file_data)  # 查找类声明部分
-                            for class_content in class_content_list:
-                                class_content_temp = class_content
-                                class_content_temp = oc_code_util.removeAnnotate(class_content_temp) #去掉注释，方便处理
-                                class_nameaa = re.findall(r'@interface (\w+) {0,2}\(\)', class_content_temp) #查找类内部
+                                instances_2 = re.findall(r'[+-] {0,3}\(instancetype\) {0,2}(\w+) {0,3};',
+                                                         class_content)  # + (instancetype)sharedInstance {
+                                if instances_2:
+                                    for inst_2 in instances_2:
+                                        classInfo_h.instMethodList.append(inst_2)
+
+
+                        #处理m
+                        classInfo = OCClassInfo()
+
+                        class_content_list = re.findall(r'@interface \w+ {0,2}\(\)[\s\S]+?@end',
+                                                        file_data_m)  # 查找类声明部分,私有
+                        for class_content in class_content_list:
+                            class_content_temp = class_content
+                            class_content_temp = oc_code_util.removeAnnotate(class_content_temp)  # 去掉注释，方便处理
+                            class_nameaa = re.findall(r'@interface (\w+) {0,2}\(\)', class_content_temp)  # 查找类名
+                            class_name = class_nameaa[0]
+                            if '@property' in class_content_temp:
+                                property_list = parse_property(class_content_temp)  # .m中 内部属性
+                                if property_list and len(property_list) > 0:
+                                    classInfo.name = class_name
+                                    # classInfo.priPropertyList = property_list
+                                    for property in property_list:
+                                        if '_MMMPRO' in property:
+                                            # property_list.remove(property)
+                                            continue
+                                        classInfo.priPropertyList.append(property)
+                                        class_content_temp = re.sub(r'%s' % property, property + '_PRIROPERTY',
+                                                                    class_content_temp)
+                                    file_data_m = file_data_m.replace(class_content, class_content_temp)
+
+                        if 'AccountLoginViewV2' in file_name:
+                            print '...'
+                        implementation_content_list = re.findall(r'@implementation[\s\S]+?@end', file_data_m)
+                        if implementation_content_list and len(implementation_content_list) > 0:
+                            for impl_content in implementation_content_list:
+                                impl_content_temp = impl_content
+                                class_nameaa = re.findall(r'@implementation {0,2}(\w+) {0,2}[\n{]',
+                                                          impl_content_temp)  # 查找类名
+                                if class_nameaa is None or len(class_nameaa) == 0:
+                                    continue
                                 class_name = class_nameaa[0]
-                                if '@property' in class_content_temp:
-                                    property_list = parse_property(class_content_temp) #内部属性
-                                    if property_list and len(property_list) > 0:
-                                        classInfo.name = class_name
-                                        classInfo.priPropertyList = property_list
-                                        for property in property_list:
-                                            class_content_temp = re.sub(r'%s' % property, property + '_PPPROPERTY', class_content_temp)
-                                        file_data = file_data.replace(class_content, class_content_temp)
+                                classInfo.name = class_name
+                                if len(classInfo.priPropertyList) > 0:
+                                    for pri_property in classInfo.priPropertyList:
+                                        pri_property_new = pri_property + '_PRIROPERTY'
+                                        if pri_property_new not in pri_property_new_list:
+                                            pri_property_new_list.append(pri_property_new)
+                                        # print '#define %s    @"%s"' % (pri_property_new, pri_property_new)
+                                        impl_content_temp = re.sub(r'\bself\.%s\b' % pri_property,
+                                                                   'self.' + pri_property_new, impl_content_temp)
+                                        impl_content_temp = re.sub(r'\bweakSelf\.%s\b' % pri_property,
+                                                                   'weakSelf.' + pri_property_new, impl_content_temp)
+                                        impl_content_temp = re.sub(r'\b\[weakSelf %s\]\b' % pri_property,
+                                                                   '[weakSelf %s]' % pri_property_new,
+                                                                   impl_content_temp)
+                                        impl_content_temp = re.sub(r'\[self %s]' % pri_property,
+                                                                   '[self %s]' % pri_property_new, impl_content_temp)
 
-                            if 'AccountLoginViewV2' in file_name:
-                                print '...'
-                            implementation_content_list = re.findall(r'@implementation[\s\S]+?@end', file_data)
-                            if implementation_content_list and len(implementation_content_list) > 0:
-                                for impl_content in implementation_content_list:
-                                    impl_content_temp = impl_content
-                                    if len(classInfo.priPropertyList) > 0:
-                                        for pri_property in classInfo.priPropertyList:
-                                            pri_property_new = pri_property + '_PPPROPERTY'
-                                            impl_content_temp = re.sub(r'\bself\.%s\b' % pri_property, 'self.' + pri_property_new, impl_content_temp)
-                                            impl_content_temp = re.sub(r'\bweakSelf\.%s\b' % pri_property, 'weakSelf.' + pri_property_new, impl_content_temp)
-                                            impl_content_temp = re.sub(r'\b\[weakSelf %s\]\b' % pri_property, '[weakSelf %s]' % pri_property_new, impl_content_temp)
-                                            impl_content_temp = re.sub(r'\[self %s]' % pri_property, '[self %s]' % pri_property_new, impl_content_temp)
+                                        impl_content_temp = re.sub(r'\b_%s\b' % pri_property, '_' + pri_property_new,
+                                                                   impl_content_temp)
 
-                                            impl_content_temp = re.sub(r'\b_%s\b' % pri_property, '_' + pri_property_new, impl_content_temp)
+                                        get_set_a = "".join(pri_property[:1].upper() + pri_property[1:])
+                                        impl_content_temp = re.sub(r'\bset%s\b' % get_set_a, 'set' + get_set_a,
+                                                                   impl_content_temp)
+                                        impl_content_temp = re.sub(r'\bget%s\b' % get_set_a, 'get' + get_set_a,
+                                                                   impl_content_temp)
+                                        # impl_content_temp = re.sub(r'\[\[%s shared\w+?\]\.%s' % (classInfo.name, pri_property), '', impl_content_temp)
 
-                                            get_set_a = "".join(pri_property[:1].upper() + pri_property[1:])
-                                            impl_content_temp = re.sub(r'\bset%s\b' % get_set_a, 'set' + get_set_a, impl_content_temp)
-                                            impl_content_temp = re.sub(r'\bget%s\b' % get_set_a, 'get' + get_set_a, impl_content_temp)
-                                            # impl_content_temp = re.sub(r'\[\[%s shared\w+?\]\.%s' % (classInfo.name, pri_property), '', impl_content_temp)
+                                        pri_property_method_def = re.findall(
+                                            r'- {0,3}\(.{1,25}\) {0,3}%s {0,3}[\{\n]' % pri_property,
+                                            impl_content_temp)  # 属性方法
+                                        if pri_property_method_def and len(
+                                                pri_property_method_def) > 0:  # - {0,3}\(.+?\)wkwebView[\{\n]
+                                            pri_property_method_def_new = pri_property_method_def[0].replace(
+                                                pri_property, pri_property_new)
+                                            impl_content_temp = impl_content_temp.replace(pri_property_method_def[0],
+                                                                                          pri_property_method_def_new)
 
-                                            pri_property_method_def = re.findall(r'- {0,3}\(.{1,25}\) {0,3}%s {0,3}[\{\n]' % pri_property, impl_content_temp) #属性方法
-                                            if pri_property_method_def and len(pri_property_method_def) > 0:  #  - {0,3}\(.+?\)wkwebView[\{\n]
-                                                pri_property_method_def_new = pri_property_method_def[0].replace(pri_property, pri_property_new)
-                                                impl_content_temp = impl_content_temp.replace(pri_property_method_def[0], pri_property_method_def_new)
-
-                                            instances = re.findall(r'\b%s {1,3}\*(\w+) {0,2};' % classInfo.name, impl_content_temp) #查找该类声明的变量 HttpServiceEngineAd *instance;
-                                            if instances:
-                                                instance = instances[0]
-                                                impl_content_temp = re.sub(r'\b%s\.%s\b' % (instance, pri_property), '%s.%s' % (instance, pri_property_new),
+                                        instances = re.findall(r'\b%s {1,3}\*(\w+) {0,2};' % classInfo.name,
+                                                               impl_content_temp)  # 查找该类声明的变量 HttpServiceEngineAd *instance;
+                                        if instances:
+                                            # instance = instances[0]
+                                            for instance in instances:
+                                                impl_content_temp = re.sub(r'\b%s\.%s\b' % (instance, pri_property),
+                                                                           '%s.%s' % (instance, pri_property_new),
                                                                            impl_content_temp)
-                                            instances_2 = re.findall(r'\+ {0,3}\(instancetype\) {0,2}(\w+) {0,3}[\n\{]', impl_content_temp)  #+ (instancetype)sharedInstance {
-                                            if instances_2:
-                                                for instance_2 in instances_2:
-                                                    # instance_2 = instances_2[0]
-                                                    impl_content_temp = re.sub(r'\b%s].%s\b' % (instance_2, pri_property), '%s].%s' % (instance_2, pri_property_new), impl_content_temp)
 
-                                    impl_var_content_list = re.findall('@implementation[\w\+\n ]+?\{[\s\S]+?\}', impl_content_temp) #处理@implementation内部声明的变量
-                                    if impl_var_content_list and len(impl_var_content_list) > 0:
-                                        for impl_var_content in impl_var_content_list:
-                                            impl_var_content_temp = impl_var_content
-                                            impl_var_content_temp = oc_code_util.removeAnnotate(impl_var_content_temp)
-                                            impl_var_list = re.findall(r' \w+ {1,3}\*?(\w+);', impl_var_content_temp) #查找implementation内部变量
-                                            if impl_var_list and len(impl_var_list) > 0:
-                                                for impl_var in impl_var_list: #内部变量变量替换
-                                                    impl_var_new = impl_var + '_IMPLVAR'
-                                                    impl_var_content_temp = re.sub(r'\b%s\b' % (impl_var), impl_var_new, impl_var_content_temp)
-                                                    # impl_content_temp = re.sub(r'\b%s\b' % (impl_var), impl_var_new, impl_content_temp)
-                                                impl_content_temp = impl_content_temp.replace(impl_var_content, impl_var_content_temp)
-                                                for impl_var in impl_var_list: #内部变量变量替换
-                                                    impl_var_new = impl_var + '_IMPLVAR'
-                                                    impl_content_temp = re.sub(r'\b%s\b' % (impl_var), impl_var_new, impl_content_temp)
+                                        instances_2 = re.findall(r'\+ {0,3}\(instancetype\) {0,2}(\w+) {0,3}[\n\{]',
+                                                                 impl_content_temp)  # + (instancetype)sharedInstance {
+                                        if instances_2:
+                                            for instance_2 in instances_2:
+                                                # instance_2 = instances_2[0]
+                                                impl_content_temp = re.sub(r'\b%s].%s\b' % (instance_2, pri_property),
+                                                                           '%s].%s' % (instance_2, pri_property_new),
+                                                                           impl_content_temp)
+
+                                impl_var_content_list = re.findall('@implementation[\w\+\n ]+?\{[\s\S]+?\}',
+                                                                   impl_content_temp)  # 处理@implementation内部声明的变量
+                                if impl_var_content_list and len(impl_var_content_list) > 0:
+                                    for impl_var_content in impl_var_content_list:
+                                        impl_var_content_temp = impl_var_content
+                                        impl_var_content_temp = oc_code_util.removeAnnotate(impl_var_content_temp)
+                                        impl_var_list = re.findall(r' \w+ {1,3}\*?(\w+);',
+                                                                   impl_var_content_temp)  # 查找implementation内部变量
+                                        if impl_var_list and len(impl_var_list) > 0:
+                                            for impl_var in impl_var_list:  # 内部变量变量替换
+                                                impl_var_new = impl_var + '_IMPLVAR'
+                                                if impl_var_new not in pri_property_new_list_impl:
+                                                    pri_property_new_list_impl.append(impl_var_new)
+                                                # print '#define %s    @"%s"' % (impl_var_new, impl_var_new)
+                                                impl_var_content_temp = re.sub(r'\b%s\b' % (impl_var), impl_var_new,
+                                                                               impl_var_content_temp)
+                                                # impl_content_temp = re.sub(r'\b%s\b' % (impl_var), impl_var_new, impl_content_temp)
+                                            impl_content_temp = impl_content_temp.replace(impl_var_content,
+                                                                                          impl_var_content_temp)
+                                            for impl_var in impl_var_list:  # 内部变量变量替换
+                                                impl_var_new = impl_var + '_IMPLVAR'
+                                                impl_content_temp = re.sub(r'\b%s\b' % (impl_var), impl_var_new,
+                                                                           impl_content_temp)
+
+                                file_data_m = file_data_m.replace(impl_content, impl_content_temp)
+
+                            file_util.wite_data_to_file(file_path_m, file_data_m)
+
+        for pri_pro in pri_property_new_list:
+            rea = word_util.random_property()
+            print '#define %s    %s' % (pri_pro, rea)
+        for pri_pro in pri_property_new_list_impl:
+            rea = word_util.random_property()
+            print '#define %s    %s' % (pri_pro, rea)
+        # if len(oc_class_s) > 0:
+        #     replace_code_pro(src_dir_path,[],[])
 
 
-                                    file_data = file_data.replace(impl_content, impl_content_temp)
+def replace_code_pro(src_dir_path, exclude_dirs, exclude_files): #解析方法前面变量
 
-                                file_util.wite_data_to_file(file_path, file_data)
+    if os.path.exists(src_dir_path):
+        list_dirs = os.walk(src_dir_path)
+        for root, dirs, files in list_dirs:
 
+            # has_exclude_dir = 0
+            # for exclude_dir in exclude_dirs:
+            #     if exclude_dir in root:
+            #         has_exclude_dir = 1
+            #
+            # if has_exclude_dir == 1:
+            #     continue
+
+            for file_name in files:
+                # if file_name in exclude_files:
+                #     continue
+                file_path = os.path.join(root, file_name)
+                if file_name.endswith('.h'):
+                    file_data = file_util.read_file_data_utf8(file_path)
+                    class_content_list = re.findall(r'@interface \w+ :[\s\S]+?@end', file_data)  # 查找类声明部分
+                    is_change = 0
+                    for class_content in class_content_list:
+                        class_content_temp = class_content
+                        class_content_temp = oc_code_util.removeAnnotate(class_content_temp)
+                        class_nameaa = re.findall(r'@interface (\w+) :', class_content_temp)
+                        class_name = class_nameaa[0]
+                        if oc_class_s.has_key(class_name):
+                            calss_info = oc_class_s[class_name]
+                            if calss_info.propertyList and len(calss_info.propertyList) > 0:
+                                for property in calss_info.propertyList:
+                                    # class_content = re.sub(r'%s;(?<=@property.{3,100}%s;)' % (property, property), '%s;' % property, class_content)
+                                    property_new = property + '_PUBROPERTY'
+                                    property_list = re.findall('@property.+ \*?%s;' % property, class_content_temp)
+                                    for property_line in property_list:
+                                        property_line_temp = re.sub(r'%s;' % property, '%s;' % property_new, property_line)
+                                        class_content_temp = class_content_temp.replace(property_line, property_line_temp)
+                                file_data = file_data.replace(class_content, class_content_temp)
+                                is_change = 1
+                    if is_change == 1:
+                        file_util.wite_data_to_file(file_path, file_data)
+
+                elif file_name.endswith('.m'):
+
+                    file_data = file_util.read_file_data_utf8(file_path)
+                    if file_data:
+                        # implementation_content_list = re.findall(r'@implementation[\s\S]+?@end', file_data)
+                        # if implementation_content_list and len(implementation_content_list) > 0:
+                        #     for impl_content in implementation_content_list:
+                        #         impl_content_temp = impl_content
+                        #         class_nameaa = re.findall(r'@implementation {0,2}(\w+) {0,2}[\n{]',
+                        #                                   impl_content_temp)  # 查找类名
+                        #         if class_nameaa is None or len(class_nameaa) == 0:
+                        #             continue
+                        #         class_name_dis = class_nameaa[0]
+                        impl_content_temp = file_data
+                        if 'ExposureHorControllerViewController' in file_name:
+                            print 'aaa'
+                        for k, v in oc_class_s.items():
+                            class_name = k
+                            classInfo = v
+                            if '@implementation ' + class_name in file_data:
+
+                                if len(classInfo.propertyList) > 0:
+                                    for pri_property in classInfo.propertyList:
+                                        pri_property_new = pri_property + '_PUBROPERTY'
+                                        impl_content_temp = re.sub(r'\bself\.%s\b' % pri_property,
+                                                                   'self.' + pri_property_new, impl_content_temp)
+                                        impl_content_temp = re.sub(r'\bweakSelf\.%s\b' % pri_property,
+                                                                   'weakSelf.' + pri_property_new, impl_content_temp)
+                                        impl_content_temp = re.sub(r'\b\[weakSelf %s\]\b' % pri_property,
+                                                                   '[weakSelf %s]' % pri_property_new,
+                                                                   impl_content_temp)
+                                        impl_content_temp = re.sub(r'\[self %s]' % pri_property,
+                                                                   '[self %s]' % pri_property_new, impl_content_temp)
+
+                                        impl_content_temp = re.sub(r'\b_%s\b' % pri_property, '_' + pri_property_new,
+                                                                   impl_content_temp)
+
+                                        get_set_a = "".join(pri_property[:1].upper() + pri_property[1:])
+                                        impl_content_temp = re.sub(r'\bset%s\b' % get_set_a, 'set' + get_set_a,
+                                                                   impl_content_temp)
+                                        impl_content_temp = re.sub(r'\bget%s\b' % get_set_a, 'get' + get_set_a,
+                                                                   impl_content_temp)
+                                        impl_content_temp = re.sub(
+                                            r'\[\[%s shared\w+?\]\.%s' % (classInfo.name, pri_property), '',
+                                            impl_content_temp)
+
+                                        pri_property_method_def = re.findall(
+                                            r'- {0,3}\(.{1,25}\) {0,3}%s {0,3}[\{\n]' % pri_property,
+                                            impl_content_temp)  # 属性方法
+                                        if pri_property_method_def and len(
+                                                pri_property_method_def) > 0:  # - {0,3}\(.+?\)wkwebView[\{\n]
+                                            pri_property_method_def_new = pri_property_method_def[0].replace(
+                                                pri_property, pri_property_new)
+                                            impl_content_temp = impl_content_temp.replace(pri_property_method_def[0],
+                                                                                          pri_property_method_def_new)
+
+                                        instances = re.findall(r'\b%s {1,3}\*(\w+) {0,2};' % classInfo.name,
+                                                               impl_content_temp)  # 查找该类声明的变量 HttpServiceEngineAd *instance;
+
+                                        if instances is None:
+                                            instances = []
+                                        instances_a = re.findall(r'\b%s\b {1,3}\*(\w+) {0,2}=' % classInfo.name,
+                                                               impl_content_temp)   #HttpServiceEngineAd *instance =  \bAccountListViewCell\b {1,3}\*(\w+) {0,2}=
+                                        if instances_a:
+                                            instances.extend(instances_a)
+
+                                        if instances:
+                                            for inst in instances:
+                                                impl_content_temp = re.sub(r'\b%s\.%s\b' % (inst, pri_property),
+                                                                           '%s.%s' % (inst, pri_property_new),
+                                                                           impl_content_temp)
+                                        if len(classInfo.instMethodList) > 0:
+                                            for instance_2 in classInfo.instMethodList:
+                                                # instance_2 = instances_2[0]
+                                                impl_content_temp = re.sub(
+                                                    r'\b%s].%s\b' % (instance_2, pri_property),
+                                                    '%s].%s' % (instance_2, pri_property_new),
+                                                    impl_content_temp)
+
+                            else:
+                                if len(classInfo.propertyList) > 0:
+                                    for pub_property in classInfo.propertyList:
+                                        pub_property_new = pub_property + '_PUBROPERTY'
+
+                                        instances = re.findall(r'\b%s\b {1,3}\*(\w+) {0,2};' % classInfo.name,
+                                                               impl_content_temp)  # 查找该类声明的变量 HttpServiceEngineAd *instance;  \bAccountListViewCell {1,3}\*(\w+) {0,2};   \b%s {1,3}\*(AccountListViewCell) {0,2};
+
+                                        if instances is None:
+                                            instances = []
+                                        instances_a = re.findall(r'\b%s\b {1,3}\*(\w+) {0,2}=' % classInfo.name,
+                                                               impl_content_temp)   #HttpServiceEngineAd *instance =
+                                        if instances_a:
+                                            instances.extend(instances_a)
+
+                                        if instances:
+                                            for inst in instances:
+                                                impl_content_temp = re.sub(r'\b%s\.%s\b' % (inst, pub_property),
+                                                                           '%s.%s' % (inst, pub_property_new),
+                                                                           impl_content_temp)
+                                        if len(classInfo.instMethodList) > 0:
+                                            for instance_2 in classInfo.instMethodList:
+                                                # instance_2 = instances_2[0]
+                                                impl_content_temp = re.sub(r'\b%s].%s\b' % (instance_2, pub_property),
+                                                                           '%s].%s' % (instance_2, pub_property_new),
+                                                                           impl_content_temp)
+                        # file_data = file_data.replace(impl_content, impl_content_temp)
+
+
+                        file_util.wite_data_to_file(file_path, impl_content_temp)
 
 
 # '\w+ \*\w+ ?='
