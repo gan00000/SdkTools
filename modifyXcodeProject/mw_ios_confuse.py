@@ -365,26 +365,6 @@ def modify_image_name_reference(oc_path, old_ref, new_ref):
 
                     wite_data_to_file(file_path, file_new_data)
 
-# highlightedImage="
-def find_highlightedImage(res_path):
-
-    if os.path.exists(res_path):
-        list_dirs = os.walk(res_path)
-        for root, dirs, files in list_dirs:
-            for file_name in files:
-
-                if file_name == ".DS_Store":
-                    continue
-
-                if file_name.endswith('.m') or file_name.endswith('.mm') \
-                        or file_name.endswith('.h') or file_name.endswith('.pch') or \
-                        file_name.endswith('.storyboard') or file_name.endswith('.xib'):  # oc文件
-
-                    file_path = os.path.join(root, file_name)  # 头文件路径
-                    file_data = read_file_data(file_path)
-                    if 'highlightedImage=' in file_data:
-                        print file_name
-
 
 storyboard_new_prefix = "FaCai"
 storyboard_old_prefix = "UKRosRed"
@@ -440,20 +420,6 @@ def replace_xproject_data_reference(xproject_data, old_file_name, new_file_name)
     return replace_data_by_word(xproject_data, old_file_name, new_file_name)
 
 
-def get_new_file_name(file_name, old_prefix, new_prefix): #new_prefix为空表示去掉前缀
-
-    if new_prefix and file_name.startswith(new_prefix):  # 已经存在前缀，不处理
-        return file_name
-
-    if old_prefix.strip() and file_name.startswith(old_prefix):  # 存在旧前缀，替换掉
-        new_file_name = file_name.replace(old_prefix, new_prefix)
-    else:
-
-        new_file_name = new_prefix + file_name
-    return new_file_name
-
-
-
 def get_new_file_name_for_oc(file_name, old_prefix, new_prefix): #new_prefix为空表示去掉前缀
 
     if '+' in file_name: #分类
@@ -484,21 +450,6 @@ def get_new_file_name_for_oc(file_name, old_prefix, new_prefix): #new_prefix为�
 
 
 
-def replace_file_content_by_word(file_path, old_content, new_content):
-
-    file_data = read_file_data(file_path)
-
-    # have_the_word_in_data(file_data, old_content)
-    old_content = '\\b' + old_content + '\\b'
-    png_old_name_re = re.compile(old_content)
-    result2 = re.sub(png_old_name_re, new_content, file_data)
-    # new_f_all_txt = file_data.replace(png_old_name, png_new_name)
-
-    f_obj = open(file_path, 'w')  # 首先先创建一个文件对象
-    f_obj.write(result2)
-    f_obj.flush()
-    f_obj.close()
-
 def wite_data_to_file(file_path, data):
     f_obj = open(file_path, mode='w')  # 首先先创建一个文件对象
     f_obj.write(data)
@@ -517,13 +468,6 @@ def replace_data_by_word(data, old_content, new_content):
         new_data = re.sub(r'\b%s\b' % old_content, new_content, data)
     return new_data
 
-def replace_image_data(data, old_content, new_content):
-    old_content = '"' + old_content + '"'
-    new_content = '"' + new_content + '"'
-    # png_old_name_re = re.compile(old_content)
-    # new_data = re.sub(png_old_name_re, new_content, data)
-    new_data = data.replace(old_content, new_content)
-    return new_data
 
 
 def replace_data_content(data, old_content, new_content):
@@ -533,27 +477,6 @@ def replace_data_content(data, old_content, new_content):
     new_data = re.sub(png_old_name_re, new_content, data)
     return new_data
 
-
-def replace_data_content22(data, old_content, new_content, delete):
-
-    png_old_name_re = re.compile(old_content)
-
-    if delete:
-        aaa = png_old_name_re.match(data)
-        new_data = data.replace(old_content, aaa.group(0))
-
-    else:
-        new_data = re.sub(png_old_name_re, new_content, data)
-    return new_data
-
-
-def have_the_word_in_data(data, the_str):
-
-    word_pattern = '\\b' + the_str + '\\b'
-    match_obj = re.search(re.compile(word_pattern), data)
-    # if match_obj:
-    #     print match_obj.group()
-    return match_obj
 
 def read_file_data(file_path):
     f_obj = open(file_path, mode="r")  # 首先先创建一个文件对象
@@ -622,21 +545,7 @@ def deleteComments(src_dir_path, exclude_dirs, exclude_files):  # 删除注释
                     file_path = os.path.join(root, file_name)
                     file_data = read_file_data(file_path)
 
-                    # file_data_0 = replace_data_content(file_data,'/\\*\\*/', '')
-                    # file_data_1 = replace_data_content(file_data_0,'([^:/])//.*', '\\1')
-                    # file_data_2 = replace_data_content(file_data_1,'^//.*', '')
-                    # file_data_3 = replace_data_content(file_data_2,'/\\*{1,2}[\\s\\S]*?\\*/', '')
-                    # file_data_4 = replace_data_content(file_data_3,'\\s*\\n', '\\n')
-
-                    # link_list = re.findall('@"\w+://\w*',file_data)
-                    # if link_list:
-                    #     for link in link_list:
-                    #         link_temp = link.replace('://', 'KKKKKK')
-                    #         file_data = file_data.replace(link, link_temp)
-
                     file_data = oc_code_util.removeAnnotate(file_data)
-
-                    # file_data = file_data.replace('KKKKKK', '://')
                     wite_data_to_file(file_path, file_data)
 
 
@@ -971,26 +880,6 @@ def addNoUseMethodForCpp(src_dir_path, exclude_dirs, exclude_files):
                         content = content + line
 
                 wite_data_to_file(file_path, content)
-
-def haveOfforceInSources(oc_path, xofforce):
-    if os.path.exists(oc_path):
-        list_dirs = os.walk(oc_path)
-        for root, dirs, files in list_dirs:
-            for file_name in files:
-
-                if file_name == ".DS_Store":
-                    continue
-
-                if file_name.endswith('.m') or file_name.endswith('.mm'):  # oc文件
-
-                    file_path = os.path.join(root, file_name)  # 头文件路径
-                    file_data = read_file_data(file_path)
-                    if xofforce in file_data:
-                        return True
-
-        return False
-
-    return False
 
 
 #找出方法名字，修改方法名
@@ -1631,12 +1520,12 @@ if __name__ == '__main__':
     #                              image_ref_path, image_exclude_files)
 
     # 1.1. 修改已经定义好的defind图片名称
-    # changeImageNameForDefindHeader('/Users/ganyuanrong/iOSProject/DySdk_iOS/SDK_MAIN/Resources/KR/SDKResourcesKR.bundle',
-    #                                '/Users/ganyuanrong/iOSProject/DySdk_iOS/SDK_MAIN/obfuscation/imageNameHeader.h')
+    # changeImageNameForDefindHeader('/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/Resources/V5/SDKResourcesV5.bundle',
+    #                                '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/obfuscation/imageNameHeader.h')
     # 1.2  改变md5:find . -iname "*.png" -exec echo {} \; -exec convert {} {} \;
 
     #2. 修改已经定义好的defind中的方法名称
-    method_header_path = '/Users/ganyuanrong/iOSProject/DySdk_iOS/SDK_MAIN/obfuscation/codeObfuscationForMethodName.h'
+    method_header_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/obfuscation/codeObfuscationForMethodName.h'
     # changeMethodHeaderValue(method_header_path)
 
     #3.添加随机注释，一般不用
@@ -1648,7 +1537,7 @@ if __name__ == '__main__':
     var_exclude_dirs = ['AFNetworking', 'YYModel', 'ThirdSrc','ThirdResources']
     var_exclude_files = []
     # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/'
-    src_path = '/Users/ganyuanrong/iOSProject/DySdk_iOS_OFS_V1/SDK_MAIN/FLSDK/'
+    src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/FLSDK/'
     # deleteComments(src_path, var_exclude_dirs, var_exclude_files)
 
     #用于查找字符使用def宏定义替换
@@ -1657,8 +1546,8 @@ if __name__ == '__main__':
     # find_string_tag(src_path, var_exclude_dirs, exclude_strings)
 
     #5. 加密字符串，上面查找
-    pc = PrpCrypt('ldy-sdk-1228KEY', 'ldy-sdk-1228IV')
-    # changeStringHeaderValue('/Users/ganyuanrong/iOSProject/DySdk_iOS_OFS_V1/SDK_MAIN/obfuscation/MWStringHeaders.h')
+    pc = PrpCrypt('sdk-tw5-0108KEY', 'sdk-tw5-0108IV')
+    # changeStringHeaderValue('/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/obfuscation/MWStringHeaders.h')
 
     # 6.修改类名
     # oc_exclude_files.extend(
@@ -1673,9 +1562,9 @@ if __name__ == '__main__':
     oc_exclude_dirs.extend(['AFNetworking', 'Masonry', 'YYModel', 'sdkFrameworks', "Resources",'ThirkLib','ThirdSrc'])
     oc_exclude_dirs_ref_modify = ['ThirkLib', "YYModel", "AFNetworking", "Resources",'ThirdSrc']
 
-    xcode_project_path = '/Users/ganyuanrong/iOSProject/DySdk_iOS_OFS_V1/SDK_MAIN/DY_SDK.xcodeproj'
-    oc_modify_path = '/Users/ganyuanrong/iOSProject/DySdk_iOS_OFS_V1/SDK_MAIN/FLSDK/'
-    oc_all_path = '/Users/ganyuanrong/iOSProject/DySdk_iOS_OFS_V1/SDK_MAIN'
+    xcode_project_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
+    oc_modify_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/FLSDK'
+    oc_all_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/'
     # modify_oc_class_name(oc_modify_path, xcode_project_path, oc_all_path, oc_exclude_dirs_ref_modify)
 
 
@@ -1683,12 +1572,12 @@ if __name__ == '__main__':
     # var_exclude_dirs = ['AFNetworking', 'YYModel', 'Plat','sdkFrameworks']
     # var_exclude_change_dirs = ['AFNetworking', 'YYModel','sdkFrameworks','ThirdSDK']
     # var_exclude_files = ['AppDelegate.m', 'MWSDK.m', 'PayData.m', 'LoginData.m', 'AccountModel.m', 'CreateOrderResp.m','USDefault.m','UIAlertController+Sdk.m','DisplayManager.mm']
-    # var_exclude_name = ['didBecomeActive','willResignActive','didEnterBackground','willEnterForeground','willTerminate',
-    #                     'loadView','target','handleAuthrization','error','delegate','name','selector','didFinishLaunchingWithOptions','application',
-    #                     'options','annotation','sourceApplication','openURL','dealloc','show','load','init','drawRect','initialize','encode',
-    #                     'decode','length','share','setData','viewWillAppear','viewDidLoad','shouldAutorotate','viewDidDisappear','sharedInstance',
-    #                     'forKey','objectForKey','setObject','length','presentingViewController','action','completion','onFrameResolved','keyboardDidShow','keyboardWillHide'
-    #                     ,'touchesBegan','touchesEnded','touchesCancelled','touchesMoved','withEvent','layoutSubviews','initWithFrame','didRotate']
+    var_exclude_name = ['dismiss','didBecomeActive','willResignActive','didEnterBackground','willEnterForeground','willTerminate',
+                        'loadView','target','handleAuthrization','error','delegate','name','selector','didFinishLaunchingWithOptions','application',
+                        'options','annotation','sourceApplication','openURL','dealloc','show','load','init','drawRect','initialize','encode',
+                        'decode','length','share','setData','viewWillAppear','viewDidLoad','shouldAutorotate','viewDidDisappear','sharedInstance',
+                        'forKey','objectForKey','setObject','length','presentingViewController','action','completion','onFrameResolved','keyboardDidShow','keyboardWillHide'
+                        ,'touchesBegan','touchesEnded','touchesCancelled','touchesMoved','withEvent','layoutSubviews','initWithFrame','didRotate']
     #
     # woords_file_path = '/Users/ganyuanrong/PycharmProjects/SdkTools/modifyXcodeProject/sdk_confuse/not_obs_method.log'
     #
@@ -1710,6 +1599,7 @@ if __name__ == '__main__':
     # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/FLSDK'
     # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/FLSDK'
     src_path = '/Users/ganyuanrong/iOSProject/DySdk_iOS_OFS_V1/SDK_MAIN/FLSDK/'
+    src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/FLSDK'
     # add_code(src_path, var_exclude_dirs, var_exclude_files)
 
     # xcode_project_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
@@ -1719,7 +1609,8 @@ if __name__ == '__main__':
     # changeXcodeProjectDir(xcode_project_path, src_path, modify_path, 'OPEN')
     # 9.修改所有uuid
     # xcode_project_path = '/Users/ganyuanrong/cpGames/vn_sdk_zkb/Unity-iPhone.xcodeproj'
-    xcode_project_path = '/Users/ganyuanrong/iOSProject/DySdk_iOS_OFS_V1/SDK_MAIN/DY_SDK.xcodeproj'
+    # xcode_project_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
+    xcode_project_path = '/Users/ganyuanrong/cpGames/twmxw_iosproj/iospro/Unity-iPhone.xcodeproj'
     # changeXcodeProjectUUid(xcode_project_path)
     #11.修改函数顺序
     #12.修改变量名称 proNameHeader.h
@@ -1745,12 +1636,19 @@ if __name__ == '__main__':
     #                     print image_name_no_extension
 
     # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK'
-    src_path = '/Users/ganyuanrong/iOSProject/DySdk_iOS_OFS_V1/SDK_MAIN/FLSDK'
+    src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/FLSDK'
     oc_exclude_files.extend(
         ['AppDelegate.h', 'MWSDK.h', 'PayData.h', 'LoginData.h', 'AccountModel.h', 'CreateOrderResp.h','UnityAppController.h','UnityAppController+Rendering.h'
          ,'UnityViewControllerBase+iOS.h','UnityViewControllerBase+tvOS.h','UnityViewControllerBase.h','UnityView.h','UnityView+iOS.h','UnityView+tvOS.h'])
     oc_exclude_dirs.extend(['AFNetworking', 'Masonry', 'YYModel', 'Model', 'sdkFrameworks', "Resources",'ThirkLib','ThirdSrc'])
-    # oc_class_parser.parse_oc_class(src_path, oc_exclude_dirs, oc_exclude_files)
+    # oc_class_parser.parse_oc_property(src_path, oc_exclude_dirs, oc_exclude_files)
 
+    src_path = '/Users/ganyuanrong/iOSProject/SDK-code'
+    bundle_path = '/Users/ganyuanrong/iOSProject/SDK-code/Resource'
+    xcodeproj_path = '/Users/ganyuanrong/iOSProject/SDK-code/GameLoginKit.xcodeproj'
+    # oc_class_parser.hand_sdk_bundle_res(xcodeproj_path, src_path, bundle_path, ['ThirdResources'],[])
 
+    src_path = '/Users/ganyuanrong/iOSProject/SDK-code/FunctionModule/'
+    all_src_path = '/Users/ganyuanrong/iOSProject/SDK-code/FunctionModule'
+    oc_class_parser.change_oc_method_name(all_src_path,src_path, ['ThirdResources','PulicHeader'],[],var_exclude_name)
     print 'end'

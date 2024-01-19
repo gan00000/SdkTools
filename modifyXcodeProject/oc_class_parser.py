@@ -9,6 +9,7 @@ from modifyXcodeProject.model.MethodInfo import MethodInfo
 from modifyXcodeProject.model.OCClassInfo import OCClassInfo
 from modifyXcodeProject.model.PropertyInfo import PropertyInfo
 from modifyXcodeProject.utils import file_util, word_util, datetime_util
+from modifyXcodeProject.utils.PrpCrypt import PrpCrypt
 
 imp.reload(sys)
 sys.setdefaultencoding('utf-8') #设置默认编码,只能是utf-8,下面\u4e00-\u9fa5要求的
@@ -867,6 +868,14 @@ def parse_oc_property(src_dir_path, exclude_dirs, exclude_files): #解析方法�
         for pri_pro in pri_property_new_list:
             rea = word_util.random_property()
             print '#define %s    %s' % (pri_pro, rea)
+            print '#define _%s    _%s' % (pri_pro, rea)
+
+            get_set_old = "".join(pri_pro[:1].upper() + pri_pro[1:])
+            get_set_new = "".join(rea[:1].upper() + rea[1:])
+            print '#define set%s    set%s' % (get_set_old, get_set_new)
+            print '#define get%s    get%s' % (get_set_old, get_set_new)
+
+
         for pri_pro in pri_property_new_list_impl:
             rea = word_util.random_property()
             print '#define %s    %s' % (pri_pro, rea)
@@ -1194,4 +1203,450 @@ def change_implementation_method_param_name(implementation_content): #抽出方�
                 implementation_content_temp = implementation_content_temp.replace(mi_content, mi_content_temp)
 
     return  implementation_content_temp
+
+
+#处理资源
+bundle_change_dic = {}
+def hand_sdk_bundle_res(xcode_project_path, src_dir_path, bundle_path, exclude_dirs, exclude_files): #解析方法前面变量
+
+    mPrpCrypt = PrpCrypt('key-2024-0117', 'iv-2024-0117')
+
+    project_content_path = os.path.join(xcode_project_path, 'project.pbxproj')
+    project_content = file_util.read_file_data(project_content_path)
+    is_project_content_change = 0
+    if os.path.exists(bundle_path):
+        list_dirs = os.walk(bundle_path)
+        for root, dirs, files in list_dirs:
+
+            has_exclude_dir = 0
+            for exclude_dir in exclude_dirs:
+                if exclude_dir in root:
+                    has_exclude_dir = 1
+
+            if has_exclude_dir == 1:
+                continue
+
+            for file_name in files:
+                if file_name in exclude_files:
+                    continue
+                # if file_name.endswith('.m') or file_name.endswith('.h'):
+                file_path = os.path.join(root, file_name)
+                if file_name.endswith('.plist'): #处理plist文件，加码内容
+                    print '处理文件中 %s' % file_path
+                    f_obj = open(file_path, "r")
+                    text_lines = f_obj.readlines()
+                    content = ''
+                    for line in text_lines:
+                        if '<key>' in line and '</key>' in line:
+                            str_keys = re.findall(r'<key>(.+)</key>', line)
+                            str_key = str_keys[0]
+                            aa_result = mPrpCrypt.aes_encrypt(str_key)
+                            line = line.replace(str_key, aa_result)
+                            content = content + line
+                        elif '<string>' in line and '</string>' in line:
+                            str_keys = re.findall(r'<string>(.+)</string>', line)
+                            str_key = str_keys[0]
+                            bb_result = mPrpCrypt.aes_encrypt(str_key)
+                            line = line.replace(str_key, bb_result)
+                            content = content + line
+                        else:
+                            content = content + line
+                    file_util.wite_data_to_file(file_path, content)
+                elif file_name.endswith('.png') or file_name.endswith('.jpg'):
+                    print '处理文件中 %s' % file_path
+                    file_name_no_extension = os.path.splitext(file_name)[0]
+                    file_extension = os.path.splitext(file_name)[1]
+                    w1, w2 = word_util.random_2word()
+                    pattern = file_name
+                    pattern_new = w1.lower() + "_" + w2.lower() + file_extension
+                    if file_name_no_extension.endswith('@2x'):
+                        file_name_new = w1.lower() + "_" + w2.lower() + '@2x' + file_extension
+                        pattern = file_name.replace('@2x','')
+                    elif file_name_no_extension.endswith('@3x'):
+                        file_name_new = w1.lower() + "_" + w2.lower() + '@3x' + file_extension
+                        pattern = file_name.replace('@3x', '')
+                    else:
+                        file_name_new = w1.lower() + "_" + w2.lower() + file_extension
+
+                    if bundle_change_dic.has_key(pattern):
+                        pattern_new_temp = bundle_change_dic[pattern]
+                        pattern_new = pattern_new_temp
+                        if file_name_no_extension.endswith('@2x'):
+                            file_name_new = pattern_new_temp.replace('.png', '@2x.png').replace('.jpg', '@2x.jpg')
+                        elif file_name_no_extension.endswith('@3x'):
+                            file_name_new = pattern_new_temp.replace('.png', '@3x.png').replace('.jpg', '@3x.jpg')
+                        else:
+                            file_name_new = pattern_new_temp
+
+                    if not bundle_change_dic.has_key(pattern):
+                        bundle_change_dic[pattern] = pattern_new
+
+                    change_relate_content_in_src(src_dir_path, exclude_dirs,exclude_files, r'"%s"' % pattern, '"%s"' % pattern_new)
+                    file_old_path = file_path
+                    file_new_path = os.path.join(root, file_name_new)
+
+                    try:
+                        os.rename(file_old_path, file_new_path)  # 更改文件名
+                        project_content = re.sub(r'\b%s\b' % file_name, file_name_new, project_content)
+                        is_project_content_change = 1
+                    except:
+                        print '文件无法更改名称：' + file_old_path
+        if is_project_content_change == 1:
+            file_util.wite_data_to_file_noencode(project_content_path, project_content)
+
+
+def change_relate_content_in_src(src_dir_path, exclude_dirs, exclude_files, pattern, repl):
+
+    if os.path.exists(src_dir_path):
+        list_dirs = os.walk(src_dir_path)
+        for root, dirs, files in list_dirs:
+
+            has_exclude_dir = 0
+            for exclude_dir in exclude_dirs:
+                if exclude_dir in root:
+                    has_exclude_dir = 1
+
+            if has_exclude_dir == 1:
+                continue
+
+            for file_name in files:
+                if file_name in exclude_files:
+                    continue
+                if file_name.endswith('.m') or file_name.endswith('.h') or file_name.endswith('.xib') \
+                        or file_name.endswith('.swift'):
+                    file_path = os.path.join(root, file_name)
+                    file_data = file_util.read_file_data(file_path)
+                    file_data = re.sub(pattern, repl, file_data)
+                    file_util.wite_data_to_file_noencode(file_path, file_data)
+
+
+def change_oc_method_name(arc_all_path, src_dir_path, exclude_dirs, exclude_files, var_exclude_names): #解析方法前面变量
+
+
+    is_project_content_change = 0
+    if os.path.exists(src_dir_path):
+        list_dirs = os.walk(src_dir_path)
+        for root, dirs, files in list_dirs:
+
+            has_exclude_dir = 0
+            for exclude_dir in exclude_dirs:
+                if exclude_dir in root:
+                    has_exclude_dir = 1
+
+            if has_exclude_dir == 1:
+                continue
+
+            for file_name in files:
+                if file_name in exclude_files:
+                    continue
+                # if file_name.endswith('.m') or file_name.endswith('.h'):
+
+                if file_name.endswith('.m') or file_name.endswith('.h'): #从m h中抽取方法
+                    file_path = os.path.join(root, file_name)
+                    # print '处理文件中 %s' % file_path
+                    if 'SensesIAPTransaction' in file_name:
+                        print '...'
+                    file_data = file_util.read_file_data(file_path)
+                    if file_data is None:
+                        print 'file data  error = %s' % file_path
+                        continue
+
+                    class_content_list = re.findall(r'@interface \w+ :[\s\S]+?@end', file_data)  # 查找类声明部分
+                    if class_content_list is None:
+                        continue
+                    if class_content_list:
+                        class_arr = []
+                        for class_content in class_content_list:
+                            class_nameaa = re.findall(r'@interface (\w+) :', class_content)
+                            class_name = class_nameaa[0]
+                            aClass = OCClassInfo()
+                            aClass.name = class_name
+                            methods = re.findall(r'[-+] {0,3}\(.+\)\w+;', class_content) #找出全部interface声明方法
+                            if methods is None:
+                                continue
+                            for method in methods:
+                                if 'ActivityView' in file_name:
+                                    print '...'
+                                if method.startswith('+'):
+                                    if 'instancetype' in method:
+                                        method_new, sigNames1 = parse_method_sign_name(method, var_exclude_names)
+
+                                        aClass.methodNameClassInstanceArr.append(sigNames1)
+                                    else:
+                                        method_new, sigNames_class = parse_method_sign_name(method, var_exclude_names)
+                                        aClass.methodNameClassArr.append(sigNames_class)
+                                else:
+                                    method_new, sigNames = parse_method_sign_name(method, var_exclude_names)
+                                    aClass.methodNameArr.append(sigNames)
+
+                                # file_data = file_data.replace(method, method_new)
+
+                            # methods = re.findall(r'[-+] {0,3}\(.+\)\w+;', class_content)
+                            class_arr.append(aClass)
+
+                        #修改使用该方法的地方
+                        change_method_use(arc_all_path, class_arr, exclude_dirs, exclude_files)
+
+
+def parse_method_sign_name(method, var_exclude_names):
+    method_new = method
+    sigNames = []
+    if ':' in method:  # 带参数的方法
+        method_params = re.findall(r'\w+:', method)
+        method_def = ''
+        for m_p in method_params:
+            if '_PPPPP' in m_p:
+                continue
+            sigName_new = m_p.replace(':', '_PPPPP:')
+            method_new = method_new.replace(m_p, sigName_new)
+            sigNames.append(m_p)
+            method_def = method_def + m_p
+        print method_def
+    else:  # 不带参数的方法
+        method_params = re.findall(r'\w+ {0,2};', method)
+        method_def = ''
+        for m_p in method_params:
+            if '_PPPPP' in m_p:
+                continue
+            m_p = m_p.replace(';', '').replace(' ', '')
+            method_new = method_new.replace(m_p, m_p + '_PPPPP')
+            sigNames.append(m_p)
+            method_def = method_def + m_p
+
+        print method_def
+    return method_new, sigNames
+
+
+def change_method_use(arc_all_path, class_arr, exclude_dirs, exclude_files):
+    if os.path.exists(arc_all_path):
+        list_dirs = os.walk(arc_all_path)
+        for root, dirs, files in list_dirs:
+
+            # has_exclude_dir = 0
+            # for exclude_dir in exclude_dirs:
+            #     if exclude_dir in root:
+            #         has_exclude_dir = 1
+            # if has_exclude_dir == 1:
+            #     continue
+            for file_name in files:
+                # if file_name in exclude_files:
+                #     continue
+
+                if '.framework' in root:
+                    continue
+                aClass = class_arr[0]
+                if file_name.endswith('.m') or file_name.endswith('.h'):
+                    file_path = os.path.join(root, file_name)
+                    file_data = file_util.read_file_data(file_path)
+                    if 'SevenSSCallbackHelper.m' == file_name and 'JYouManager' == aClass.name:
+                        print '...'
+
+                    file_is_change = 0
+
+                    if aClass.name in file_name:
+                        file_is_change = 1
+                        file_data = method_use_rep(file_data, aClass.methodNameArr, 'self') #类内调用
+                        file_data = method_use_rep(file_data, aClass.methodNameClassArr, 'self')
+
+                        # for xx_arr in aClass.methodNameClassArr:
+                        #     for xx in xx_arr:
+                        #         if ':' in xx:
+                        #             xx_new = xx.replace(':', '_PPPPP:')
+                        #             file_data = re.sub(r'%s {0,2}\(' % xx, xx_new + '(')
+                        #         else:
+                        #             xx_new = xx + '_PPPPP'
+                        #             file_data = re.sub(r'\) {0,2}%s' % xx, ')' + xx_new)
+
+                    instances = re.findall(r'\b%s\b {1,3}\* {0,2}(\w+) {0,2}[;=]' % aClass.name,
+                                           file_data)  # 查找该类声明的变量 HttpServiceEngineAd *instance;  HttpServiceEngineAd *instance=
+                    if instances:
+                        # instance = instances[0]
+                        for instance in instances:
+                            file_is_change = 1
+                            file_data = method_use_rep(file_data, aClass.methodNameArr, instance) #成员方法调用
+
+                    if len(aClass.methodNameClassInstanceArr) > 0:
+                        file_is_change = 1
+                        for methodNameClassInstance in aClass.methodNameClassInstanceArr:
+
+                            xxObj = r'\[%s %s]' % (aClass.name, methodNameClassInstance[0]) #只考虑一个方法名的情况
+                            file_data = method_use_rep(file_data, aClass.methodNameArr, xxObj)
+
+                            xxObj2 = r'%s\.%s' % (aClass.name, methodNameClassInstance[0])  # 只考虑一个方法名的情况
+                            file_data = method_use_rep(file_data, aClass.methodNameArr, xxObj2)
+
+                    if len(aClass.methodNameClassArr) > 0:
+                        file_is_change = 1
+                        file_data = method_use_rep(file_data, aClass.methodNameClassArr, aClass.name) #类方法调用
+
+                    if len(aClass.methodNameClassInstanceArr) > 0:
+                        file_is_change = 1
+                        file_data = method_use_rep(file_data, aClass.methodNameClassInstanceArr, aClass.name) #类方法调用
+
+                    # [SensesAlertView alloc
+                    alloc_obj = r'\[%s alloc]' % aClass.name
+                    file_data = method_use_rep(file_data, aClass.methodNameArr, alloc_obj)
+                    #[self alloc]  [self class]
+                    if aClass.methodNameArr:#
+                        file_is_change = 1
+                        for mmNames in aClass.methodNameArr:
+                            select_aa = ''
+                            select_bb = ''
+                            # select_old = ':@selector(%s)'
+                            # select_new = ':@selector(%s)'
+
+                            for namex in mmNames:#:@selector(unBindUid:userToken:type:)
+                                select_aa = select_aa + namex
+                                if ':' in namex:
+                                    namex_new = namex.replace(':', '_PPPPP:')
+                                    select_bb = select_bb + namex_new
+                                else:
+                                    select_bb = select_bb + namex + '_PPPPP'
+
+                            select_old = ':@selector(%s)' % select_aa
+                            select_new = ':@selector(%s)' % select_bb
+                            if 'dismiss:' in select_old and 'ActivityView' in file_name:
+                                print '...'
+                            file_data = file_data.replace(select_old, select_new)
+
+
+                    all_method = []
+                    all_method.extend(aClass.methodNameArr)
+                    all_method.extend(aClass.methodNameClassArr)
+                    all_method.extend(aClass.methodNameClassInstanceArr)
+
+                    if aClass.name in file_name and all_method:
+                        file_is_change = 1
+
+                        method_may_list = re.findall(r'[-+] {0,3}\(.+\).+', file_data) #重新找出可能是的方法
+                        for method_may in method_may_list:
+                            method_may_temp = method_may
+                            for xx_arr in all_method:
+                                belong = 1
+                                for xxa in xx_arr:
+                                    if xxa not in method_may:
+                                        belong = 0
+                                #xx_arr属于method_may方法
+                                if belong == 1:
+                                    for xx in xx_arr:
+                                        if ':' in xx:
+                                            xx_new = xx.replace(':', '_PPPPP:')  # setTransactionWithDictionary:(
+                                            method_may_temp = re.sub(r'%s {0,2}\(' % xx, xx_new + '(', method_may_temp)
+                                        else:
+                                            if 'getFirstWindow' in xx:
+                                                print '...'
+                                            if ':' in method_may_temp:#签名没有:
+                                                continue
+                                            xx_new = xx + '_PPPPP'
+                                            # method_may_temp = re.sub(r'\) {0,2}%s {0,4}\{' % xx, ')' + xx_new + '{', method_may_temp)
+                                            method_may_temp = re.sub(r'\) {0,2}%s {0,4}' % xx, ')' + xx_new, method_may_temp)
+                                            # method_may_temp = re.sub(r'\) {0,2}%s {0,4};' % xx, ')' + xx_new + ';', method_may_temp)
+                            file_data = file_data.replace(method_may, method_may_temp)
+
+                    if file_is_change == 1:
+                        file_util.wite_data_to_file_noencode(file_path, file_data)
+
+
+def method_use_rep(file_data, methodNameArr, instance):
+
+    for method_signs in methodNameArr:
+
+        # impl_content_temp = re.sub(
+        #     r'\[%s %s\b]' % (instance, pri_property),
+        #     '%s.%s' % (instance, pri_property_new),
+        #     impl_content_temp)
+
+        alen = len(method_signs)
+        method_partter = ''
+        method_partter2 = ''
+        if alen == 1:
+            m_sign = method_signs[0]
+            if m_sign.endswith(':'):
+                if instance.endswith(']'):
+                    method_partter = r'\[_?%s {0,2}%s' % (instance, m_sign)
+                else:
+                    method_partter = r'\[_?%s {1,3}%s' % (instance, m_sign)
+            else:
+                if instance.endswith(']'):
+                    method_partter = r'\[_?%s {0,2}%s {0,2}]' % (instance, m_sign)
+                else:
+                    method_partter = r'\[_?%s {1,3}%s {0,2}]' % (instance, m_sign)
+                method_partter2 = r'%s\.%s' % (instance, m_sign)
+
+        # elif alen == 2:  # \[oneGoumai {1,3}inAppbuyProduct:.+? quanlity:.+?]
+        #     method_partter = r'\[_?%s {1,3}%s.+? %s' % (
+        #         instance, method_signs[0], method_signs[1])
+        # elif alen == 3:
+        #     method_partter = r'\[_?%s {1,3}%s.+? %s.+? %s' % (
+        #         instance, method_signs[0], method_signs[1], method_signs[2])
+        # elif alen == 4:
+        #     method_partter = r'\[_?%s {1,3}%s.+? %s.+? %s.+? %s' % (
+        #         instance, method_signs[0], method_signs[1], method_signs[2], method_signs[3])
+        # elif alen == 5:
+        #     method_partter = r'\[_?%s {1,3}%s.+? %s.+? %s.+? %s.+? %s' % (
+        #         instance, method_signs[0], method_signs[1], method_signs[2], method_signs[3],
+        #         method_signs[4])
+        #
+        # elif alen == 6:
+        #     method_partter = r'\[_?%s {1,3}%s.+? %s.+? %s.+? %s.+? %s.+? %s' % (
+        #         instance, method_signs[0], method_signs[1], method_signs[2], method_signs[3],
+        #         method_signs[4], method_signs[5])
+        else:
+
+            x_partter = '\[_?%s' % instance
+            me_l = len(method_signs) #方法签名长度
+            for i in range(me_l):
+
+                if i == me_l - 1:
+                    x_partter = x_partter + ' {1,2}%s' % method_signs[i]
+                else:
+                    if instance.endswith(']') and i == 0:
+                        x_partter = x_partter + ' {0,2}%s.+?' % method_signs[i]
+                    else:
+                        x_partter = x_partter + ' {1,2}%s.+?' % method_signs[i]
+            method_partter = r'%s' % x_partter
+
+        if method_partter != '':
+            method_call_list = re.findall(method_partter, file_data)  # 查找方法调用位置
+            if method_call_list:
+                for method_call in method_call_list:
+                    method_call_temp = method_call
+                    # method_sign_new = ''
+                    for method_sign in method_signs:
+                        if method_sign.endswith(':'):
+                            method_sign_new = method_sign.replace(':', '') + '_PPPPP:'
+                        else:
+                            method_sign_new = method_sign + '_PPPPP'
+                        method_call_temp = method_call_temp.replace(method_sign, method_sign_new)
+
+                    file_data = file_data.replace(method_call, method_call_temp)
+
+        if method_partter2 != '': #处理.点调用方法的方式
+            sign_new = method_partter2 + '_PPPPP'
+            sign_new = sign_new.replace('\\', '')
+            file_data = re.sub(method_partter2, sign_new, file_data)
+            # method_call_list2 = re.findall(method_partter2, file_data)  # 查找方法调用位置
+            # if method_call_list2:
+            #
+            #     for method_call in method_call_list2:
+            #         method_call_temp = method_call
+            #
+            #         # method_sign_new = ''
+            #         for method_sign in method_signs:
+            #             if method_sign.endswith(':'):
+            #                 method_sign_new = method_sign.replace(':', '') + '_PPPPP:'
+            #             else:
+            #                 method_sign_new = method_sign + '_PPPPP'
+            #             method_call_temp = method_call_temp.replace(method_sign, method_sign_new)
+            #
+            #         file_data = file_data.replace(method_call, method_call_temp)
+    return file_data
+
+
+
+
+
+
+
+
 
