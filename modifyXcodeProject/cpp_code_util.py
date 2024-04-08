@@ -29,14 +29,17 @@ cpp_base_type = ['int', 'bool', 'void', 'int32_t', 'int64_t','double','float']
 
 #找出方法名字，修改方法名
 def create_operation_expression(rightVar):
-    value1 = random.randint(1, 999)
+    value1 = random.randint(1, 50)
     content = str(value1)
     operation_count = random.randint(1, 5)
     # if (operation_count == 0):
     #     return content
     for c in range(operation_count):
         operation_type = operation_arr[random.randint(0, len(operation_arr) -1)]
-        content = content + ' ' + operation_type + ' ' + str(random.randint(1, 999))
+        if operation_type == '*':
+            content = content + ' ' + operation_type + ' ' + str(random.randint(-50, 50))
+        else:
+            content = content + ' ' + operation_type + ' ' + str(random.randint(1, 999))
     operation_type = operation_arr[random.randint(0, len(operation_arr) - 2)]
     content = rightVar + ' ' + operation_type + ' ' + content
     return content
@@ -48,11 +51,18 @@ def create_operation_expression_compare(rightVar):
     content = left_s + ' ' + bijiao_s + ' ' + str(right_value)
     return content
 
-def create_operation_expression_compare2(rightVar):
+def create_operation_expression_compare2(rightVar, m_value):
     # left_s = create_operation_expression(rightVar)
     bijiao_s = operation_bijiao_arr[random.randint(0, len(operation_bijiao_arr) - 1)] #比较符号
-    right_value = random.randint(1, 100000)
-    content = rightVar + ' ' + bijiao_s + ' ' + str(right_value)
+    if bijiao_s == '>' or bijiao_s == '==' or bijiao_s == '>=':
+        right_value = m_value + random.randint(1, 9999)
+        content = rightVar + ' ' + bijiao_s + ' ' + str(right_value)
+    elif bijiao_s == '<' or bijiao_s == '<=':
+        right_value = m_value - random.randint(1, 9999)
+        content = rightVar + ' ' + bijiao_s + ' ' + str(right_value)
+    elif bijiao_s == '!=' or bijiao_s == '<=':
+        right_value = m_value
+        content = rightVar + ' ' + bijiao_s + ' ' + str(right_value)
     return content
 
 
@@ -66,7 +76,8 @@ def cpp_code_auto_create1():
     var_arr.append(var1)
 
     type_var = numbers_params_type[random.randint(0, len(numbers_params_type) - 1)]
-    content = '%s %s = %s;\n' % (type_var, var1, str(random.randint(1, 9999)))
+    rig_value = random.randint(1, 9999)
+    content = '%s %s = %s;  //commontemple ififif 111\n' % (type_var, var1, str(rig_value))
     if_count = random.randint(1, 12)
     for i in range(if_count):
         var3 = word_util.random_1words_not_same_inarr(var_arr)
@@ -88,6 +99,7 @@ def cpp_code_auto_create1():
         var1 = var3
         var_arr.append(var3)
     # print content
+    content = content + '   //commontemple ififif 111 end'
     return var_arr, content
 
 def cpp_code_auto_create2():
@@ -99,7 +111,8 @@ def cpp_code_auto_create2():
 
     var_arr.append(var1)
     type_var1 = numbers_params_type[random.randint(0, len(numbers_params_type) - 1)]
-    content = '%s %s = %s;\n' % (type_var1, var1, str(random.randint(1, 9999)))
+    rig_value = random.randint(1, 9999)
+    content = '%s %s = %s;  //commontemple ififif 222\n' % (type_var1, var1, str(rig_value))
     # content = content + '\nif(%s){\n' % (create_operation_expression_compare(var1))
     # var2 = word_util.random_1words_not_same_inarr(var_arr)
     # content2 = '\t%s = %s;' % (var2, create_operation_expression(var1))
@@ -108,7 +121,7 @@ def cpp_code_auto_create2():
     if_count = random.randint(1, 5)
     for i in range(if_count):
 
-        ifdata = '\nif(%s){\n' % (create_operation_expression_compare2(var1))
+        ifdata = '\nif(%s){\n' % (create_operation_expression_compare2(var1,rig_value))
         var3 = word_util.random_1words_not_same_inarr(var_arr)
         lett = string.letters[random.randint(0, len(string.letters) - 1)]
         var3 = lett + '_' + var3
@@ -128,6 +141,7 @@ def cpp_code_auto_create2():
         var1 = var3
         var_arr.append(var3)
     # print content
+    content = content + '   //commontemple ififif 222 end'
     return var_arr, content
 
 def create_case_expression(leftVar, rightVar):

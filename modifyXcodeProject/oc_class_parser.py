@@ -1229,6 +1229,8 @@ def hand_sdk_bundle_res(xcode_project_path, src_dir_path, bundle_path, exclude_d
             for file_name in files:
                 if file_name in exclude_files:
                     continue
+                if '.framework' in root:
+                    continue
                 # if file_name.endswith('.m') or file_name.endswith('.h'):
                 file_path = os.path.join(root, file_name)
                 if file_name.endswith('.plist'): #处理plist文件，加码内容
@@ -1282,6 +1284,13 @@ def hand_sdk_bundle_res(xcode_project_path, src_dir_path, bundle_path, exclude_d
                         bundle_change_dic[pattern] = pattern_new
 
                     change_relate_content_in_src(src_dir_path, exclude_dirs,exclude_files, r'"%s"' % pattern, '"%s"' % pattern_new)
+                    # 'senseImgWithNamed:@"backLine"'
+                    #特定
+                    # xxxpattern = pattern.replace('.png', '')
+                    # sense_pattern = 'senseImgWithNamed:@"%s' % xxxpattern
+                    # sense_pattern_new = 'senseImgWithNamed:@"%s' % pattern_new
+                    # change_relate_content_in_src(src_dir_path, exclude_dirs, exclude_files, r'"%s"' % sense_pattern, '"%s"' % sense_pattern_new)
+
                     file_old_path = file_path
                     file_new_path = os.path.join(root, file_name_new)
 
@@ -1291,6 +1300,11 @@ def hand_sdk_bundle_res(xcode_project_path, src_dir_path, bundle_path, exclude_d
                         is_project_content_change = 1
                     except:
                         print '文件无法更改名称：' + file_old_path
+                elif file_name.endswith('.txt'):
+                    txt_data = file_util.read_file_data(file_path)
+                    aa_result = mPrpCrypt.aes_encrypt(txt_data)
+                    file_util.wite_data_to_file(file_path, aa_result)
+
         if is_project_content_change == 1:
             file_util.wite_data_to_file_noencode(project_content_path, project_content)
 
@@ -1316,7 +1330,14 @@ def change_relate_content_in_src(src_dir_path, exclude_dirs, exclude_files, patt
                         or file_name.endswith('.swift'):
                     file_path = os.path.join(root, file_name)
                     file_data = file_util.read_file_data(file_path)
+
                     file_data = re.sub(pattern, repl, file_data)
+
+                    xxxpattern = pattern.replace('.png', '')
+                    aaa = 'senseImgWithNamed:@%s' % xxxpattern
+                    bbb = 'senseImgWithNamed:@%s' % repl
+                    file_data = file_data.replace(aaa, bbb)
+
                     file_util.wite_data_to_file_noencode(file_path, file_data)
 
 
@@ -1339,6 +1360,8 @@ def change_oc_method_name(arc_all_path, src_dir_path, exclude_dirs, exclude_file
             for file_name in files:
                 if file_name in exclude_files:
                     continue
+                if file_name == '.DS_Store':
+                    continue
                 # if file_name.endswith('.m') or file_name.endswith('.h'):
 
                 if file_name.endswith('.m') or file_name.endswith('.h'): #从m h中抽取方法
@@ -1352,7 +1375,7 @@ def change_oc_method_name(arc_all_path, src_dir_path, exclude_dirs, exclude_file
                         continue
 
                     class_content_list = re.findall(r'@interface \w+ :[\s\S]+?@end', file_data)  # 查找类声明部分
-                    if class_content_list is None:
+                    if class_content_list is None or len(class_content_list) < 1:
                         continue
                     if class_content_list:
                         class_arr = []
@@ -1385,7 +1408,7 @@ def change_oc_method_name(arc_all_path, src_dir_path, exclude_dirs, exclude_file
                             class_arr.append(aClass)
 
                         #修改使用该方法的地方
-                        change_method_use(arc_all_path, class_arr, exclude_dirs, exclude_files)
+                        # change_method_use(arc_all_path, class_arr, exclude_dirs, exclude_files)
 
 
 def parse_method_sign_name(method, var_exclude_names):
