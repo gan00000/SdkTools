@@ -3,6 +3,7 @@ import imp
 import sys
 import uuid
 
+import md5util
 from modifyXcodeProject import oc_class_parser, oc_method_util, cpp_code_util, oc_code_util
 from modifyXcodeProject.utils import file_util, word_util, datetime_util
 from modifyXcodeProject.utils.PrpCrypt import PrpCrypt
@@ -883,7 +884,7 @@ def addNoUseMethodForCpp(src_dir_path, exclude_dirs, exclude_files):
 
 
 #找出方法名字，修改方法名
-def modify_class_method(src_dir, exclude_dirs,var_exclude_change_dirs, exclude_files, exclude_method_name):
+def find_class_method(src_dir, exclude_dirs, var_exclude_change_dirs, exclude_files, exclude_method_name):
 
     mthod_params_list = []
     mthod_arr2 = []
@@ -919,22 +920,27 @@ def modify_class_method(src_dir, exclude_dirs,var_exclude_change_dirs, exclude_f
                             property_list_h = re.findall(r'@property.+ \*?(\w+);', file_data_h)
                             if property_list_h:  # 存在属性
                                 for property_h in property_list_h:
-                                    print property_h
+                                    # print property_h
                                     if property_h not in class_property_list:
                                         class_property_list.append(property_h)
 
                     file_data_m = read_file_data(file_path)
+                    file_data_m = oc_code_util.removeAnnotate(file_data_m)
                     property_list_m = re.findall(r'@property.+ \*?(\w+);', file_data_m)
                     if property_list_m:  # 存在属性
                         for property_m in property_list_m:
-                            print property_m
+                            # print property_m
                             if property_m not in class_property_list:
                                 class_property_list.append(property_m)
 
                     method_def_list = re.findall(r'[-+] {0,3}\(\w+\) {0,2}\w+[\s\S]*?\{', file_data_m) #找出所有该文件方法
                     if method_def_list:
                         for method_content in method_def_list:
-                            print method_content
+                            # print method_content
+                            if '_MMMethodMMM' in method_content or 'system_method' in method_content:
+                                pass
+                            else:
+                                print method_content
                             if 'IBAction' in method_content: #犹豫别人工程的原因，这里先忽略这种
                                 continue
 
@@ -953,13 +959,13 @@ def modify_class_method(src_dir, exclude_dirs,var_exclude_change_dirs, exclude_f
                                     mthod_params_list2.append(param_1)
                                     if param_1 not in mthod_params_list and param_1 not in exclude_method_name and param_1 not in class_property_list:
                                         mthod_params_list.append(param_1)
-                            print mthod_params_list2
+                            # print mthod_params_list2
 
 
 
     print '=============================='
     print '=============================='
-    print mthod_params_list
+    # print mthod_params_list
     print '=============================='
     print '=============================='
     iii = 1
@@ -1106,6 +1112,7 @@ def find_string_tag(src_dir_path,exclude_dirs, exclude_strings):
                 if file_name.endswith('.m') or file_name.endswith('.mm') or file_name.endswith('.h'):
                     file_path = os.path.join(root, file_name)  # 头文件路径
                     file_data = file_util.read_file_data(file_path)
+                    file_data = oc_code_util.removeAnnotate(file_data)
                     # file_data = unicode(file_data)
                     method_tag_results = re.findall(r'@".*?"', file_data)  #中文 ：\u4e00-\u9fa5
                     # method_tag_results = compile_pp.findall(file_data)
@@ -1119,7 +1126,8 @@ def find_string_tag(src_dir_path,exclude_dirs, exclude_strings):
 
                             if xxxd in exclude_strings:
                                 continue
-
+                            if '://' in xxxd:
+                                continue
                             if xxxd not in xxxresult:
                                 xxxresult.append(xxxd)
 
@@ -1135,7 +1143,7 @@ def find_string_tag(src_dir_path,exclude_dirs, exclude_strings):
             if xssss_vale in exclude_strings:
                 continue
 
-            w1, w2 = random_2word()
+            # w1, w2 = random_2word()
             # 匹配所有汉字
             # print(re.findall(u'[\u4e00-\u9fa5]', xssss_vale))
             # if re.match(u'[\u4e00-\u9fa5]', xssss_vale):
@@ -1144,8 +1152,8 @@ def find_string_tag(src_dir_path,exclude_dirs, exclude_strings):
             xssss_vale22 = re.sub(r'[-#.:/ 0-9a-zA-Z_]+', '', xssss_vale22)
             xssss_vale22 = xssss_vale22.replace(' ', '')
             if len(xssss_vale22) > 0:
-
-                ssa = "wwwww_tag_wwwww_" + w1 + '_' + w2
+                md5_str = md5util.md5hex(xssss_vale)
+                ssa = "wwwww_tag_wwwww_" + md5_str #w1 + '_' + w2
             else:
                 ssa = "wwwww_tag_wwwww_" + xssss_vale
 
@@ -1175,6 +1183,9 @@ def find_string_tag(src_dir_path,exclude_dirs, exclude_strings):
                         continue
 
                     for file_name in files:
+
+                        if '.framework' in root or '.bundle' in root:
+                            continue
 
                         if file_name.endswith('.m') or file_name.endswith('.mm') or file_name.endswith('.h'):
                             file_path = os.path.join(root, file_name)  # 头文件路径
@@ -1462,6 +1473,179 @@ def change_pro_name(arc_path):
             print '#define  _' + pp + '      _' + wwwa
 
 
+def find_sepcil_tag_for_other_sdk(src_dir_path, tag_patter):
+
+    xxxresult = []
+    if os.path.exists(src_dir_path):
+        list_dirs = os.walk(src_dir_path)
+        for root, dirs, files in list_dirs:
+
+            for file_name in files:
+                if '.framework' in root or '.bundle' in root:
+                    continue
+
+                if file_name.endswith('.m') or file_name.endswith('.mm') or file_name.endswith('.h'):
+                    file_path = os.path.join(root, file_name)  # 头文件路径
+                    file_data = file_util.read_file_data(file_path)
+                    tag_results = re.findall(r'@selector\((.+?)\)', file_data)
+                    if tag_results:
+                        for xxxd in tag_results:
+                            if xxxd not in xxxresult:
+                                xxxresult.append(xxxd)
+
+    if xxxresult:
+        def_arr = []
+        if os.path.exists(src_dir_path):
+            list_dirs = os.walk(src_dir_path)
+            for root, dirs, files in list_dirs:
+
+                for file_name in files:
+
+                    if '.framework' in root or '.bundle' in root:
+                        continue
+
+                    if file_name.endswith('.m') or file_name.endswith('.mm') or file_name.endswith('.h'):
+                        file_path = os.path.join(root, file_name)  # 头文件路径
+                        file_data = read_file_data(file_path)
+                        for select_method in xxxresult:
+                            if ':' in select_method:
+                                select_arr = select_method.split(':')
+                                is_has = 0
+                                for select_x in select_arr:
+                                    if select_x != '':
+                                        aaa = re.findall(r'%s_PPPPP' % select_x, file_data)
+                                        if aaa:
+                                            is_has = 1
+                                        else:
+                                            is_has = 0
+                                            break
+                                if is_has == 1:
+                                    print 'file=%s, method = %s' % (file_name, select_method)
+                            else:
+                                aaa = re.findall(r'%s_PPPPP' % select_method, file_data)
+                                if aaa:
+                                    print 'file=%s, method = %s' % (file_name, select_method)
+
+def encryption_string_for_other_sdk(src_dir_path,exclude_dirs, exclude_strings):
+
+    if os.path.exists(src_dir_path):
+        list_dirs = os.walk(src_dir_path)
+        mPrpCrypt = PrpCrypt('key-2024-0117', 'iv-2024-0117')
+        for root, dirs, files in list_dirs:
+
+            has_exclude_dir = 0
+            for exclude_dir in exclude_dirs:
+                if exclude_dir in root:
+                    has_exclude_dir = 1
+
+            if has_exclude_dir == 1:
+                continue
+
+            for file_name in files:
+                if '.framework' in root or '.bundle' in root:
+                    continue
+                if file_name.endswith('.m') or file_name.endswith('.mm') or file_name.endswith('.h'):
+                    file_path = os.path.join(root, file_name)  # 头文件路径
+                    file_data = file_util.read_file_data(file_path)
+                    method_tag_results = re.findall(r'@"(.*?)"', file_data)  #中文 ：\u4e00-\u9fa5
+
+                    if method_tag_results:
+                        for xxxd in method_tag_results:
+                            # xxxd = str(xxxdxxx)
+                            if len(xxxd) < 1 :#小于3的去掉
+                                continue
+
+                            if xxxd in exclude_strings:
+                                continue
+                            en_result = mPrpCrypt.aes_encrypt(xxxd)
+                            str_new = 'SDK_DEC(@"%s")' % en_result
+                            file_data = file_data.replace('@"%s"' % xxxd, str_new)
+
+                        file_util.wite_data_to_file(file_path, file_data)
+
+def find_sepcil_tag_for_other_sdk_methodppp(src_dir_path):
+
+    xxxresult = []
+    if os.path.exists(src_dir_path):
+        list_dirs = os.walk(src_dir_path)
+        for root, dirs, files in list_dirs:
+
+            for file_name in files:
+                if '.framework' in root or '.bundle' in root:
+                    continue
+
+                if file_name.endswith('.m') or file_name.endswith('.mm') or file_name.endswith('.h'):
+                    file_path = os.path.join(root, file_name)  # 头文件路径
+                    file_data = file_util.read_file_data(file_path)
+                    tag_results = re.findall(r'\w+_PPPPP', file_data)
+                    if tag_results:
+                        for xxxd in tag_results:
+                            if xxxd not in xxxresult:
+                                xxxresult.append(xxxd)
+
+    if xxxresult:
+        sign_name_old_new_arr = {}
+        if os.path.exists(src_dir_path):
+            list_dirs = os.walk(src_dir_path)
+            for root, dirs, files in list_dirs:
+
+                for file_name in files:
+
+                    if '.framework' in root or '.bundle' in root:
+                        continue
+
+                    if file_name.endswith('.m') or file_name.endswith('.mm') or file_name.endswith('.h'):
+                        file_path = os.path.join(root, file_name)  # 头文件路径
+                        file_data = read_file_data(file_path)
+                        for sign_name in xxxresult:
+                            if sign_name_old_new_arr.has_key(sign_name):
+                                new_signa = sign_name_old_new_arr[sign_name]
+                                file_data = re.sub(r'%s' % sign_name, new_signa, file_data)
+                            else:
+                                w1 = word_util.random_word_dong()
+                                w2 = word_util.random_word_name()
+
+                                new_sign = ''
+                                if sign_name.startswith('initWith'):
+                                    new_sign = 'initWith_jw_' + w1.capitalize() + w2.capitalize()
+                                elif sign_name.startswith('init'):
+                                    new_sign = 'init_jw_' + w1.capitalize() + w2.capitalize()
+                                else:
+                                    new_sign = 'jw_' + w1.lower() + w2.capitalize()
+
+                                sign_name_old_new_arr[sign_name] = new_sign
+                                file_data = re.sub(r'%s' % sign_name, new_sign, file_data)
+                        file_util.wite_data_to_file(file_path, file_data)
+
+def find_MMMethodMMM_not_defind(src_dir_path, tag_defind_header):
+
+    tag_defind_header_file_data = file_util.read_file_data(tag_defind_header)
+    tag_def_results = re.findall(r'\w+_MMMethodMMM', tag_defind_header_file_data)
+
+    xxxresult = []
+    if os.path.exists(src_dir_path):
+        list_dirs = os.walk(src_dir_path)
+        for root, dirs, files in list_dirs:
+
+            for file_name in files:
+                if '.framework' in root or '.bundle' in root:
+                    continue
+
+                if file_name.endswith('.m') or file_name.endswith('.mm') or file_name.endswith('.h'):
+                    file_path = os.path.join(root, file_name)  # 头文件路径
+                    file_data = file_util.read_file_data(file_path)
+                    tag_results = re.findall(r'\w+_MMMethodMMM', file_data)
+                    if tag_results:
+                        for xxxd in tag_results:
+                            if xxxd not in xxxresult:
+                                xxxresult.append(xxxd)
+
+    if xxxresult:
+        for mres in xxxresult:
+            if mres not in tag_def_results:
+                bb = mres.replace("_MMMethodMMM", '')
+                print '#define %s          %s' % (mres, bb)
+
 if __name__ == '__main__':
 
     # xcode_project_path = '/Users/ganyuanrong/iOSProject/game_mw_sdk_ios_v3/MW_OBS_V3/MW_SDK.xcodeproj'
@@ -1520,13 +1704,39 @@ if __name__ == '__main__':
     #                              image_ref_path, image_exclude_files)
 
     # 1.1. 修改已经定义好的defind图片名称
-    # changeImageNameForDefindHeader('/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/Resources/V5/SDKResourcesV5.bundle',
-    #                                '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/obfuscation/imageNameHeader.h')
+    # changeImageNameForDefindHeader('/Users/ganyuanrong/iOSProject/flsdk_ios_vn_v4/GamaSDK_iOS_Integration/Resources/VN/SDKResourcesVN.bundle',
+    #                                '/Users/ganyuanrong/iOSProject/flsdk_ios_vn_v4/GamaSDK_iOS_Integration/obfuscation/imageNameHeader.h')
     # 1.2  改变md5:find . -iname "*.png" -exec echo {} \; -exec convert {} {} \;
 
     #2. 修改已经定义好的defind中的方法名称
-    method_header_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/obfuscation/codeObfuscationForMethodName.h'
+    method_header_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/obfuscation/codeObfuscationForMethodName.h'
     # changeMethodHeaderValue(method_header_path)
+    #查找被_MMMethodMMM标记的方法
+    # find_MMMethodMMM_not_defind('/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK',method_header_path)
+
+    #查找方法
+    var_exclude_dirs = ['/Plat', '/Base']
+    var_exclude_change_dirs = []
+    var_exclude_files = []
+    # 找出所有方法名字并修改
+    # var_exclude_dirs = ['AFNetworking', 'YYModel', 'Plat','sdkFrameworks']
+    # var_exclude_change_dirs = ['AFNetworking', 'YYModel','sdkFrameworks','ThirdSDK']
+    # var_exclude_files = ['AppDelegate.m', 'MWSDK.m', 'PayData.m', 'LoginData.m', 'AccountModel.m', 'CreateOrderResp.m','USDefault.m','UIAlertController+Sdk.m','DisplayManager.mm']
+    var_exclude_name = ['dismiss', 'didBecomeActive', 'willResignActive', 'didEnterBackground', 'willEnterForeground',
+                        'willTerminate',
+                        'loadView', 'target', 'handleAuthrization', 'error', 'delegate', 'name', 'selector',
+                        'didFinishLaunchingWithOptions', 'application',
+                        'options', 'annotation', 'sourceApplication', 'openURL', 'dealloc', 'show', 'load', 'init',
+                        'drawRect', 'initialize', 'encode',
+                        'decode', 'length', 'share', 'setData', 'viewWillAppear', 'viewDidLoad', 'shouldAutorotate',
+                        'viewDidDisappear', 'sharedInstance',
+                        'forKey', 'objectForKey', 'setObject', 'length', 'presentingViewController', 'action',
+                        'completion', 'onFrameResolved', 'keyboardDidShow', 'keyboardWillHide'
+        , 'touchesBegan', 'touchesEnded', 'touchesCancelled', 'touchesMoved', 'withEvent', 'layoutSubviews',
+                        'initWithFrame', 'didRotate']
+    find_class_method('/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK', var_exclude_dirs, var_exclude_change_dirs, var_exclude_files, var_exclude_name)
+
+
 
     #3.添加随机注释，一般不用
     # oc_all_path = '/Users/ganyuanrong/Desktop/Default-moqumiaowan_9.27-Release-1.0_scussce/Classes/'
@@ -1537,48 +1747,42 @@ if __name__ == '__main__':
     var_exclude_dirs = ['AFNetworking', 'YYModel', 'ThirdSrc','ThirdResources']
     var_exclude_files = []
     # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/'
-    src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/FLSDK/'
+    src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn_v4/GamaSDK_iOS_Integration/FLSDK/'
+    # src_path = '/Users/ganyuanrong/iOSProject/SDK-code/FunctionModule'
     # deleteComments(src_path, var_exclude_dirs, var_exclude_files)
 
     #用于查找字符使用def宏定义替换
-    # var_exclude_dirs = ['AFNetworking', 'YYModel', 'ThirdSrc', 'ThirdResources']
-    # exclude_strings = ['com',"%2ld",'YES','POST','UTF-8','SELF MATCHES %@','UIInputWindowController','<UIInputSetHostView','<UIInputSetContainerView',']','\\n\\n','\\n','\n','','%@','%d', '%ld', '%@-%@', 'true', 'false', 'txt', 'bundle', '.', 'plist', '#', 'USD','yyyy-MM-dd','%02x', '-', '%@(%d)', '+', '_', 'lproj', 'json', '%s', '?']
-    # find_string_tag(src_path, var_exclude_dirs, exclude_strings)
+    var_exclude_dirs = ['AFNetworking', 'YYModel', 'ThirdSrc', 'ThirdResources','Common']
+    exclude_strings = ['OK','com',"%2ld",'YES','POST','UTF-8','SELF MATCHES %@','UIInputWindowController','<UIInputSetHostView','<UIInputSetContainerView',']','\\n\\n','\\n','\n','','%@','%d', '%ld', '%@-%@', 'true', 'false', 'txt', 'bundle', '.', 'plist', '#', 'USD','yyyy-MM-dd','%02x', '-', '%@(%d)', '+', '_', 'lproj', 'json', '%s', '?']
+    # find_string_tag('/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK', var_exclude_dirs, exclude_strings)
 
     #5. 加密字符串，上面查找
-    pc = PrpCrypt('sdk-tw5-0108KEY', 'sdk-tw5-0108IV')
-    # changeStringHeaderValue('/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/obfuscation/MWStringHeaders.h')
+    pc = PrpCrypt('wxsdk-vn2023KEY', 'wxsdk-vn2023IV')
+    # changeStringHeaderValue('/Users/ganyuanrong/iOSProject/flsdk_ios_vn_v4/GamaSDK_iOS_Integration/obfuscation/MWStringHeaders.h')
 
     # 6.修改类名
-    # oc_exclude_files.extend(
-    #     ['AppDelegate.h', 'MWSDK.h', 'PayData.h', 'LoginData.h', 'AccountModel.h', 'CreateOrderResp.h','UnityAppController.h','UnityAppController+Rendering.h'
-    #      ,'UnityViewControllerBase+iOS.h','UnityViewControllerBase+tvOS.h','UnityViewControllerBase.h','UnityView.h','UnityView+iOS.h','UnityView+tvOS.h'])
-    # oc_exclude_dirs.extend(['AFNetworking', 'Masonry', 'YYModel', 'Model', 'sdkFrameworks', "Resources",'ThirkLib','ThirdSrc'])
-    # oc_exclude_dirs_ref_modify = ['ThirkLib', "YYModel", "AFNetworking", "Resources",'ThirdSrc']
+    oc_exclude_files.extend(
+        ['AppDelegate.h', 'MWSDK.h', 'PayData.h', 'LoginData.h', 'AccountModel.h', 'CreateOrderResp.h','UnityAppController.h','UnityAppController+Rendering.h'
+         ,'UnityViewControllerBase+iOS.h','UnityViewControllerBase+tvOS.h','UnityViewControllerBase.h','UnityView.h','UnityView+iOS.h','UnityView+tvOS.h'])
+    oc_exclude_dirs.extend(['AFNetworking', 'Masonry', 'YYModel', 'Model', 'sdkFrameworks', "Resources",'ThirkLib','ThirdSrc'])
+    oc_exclude_dirs_ref_modify = ['ThirkLib', "YYModel", "AFNetworking", "Resources",'ThirdSrc']
 
     oc_exclude_files.extend(
         ['AppDelegate.h', 'MWSDK.h', 'PayData.h', 'LoginData.h', 'UnityAppController.h','UnityAppController+Rendering.h'
          ,'UnityViewControllerBase+iOS.h','UnityViewControllerBase+tvOS.h','UnityViewControllerBase.h','UnityView.h','UnityView+iOS.h','UnityView+tvOS.h'])
-    oc_exclude_dirs.extend(['AFNetworking', 'Masonry', 'YYModel', 'sdkFrameworks', "Resources",'ThirkLib','ThirdSrc'])
+    oc_exclude_dirs.extend(['ThirdResources','PulicHeader','AFNetworking', 'Masonry', 'YYModel', 'sdkFrameworks', "Resources",'ThirkLib','ThirdSrc'])
     oc_exclude_dirs_ref_modify = ['ThirkLib', "YYModel", "AFNetworking", "Resources",'ThirdSrc']
 
-    xcode_project_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
-    oc_modify_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/FLSDK'
-    oc_all_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/'
+    xcode_project_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn_v4/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
+    oc_modify_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn_v4/GamaSDK_iOS_Integration//FLSDK'
+    oc_all_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn_v4/GamaSDK_iOS_Integration/'
+
+    # xcode_project_path = '/Users/ganyuanrong/iOSProject/SDK-code/GameLoginKit.xcodeproj'
+    # oc_modify_path = '/Users/ganyuanrong/iOSProject/SDK-code/FunctionModule'
+    # oc_all_path = '/Users/ganyuanrong/iOSProject/SDK-code'
     # modify_oc_class_name(oc_modify_path, xcode_project_path, oc_all_path, oc_exclude_dirs_ref_modify)
 
 
-    #找出所有方法名字并修改
-    # var_exclude_dirs = ['AFNetworking', 'YYModel', 'Plat','sdkFrameworks']
-    # var_exclude_change_dirs = ['AFNetworking', 'YYModel','sdkFrameworks','ThirdSDK']
-    # var_exclude_files = ['AppDelegate.m', 'MWSDK.m', 'PayData.m', 'LoginData.m', 'AccountModel.m', 'CreateOrderResp.m','USDefault.m','UIAlertController+Sdk.m','DisplayManager.mm']
-    var_exclude_name = ['dismiss','didBecomeActive','willResignActive','didEnterBackground','willEnterForeground','willTerminate',
-                        'loadView','target','handleAuthrization','error','delegate','name','selector','didFinishLaunchingWithOptions','application',
-                        'options','annotation','sourceApplication','openURL','dealloc','show','load','init','drawRect','initialize','encode',
-                        'decode','length','share','setData','viewWillAppear','viewDidLoad','shouldAutorotate','viewDidDisappear','sharedInstance',
-                        'forKey','objectForKey','setObject','length','presentingViewController','action','completion','onFrameResolved','keyboardDidShow','keyboardWillHide'
-                        ,'touchesBegan','touchesEnded','touchesCancelled','touchesMoved','withEvent','layoutSubviews','initWithFrame','didRotate']
-    #
     # woords_file_path = '/Users/ganyuanrong/PycharmProjects/SdkTools/modifyXcodeProject/sdk_confuse/not_obs_method.log'
     #
     # f_obj = open(woords_file_path, "r")
@@ -1587,12 +1791,11 @@ if __name__ == '__main__':
     #     line = line.decode('utf-8')
     #     method_name = line.strip().replace(' ', '').replace(':', '')
     #     var_exclude_name.append(method_name)
-    # modify_class_method('/Users/ganyuanrong/Downloads/益乐互动_iOS源码/YLFunSDK/FunctionModule',var_exclude_dirs,var_exclude_change_dirs,var_exclude_files,var_exclude_name)
 
 
     # oc_class_parser.parse('/Users/ganyuanrong/Desktop/AdDelegate.m')
     #7.添加垃圾代码
-    var_exclude_dirs = ['AFNetworking', 'YYModel', 'ThirdSrc']
+    var_exclude_dirs = ['AFNetworking', 'YYModel', 'ThirdSrc', 'ThirdResources']
     var_exclude_files = []
     # # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/'
     # src_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v41/GamaSDK_iOS_Integration/FLSDK/'
@@ -1600,6 +1803,8 @@ if __name__ == '__main__':
     # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/FLSDK'
     src_path = '/Users/ganyuanrong/iOSProject/DySdk_iOS_OFS_V1/SDK_MAIN/FLSDK/'
     src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/FLSDK'
+
+    src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn_v4/GamaSDK_iOS_Integration/FLSDK'
     # add_code(src_path, var_exclude_dirs, var_exclude_files)
 
     # xcode_project_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
@@ -1610,7 +1815,7 @@ if __name__ == '__main__':
     # 9.修改所有uuid
     # xcode_project_path = '/Users/ganyuanrong/cpGames/vn_sdk_zkb/Unity-iPhone.xcodeproj'
     # xcode_project_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
-    xcode_project_path = '/Users/ganyuanrong/cpGames/twmxw_iosproj/iospro/Unity-iPhone.xcodeproj'
+    xcode_project_path = '/Users/ganyuanrong/iOSProject/SDK-code/GameLoginKit.xcodeproj'
     # changeXcodeProjectUUid(xcode_project_path)
     #11.修改函数顺序
     #12.修改变量名称 proNameHeader.h
@@ -1643,12 +1848,25 @@ if __name__ == '__main__':
     oc_exclude_dirs.extend(['AFNetworking', 'Masonry', 'YYModel', 'Model', 'sdkFrameworks', "Resources",'ThirkLib','ThirdSrc'])
     # oc_class_parser.parse_oc_property(src_path, oc_exclude_dirs, oc_exclude_files)
 
+    #================================
     src_path = '/Users/ganyuanrong/iOSProject/SDK-code'
     bundle_path = '/Users/ganyuanrong/iOSProject/SDK-code/Resource'
     xcodeproj_path = '/Users/ganyuanrong/iOSProject/SDK-code/GameLoginKit.xcodeproj'
     # oc_class_parser.hand_sdk_bundle_res(xcodeproj_path, src_path, bundle_path, ['ThirdResources'],[])
 
-    src_path = '/Users/ganyuanrong/iOSProject/SDK-code/FunctionModule/'
-    all_src_path = '/Users/ganyuanrong/iOSProject/SDK-code/FunctionModule'
-    oc_class_parser.change_oc_method_name(all_src_path,src_path, ['ThirdResources','PulicHeader'],[],var_exclude_name)
+    # src_path = '/Users/ganyuanrong/KPlatform/KPlatform_iOS/SDK_MAIN/MainModel'
+    # all_src_path = '/Users/ganyuanrong/KPlatform/KPlatform_iOS/SDK_MAIN/MainModel'
+    # oc_class_parser.change_oc_method_name(all_src_path,src_path, ['/Plat','/Base'],[],var_exclude_name)
+
+    # find_sepcil_tag_for_other_sdk(src_path, '')
+    # encryption_string_for_other_sdk(src_path, var_exclude_dirs, exclude_strings)
+
+    # find_sepcil_tag_for_other_sdk_methodppp(src_path)
+
+    # mPrpCrypt = PrpCrypt('key-2024-0117', 'iv-2024-0117')
+    # aaresult = mPrpCrypt.aes_encrypt('https://api-hwsdk.egame168.com/')
+    # print aaresult
+    # aaresult = mPrpCrypt.aes_encrypt('mainurl')
+    # print aaresult
+
     print 'end'

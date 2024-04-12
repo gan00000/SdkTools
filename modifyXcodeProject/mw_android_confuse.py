@@ -103,7 +103,7 @@ def getIds(src_dir_path):
     print result_aar
     return result_aar
 
-def rename_res_file(src_dir_path):
+def rename_res_file(src_dir_path, pref):
     drawable_file_aar = []
     layout_file_aar = []
     mipmap_file_aar = []
@@ -148,7 +148,7 @@ def rename_res_file(src_dir_path):
                 else:
                     file_info.file_name_no_extension = file_name_no_extension
 
-                pref = 'cal_'
+                # pref = 'cal_'
 
                 if 'res/drawable' in root:
 
@@ -280,9 +280,9 @@ def rename_res_file(src_dir_path):
     # return drawable_file_aar, layout_file_aar, mipmap_file_aar, values_file_aar, anim_file_aar
     return res_dic
 
-def change_res_file_name(src_path, res_path):
+def change_res_file_name(src_path, res_path, pref=""):
 
-    res_dic = rename_res_file(src_path)
+    res_dic = rename_res_file(src_path, pref)
     # ids_aar = getIds(res_path)
     # str_aar = getStringKey(res_path)
     # color_aar = getColorKey(res_path)
@@ -318,6 +318,8 @@ def change_id_tag_file_name(src_path, res_path):
     str_aar = getStringKey(res_path)
     color_aar = getColorKey(res_path)
     dimen_aar = getDimenKey(res_path)
+
+    #todo change stype
 
     if os.path.exists(src_path):
         list_dirs = os.walk(src_path)
@@ -355,7 +357,7 @@ def rename_id(file_data, ids_aar):
             new_id = id_old_new_dic[id_name]
         else:
             w1,w2 = word_util.random_2words_not_same_inarr(id_tepm_aar)
-            new_id = 'mId_' + w1.lower() + '_' + w2.lower()
+            new_id = w1.lower() + '_' + w2.lower()
             id_old_new_dic[id_name] = new_id
 
         file_data = re.sub(r'@id/%s\b' % id_name, '@id/%s' % new_id, file_data)
@@ -371,7 +373,7 @@ def rename_string(file_data, str_aar):
             new_tag = string_old_new_dic[str_name]
         else:
             w1,w2 = word_util.random_2words_not_same_inarr(aaa2)
-            new_tag = 'mstr_' + w1.lower() + '_' + w2.lower()
+            new_tag =  w1.lower() + '_' + w2.lower()
             string_old_new_dic[str_name] = new_tag
 
         file_data = re.sub(r'@string/%s\b' % str_name, '@string/%s' % new_tag, file_data)
@@ -387,7 +389,7 @@ def rename_color(file_data, color_aar):
             new_tag = color_old_new_dic[str_name]
         else:
             w1, w2 = word_util.random_2words_not_same_inarr(aaa3)
-            new_tag = 'mcolor_' + w1.lower() + '_' + w2.lower()
+            new_tag =  w1.lower() + '_' + w2.lower()
             color_old_new_dic[str_name] = new_tag
 
         file_data = re.sub(r'@color/%s\b' % str_name, '@color/%s' % new_tag, file_data)
@@ -403,7 +405,8 @@ def rename_dimen(file_data, dimen_aar):
             new_tag = dimen_old_new_dic[str_name]
         else:
             w1, w2 = word_util.random_2words_not_same_inarr(aaa4)
-            new_tag = 'mdimen_' + w1.lower() + '_' + w2.lower()
+            # new_tag = 'mdimen_' + w1.lower() + '_' + w2.lower()
+            new_tag = w1.lower() + '_' + w2.lower()
             dimen_old_new_dic[str_name] = new_tag
 
         file_data = re.sub(r'@dimen/%s\b' % str_name, '@dimen/%s' % new_tag, file_data)
@@ -536,31 +539,41 @@ if __name__ == '__main__':
     word_util.words_dong = words_dong
     word_util.genest_word = genest_word
 
-    src_path = '/Users/ganyuanrong/MyAndroid/AutoCalc/app/src/mon_jisuan'
-    res_path = '/Users/ganyuanrong/MyAndroid/AutoCalc/app/src/mon_jisuan/res'
+    # src_path = '/Users/ganyuanrong/AndroidProject/martial_gp2_sdk_code/quickgamesdk/src/main'
+    # res_path = '/Users/ganyuanrong/AndroidProject/martial_gp2_sdk_code/quickgamesdk/src/main/res'
+
+    src_path = '/Users/ganyuanrong/AndroidProject/DYSDK/SDKModule/src'
+    res_path = '/Users/ganyuanrong/AndroidProject/DYSDK/SDKModule/src'
 
     #1.修改res下面的文件名字
-    # change_res_file_name(src_path, src_path)
+    # change_res_file_name(src_path, src_path, "sady_")
 
-    exclude_string = ['sdk_game_code','sdk_app_key','sdk_more_language','sdk_af_dev_key','sdk_default_server_language',
+    exclude_string = ['dy_adjust_token','sdk_game_code','sdk_app_key','sdk_more_language','sdk_af_dev_key','sdk_default_server_language',
                       'default_web_client_id','sdk_inner_version','scheme','facebook_app_id','facebook_client_token',
                       'facebook_authorities','fb_login_protocol_scheme','facebook_app_name','line_channelId','channel_platform','sdk_name']
     #2.修改资源 id值
-    # change_id_tag_file_name(src_path, src_path)
+    # change_id_tag_file_name(src_path, res_path)
 
     # find_R_in_code(src_path)
 
-    alla = []
-    for i in range(10000):
-        msg = ''
-        letter_count = random.randint(2, 6)
-        for m in range(letter_count):
-            lett = string.letters[random.randint(0, len(string.letters) - 1)]
-            msg = msg + lett
-        msg = 'ath' + msg.lower()
-        if msg not in alla:
-            alla.append(msg)
-            print msg
+    # alla = []
+    # for i in range(10000):
+    #     msg = ''
+    #     letter_count = random.randint(3, 8)
+    #     for m in range(letter_count):
+    #         lett = string.letters[random.randint(0, len(string.letters) - 1)]
+    #         msg = msg + lett
+    #     # msg = 'tw' + msg.lower()
+    #     msg = msg.lower()
+    #
+    #     addd = string.letters[random.randint(0, len(string.letters) - 1)]
+    #     number = random.randint(0, 99999)
+    #     # for i in range(number):
+    #     #     msg = msg + '0'
+    #     msg = msg + str(number) + addd
+    #     if msg not in alla:
+    #         alla.append(msg)
+    #         print msg
 
     print 'end'
 
