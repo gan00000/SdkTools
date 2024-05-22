@@ -1,6 +1,7 @@
 #coding=utf-8
 import imp
 import random
+import string
 import sys
 
 imp.reload(sys)
@@ -82,7 +83,12 @@ def random_1word():
     # words_name_alary.append(first_word)
     global w_count
     w_count = w_count + 1
-    return first_word + str(w_count)
+
+    aa = random.randint(1, 6)
+    for ii in range(aa):
+        addd = string.letters[random.randint(0, len(string.letters) - 1)]
+        first_word = first_word + addd
+    return first_word
 
 
 def random_2words_not_same_inarr(word_aar):

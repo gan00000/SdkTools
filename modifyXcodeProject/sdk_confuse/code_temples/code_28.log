@@ -1,6 +1,6 @@
-    NSArray *ppppp1_ppppp = @[array_value_array]; //temple28
+         NSArray *ppppp1_ppppp = @[array_value_array]; //temple28
 
-          int ppppp2_ppppp = ppppp1_ppppp.count;
+         int ppppp2_ppppp = ppppp1_ppppp.count;
          int ppppp3_ppppp = (int)ppppp2_ppppp;
          int ppppp4_ppppp = int1_int;
          int ppppp5_ppppp = int2_int;
@@ -15,6 +15,10 @@
          }
           [ppppp1_ppppp enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
               if (idx <= int4_int) {
-                  NSLog(@"enumerateObjectsUsingBlock:%@", obj);
-            }
+
+                  CodeTemplate2_CodeTemplate
+
+              }else{
+                int ppppp9_ppppp = int2_int;
+              }
           }];

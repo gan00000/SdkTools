@@ -4,6 +4,7 @@ import string
 import sys
 import uuid
 
+import md5util
 from modifyXcodeProject import oc_class_parser, oc_method_util, cpp_code_util, oc_code_util
 from modifyXcodeProject.model.AndResFileInfo import AndResFileInfo
 from modifyXcodeProject.utils import file_util, word_util, datetime_util
@@ -270,15 +271,23 @@ def rename_res_file(src_dir_path, pref):
                     os.rename(file_info.file_path, file_new_path)
 
 
-    print drawable_file_aar
-    print layout_file_aar
-    print mipmap_file_aar
+    # print drawable_file_aar
+    # print layout_file_aar
+    # print mipmap_file_aar
     # print values_file_aar
-    print anim_file_aar
+    # print anim_file_aar
+    log_info('drawable', drawable_file_aar)
+    log_info('layout', layout_file_aar)
+    log_info('mipmap', mipmap_file_aar)
+    log_info('anim', anim_file_aar)
     res_dic = {'drawable': drawable_file_aar, 'layout': layout_file_aar, 'mipmap': mipmap_file_aar,
                 'anim': anim_file_aar}
     # return drawable_file_aar, layout_file_aar, mipmap_file_aar, values_file_aar, anim_file_aar
     return res_dic
+
+def log_info(type, infos):
+    for info in infos:
+        print 'type:%s, name=%s, new_name=%s' % (type, info.name, info.name_new)
 
 def change_res_file_name(src_path, res_path, pref=""):
 
@@ -359,6 +368,7 @@ def rename_id(file_data, ids_aar):
             w1,w2 = word_util.random_2words_not_same_inarr(id_tepm_aar)
             new_id = w1.lower() + '_' + w2.lower()
             id_old_new_dic[id_name] = new_id
+            print 'id_old=%s,id_new=%s' % (id_name, new_id)
 
         file_data = re.sub(r'@id/%s\b' % id_name, '@id/%s' % new_id, file_data)
         file_data = re.sub(r'R\.id\.%s\b' % id_name, 'R.id.%s' % new_id, file_data)
@@ -375,6 +385,7 @@ def rename_string(file_data, str_aar):
             w1,w2 = word_util.random_2words_not_same_inarr(aaa2)
             new_tag =  w1.lower() + '_' + w2.lower()
             string_old_new_dic[str_name] = new_tag
+            print 'string_old=%s,string_new=%s' % (str_name, new_tag)
 
         file_data = re.sub(r'@string/%s\b' % str_name, '@string/%s' % new_tag, file_data)
         file_data = re.sub(r'R\.string\.%s\b' % str_name, 'R.string.%s' % new_tag, file_data)
@@ -391,6 +402,7 @@ def rename_color(file_data, color_aar):
             w1, w2 = word_util.random_2words_not_same_inarr(aaa3)
             new_tag =  w1.lower() + '_' + w2.lower()
             color_old_new_dic[str_name] = new_tag
+            print 'color_old=%s,color_new=%s' % (str_name, new_tag)
 
         file_data = re.sub(r'@color/%s\b' % str_name, '@color/%s' % new_tag, file_data)
         file_data = re.sub(r'R\.color\.%s\b' % str_name, 'R.color.%s' % new_tag, file_data)
@@ -408,6 +420,7 @@ def rename_dimen(file_data, dimen_aar):
             # new_tag = 'mdimen_' + w1.lower() + '_' + w2.lower()
             new_tag = w1.lower() + '_' + w2.lower()
             dimen_old_new_dic[str_name] = new_tag
+            print 'dimen_old=%s,dimen_new=%s' % (str_name, new_tag)
 
         file_data = re.sub(r'@dimen/%s\b' % str_name, '@dimen/%s' % new_tag, file_data)
         file_data = re.sub(r'R\.dimen\.%s\b' % str_name, 'R.dimen.%s' % new_tag, file_data)
@@ -526,6 +539,87 @@ def replce_R_xxx(file_data, xxx_list, class_name):
 
     return file_data
 
+def insert_res_string(res_path, pref=""):
+
+    if os.path.exists(res_path):
+        list_dirs = os.walk(res_path)
+        words_arr = []
+        for root, dirs, files in list_dirs:
+
+            if root.endswith('values'):
+
+                for file_name in files:
+                    file_path = os.path.join(root, file_name)
+                    str_lines = file_util.read_file_data_for_line(file_path)
+                    file_content = ''
+                    for str_line in str_lines:
+                        file_content = file_content + str_line
+                        if '<string' in str_line and '</string>' in str_line:
+                            insert_count = random.randint(1, 4)
+                            insert_content = ''
+                            for xm in range(insert_count):
+                                w1, w2 = word_util.random_2words_not_same_inarr(words_arr)
+                                temmp_str = '\n\t<string name="%s">%s</string>' % (w1, w2)
+                                insert_content = insert_content + temmp_str
+                            file_content = file_content + insert_content + '\n'
+
+                    file_util.wite_data_to_file_noencode(file_path, file_content)
+
+def get_dit_md5(res_path, pref=""):
+
+    file_md5s = []
+    md5_name_dic = {}
+    if os.path.exists(res_path):
+        list_dirs = os.walk(res_path)
+        for root, dirs, files in list_dirs:
+            for file_name in files:
+                file_path = os.path.join(root, file_name)
+                s_md5 = md5util.md5sum(file_path)
+                file_md5s.append(s_md5)
+                md5_name_dic[s_md5] = file_path
+    return file_md5s, md5_name_dic
+
+def check_md5(path1, path2):
+    md51s, md5_name_dic_1 = get_dit_md5(path1)
+    md52s , md5_name_dic_2 = get_dit_md5(path2)
+    same_md5 = []
+    for mm1, name1 in md5_name_dic_1.items():
+        for mm2, name2 in md5_name_dic_2.items():
+            if mm1 == mm2:
+                same_md5.append(name1)
+                print 'same1 = %s, same2 = %s' % (name1, name2)
+
+    print 'dir1 count = %s, with dir2 same count = %s' % (str(len(md51s)), str(len(same_md5)))
+
+
+
+def addLajiFile():#添加垃圾文件到目录
+
+    src_dir_path = '/Users/ganyuanrong/wbgame/dongli_ywQB_yingjing_yijingqb_40110001/game_assets_pack/src/main/assets'
+    if os.path.exists(src_dir_path):
+        list_dirs = os.walk(src_dir_path)
+        for root, dirs, files in list_dirs:
+
+            for dir_name in dirs:
+                if '.framework' in root or '.bundle' in root:
+                    continue
+
+                file_dir = os.path.join(root, dir_name)  # 头文件路径
+                mPrpCrypt = PrpCrypt('nnaaadmmdaakk99', 'nnaaadmmdaakk99')
+                lett_src = string.letters
+                lett_src = lett_src + '0123456789'
+
+                letter_count = random.randint(100, 800)
+                for i in range(letter_count):
+                    msg = ''
+                    letter_count = random.randint(20, 80000)
+                    for m in range(letter_count):
+                        lett = lett_src[random.randint(0, len(lett_src) - 1)]
+                        msg = msg + lett
+                    aaresult = mPrpCrypt.aes_encrypt(msg)
+                    file_name = md5util.md5hex(aaresult)
+                    file_util.wite_data_to_file(os.path.join(file_dir, file_name), aaresult)
+
 
 if __name__ == '__main__':
 
@@ -546,13 +640,15 @@ if __name__ == '__main__':
     res_path = '/Users/ganyuanrong/AndroidProject/DYSDK/SDKModule/src'
 
     #1.修改res下面的文件名字
-    # change_res_file_name(src_path, src_path, "sady_")
+    # change_res_file_name(src_path, src_path, "chosea_")
 
     exclude_string = ['dy_adjust_token','sdk_game_code','sdk_app_key','sdk_more_language','sdk_af_dev_key','sdk_default_server_language',
                       'default_web_client_id','sdk_inner_version','scheme','facebook_app_id','facebook_client_token',
                       'facebook_authorities','fb_login_protocol_scheme','facebook_app_name','line_channelId','channel_platform','sdk_name']
     #2.修改资源 id值
     # change_id_tag_file_name(src_path, res_path)
+
+    # insert_res_string('/Users/ganyuanrong/AndroidProject/martial_gp2_sdk_code/quickgamesdk/src/main/res')
 
     # find_R_in_code(src_path)
 
@@ -574,6 +670,8 @@ if __name__ == '__main__':
     #     if msg not in alla:
     #         alla.append(msg)
     #         print msg
+
+    check_md5('/Users/ganyuanrong/AndroidProject/martial_gp2_sdk_code/demo/build/outputs/bundle/payGooglePlayRelease/demo-payGooglePlay-release', '/Users/ganyuanrong/Downloads/cc/')
 
     print 'end'
 
