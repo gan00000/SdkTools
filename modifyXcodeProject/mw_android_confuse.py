@@ -1,8 +1,11 @@
 #coding=utf-8
+import base64
 import imp
 import string
 import sys
 import uuid
+
+from Crypto.Cipher import AES
 
 import md5util
 from modifyXcodeProject import oc_class_parser, oc_method_util, cpp_code_util, oc_code_util
@@ -359,6 +362,87 @@ id_old_new_dic = {}
 color_old_new_dic = {}
 dimen_old_new_dic = {}
 
+def remove_unuse_resource(src_path, res_path):
+    #修改id
+    # ids_aar = getIds(res_path)
+    # 修改string key
+    str_aar = getStringKey(res_path)
+    color_aar = getColorKey(res_path)
+    dimen_aar = getDimenKey(res_path)#@color
+
+    #todo change stype
+
+    no_use_str = []
+    no_use_color = []
+    no_use_dimen = []
+
+    for xml_tag_name in str_aar:
+        is_use = check_res_tag_use(src_path, 'string', xml_tag_name)
+        if is_use is False:
+            print 'no user res tag:' + xml_tag_name
+            # no_use_str.append(xml_tag_name)
+            del_res_tag(src_path, 'string', xml_tag_name)
+
+    for xml_tag_name in color_aar:
+        if 'manageriseiedd_acceptencyyzjf' == xml_tag_name:
+            pass
+        is_use = check_res_tag_use(src_path, 'color', xml_tag_name)
+        if is_use is False:
+            print 'no user res tag:' + xml_tag_name
+            # no_use_color.append(xml_tag_name)
+            del_res_tag(src_path, 'color', xml_tag_name)
+    for xml_tag_name in dimen_aar:
+        is_use = check_res_tag_use(src_path, 'dimen', xml_tag_name)
+        if is_use is False:
+            print 'no user res tag:' + xml_tag_name
+            # no_use_dimen.append(xml_tag_name)
+            del_res_tag(src_path, 'dimen', xml_tag_name)
+
+
+
+def check_res_tag_use(src_path, res_type, res_name):#检查资源是否有引用
+
+    if os.path.exists(src_path):
+        list_dirs = os.walk(src_path)
+        for root, dirs, files in list_dirs:
+            for file_name in files:
+                file_path = os.path.join(root, file_name)
+                file_data = file_util.read_file_data(file_path)
+
+                if file_name.endswith('.java'):
+                    file_data = oc_code_util.removeAnnotate(file_data)
+
+                # if 'manageriseiedd_acceptencyyzjf' == xml_tag_name:
+                #     pass
+                # if 'PullToRefreshRecyclerView' in file_name and 'manageriseiedd_acceptencyyzjf' == res_name:
+                #     pass
+
+                res_ref_arr = re.findall(r'@%s/%s\b' % (res_type, res_name), file_data)  #color="@color/localaclenutf_smileeebd" >
+                if res_ref_arr and len(res_ref_arr) > 0:
+                    return True
+                res_ref_arr = re.findall(r'R\.%s\.%s\b' % (res_type, res_name), file_data)  #R.color.manageriseiedd_acceptencyyzjf
+                if res_ref_arr and len(res_ref_arr) > 0:
+                    return True
+
+    return False
+
+def del_res_tag(src_path, res_type, res_name):#检查资源是否有引用
+
+    if os.path.exists(src_path):
+        list_dirs = os.walk(src_path)
+        for root, dirs, files in list_dirs:
+            for file_name in files:
+                file_path = os.path.join(root, file_name)
+                file_data = file_util.read_file_data(file_path)
+
+                # file_data = re.sub('<!--.*-->', '', file_data)
+                # '<string name="api_pay_web_payment">api/web/payment.page</string>'
+                tag_obj = re.findall(r'<%s name="%s">.*</%s>' % (res_type, res_name, res_type), file_data)
+                if tag_obj and len(tag_obj) > 0:
+                    file_data = re.sub(r'<%s name="%s">.*</%s>' % (res_type, res_name, res_type), '',  file_data)
+                    file_util.wite_data_to_file_noencode(file_path, file_data)
+
+
 def rename_id(file_data, ids_aar):
     id_tepm_aar = []
     for id_name in ids_aar:
@@ -595,7 +679,10 @@ def check_md5(path1, path2):
 
 def addLajiFile():#添加垃圾文件到目录
 
-    src_dir_path = '/Users/ganyuanrong/wbgame/dongli_ywQB_yingjing_yijingqb_40110001/game_assets_pack/src/main/assets'
+    src_dir_path = '/Users/ganyuanrong/wbgame/lajifile'
+    # src_dir_path = '/Users/ganyuanrong/ldysdk/kofts/src'
+    # src_dir_path = '/Users/ganyuanrong/ldysdk/kofts/'
+    # src_dir_path = '/Users/ganyuanrong/ldysdk/kofts/aaad/kdkka'
     if os.path.exists(src_dir_path):
         list_dirs = os.walk(src_dir_path)
         for root, dirs, files in list_dirs:
@@ -604,22 +691,90 @@ def addLajiFile():#添加垃圾文件到目录
                 if '.framework' in root or '.bundle' in root:
                     continue
 
-                file_dir = os.path.join(root, dir_name)  # 头文件路径
-                mPrpCrypt = PrpCrypt('nnaaadmmdaakk99', 'nnaaadmmdaakk99')
-                lett_src = string.letters
-                lett_src = lett_src + '0123456789'
+                # if 'game_fanisa_' not in root:
+                #     continue
 
-                letter_count = random.randint(100, 800)
+                file_dir = os.path.join(root, dir_name)  # 头文件路径
+                mPrpCrypt = PrpCrypt('KEY_KDAMOON88bb', 'IV_KDAMOON88bb')
+                lett_src = string.letters
+                lett_src = lett_src + '012dddd3456789'
+
+                letter_count = random.randint(10, 50)
                 for i in range(letter_count):
                     msg = ''
-                    letter_count = random.randint(20, 80000)
+                    letter_count = random.randint(20, 800)
                     for m in range(letter_count):
                         lett = lett_src[random.randint(0, len(lett_src) - 1)]
                         msg = msg + lett
-                    aaresult = mPrpCrypt.aes_encrypt(msg)
+                    aaresult = mPrpCrypt.aes_encrypt_base64(msg)
                     file_name = md5util.md5hex(aaresult)
                     file_util.wite_data_to_file(os.path.join(file_dir, file_name), aaresult)
 
+def jiamiIOSFile():
+
+    # src_dir_path = '/Users/ganyuanrong/ldysdk/kofts-aaaraw/res/raw-assets/resources/sound'
+    # new_directory11 = '/Users/ganyuanrong/ldysdk/kofts_jiami_sound'
+
+    src_dir_path = '/Users/ganyuanrong/ldysdk/kofts-aaaraw/src'
+    new_directory = '/Users/ganyuanrong/ldysdk/kofts_jiami'
+
+    if os.path.exists(src_dir_path):
+        list_dirs = os.walk(src_dir_path)
+        for root, dirs, files in list_dirs:
+
+            for file_name in files:
+                if '.framework' in root or '.bundle' in root:
+                    continue
+
+                if '.DS_Store' == file_name:
+                    continue
+
+                file_path = os.path.join(root, file_name)  # 头文件路径
+                file_data = file_util.read_file_data(file_path)
+
+                # file_name_new = md5util.md5hex("UUYYAOODXX88A" + file_name)
+                file_name_new = md5util.md5hex("KKDAMOONMOON888AA" + file_name)
+
+
+                # new_directory = root.replace('/Users/ganyuanrong/ldysdk/kofts-aaaraw/res/raw-assets/resources/sound', new_directory11)
+                # 检查目录是否存在
+                if not os.path.exists(new_directory):
+                    # 不存在则创建目录
+                    os.makedirs(new_directory)
+
+                file_path_new = os.path.join(new_directory, file_name_new)
+
+
+                mPrpCrypt = PrpCrypt('KEY_KDAMOON88AA', 'IV_KDAMOON88AA')
+                # en_data = mPrpCrypt.aes_encrypt(file_data)
+                en_data = mPrpCrypt.encrypt_for_data(file_data)
+
+                file_util.wite_data_to_file_noencode(file_path_new, en_data)
+
+
+def change_aaa(arc_path):
+    # "/v1/system/init";
+    if os.path.exists(arc_path):
+        str_lines = file_util.read_file_data_for_line(arc_path)
+        content_a = ''
+        for str_line in str_lines:
+
+            if '/v1/' not in str_line:
+                content_a = content_a + str_line
+                continue
+            w1 = word_util.random_word_dong()
+            w2 = word_util.random_word_name()
+            new_w = w1 + '_' + w2
+            result = re.findall(r'"/v1/(.+)";', str_line)
+            if result:
+                aa = result[0]
+                str_line = str_line.replace(aa, new_w)
+                str_line = str_line.replace(';', ';   //  /v1/%s' % aa)
+                content_a = content_a + str_line
+
+            else:
+                content_a = content_a + str_line
+        file_util.wite_data_to_file(arc_path, content_a)
 
 if __name__ == '__main__':
 
@@ -636,19 +791,26 @@ if __name__ == '__main__':
     # src_path = '/Users/ganyuanrong/AndroidProject/martial_gp2_sdk_code/quickgamesdk/src/main'
     # res_path = '/Users/ganyuanrong/AndroidProject/martial_gp2_sdk_code/quickgamesdk/src/main/res'
 
-    src_path = '/Users/ganyuanrong/AndroidProject/DYSDK/SDKModule/src'
-    res_path = '/Users/ganyuanrong/AndroidProject/DYSDK/SDKModule/src'
+    # src_path = '/Users/ganyuanrong/AndroidProject/DYSDK/SDKModuleOBS1/src'
+    # res_path = '/Users/ganyuanrong/AndroidProject/DYSDK/SDKModuleOBS1/src'
+    src_path = '/Users/ganyuanrong/AndroidProject/martial_gp2_sdk_code/quickgamesdk/src'
+    res_path = '/Users/ganyuanrong/AndroidProject/martial_gp2_sdk_code/quickgamesdk/src'
 
-    #1.修改res下面的文件名字
-    # change_res_file_name(src_path, src_path, "chosea_")
-
-    exclude_string = ['dy_adjust_token','sdk_game_code','sdk_app_key','sdk_more_language','sdk_af_dev_key','sdk_default_server_language',
+    exclude_string = ['reg_is_need_vfcode','sdk_supported_languages','dy_topon_test','dy_admob_app_id','dy_ad_placement_ids','dy_topon_appkey','dy_topon_appid','dy_adjust_token','sdk_game_code','sdk_app_key','sdk_more_language','sdk_af_dev_key','sdk_default_server_language',
                       'default_web_client_id','sdk_inner_version','scheme','facebook_app_id','facebook_client_token',
                       'facebook_authorities','fb_login_protocol_scheme','facebook_app_name','line_channelId','channel_platform','sdk_name']
+
+    # 0.移除不用的资源
+    # remove_unuse_resource(src_path, res_path)
+
+    # 1.修改res下面的文件名字
+    # change_res_file_name(src_path, src_path, "aptsdk_")
+
     #2.修改资源 id值
     # change_id_tag_file_name(src_path, res_path)
 
-    # insert_res_string('/Users/ganyuanrong/AndroidProject/martial_gp2_sdk_code/quickgamesdk/src/main/res')
+    # 3.添加无效string tag
+    # insert_res_string(res_path)
 
     # find_R_in_code(src_path)
 
@@ -671,7 +833,11 @@ if __name__ == '__main__':
     #         alla.append(msg)
     #         print msg
 
-    check_md5('/Users/ganyuanrong/AndroidProject/martial_gp2_sdk_code/demo/build/outputs/bundle/payGooglePlayRelease/demo-payGooglePlay-release', '/Users/ganyuanrong/Downloads/cc/')
+    # check_md5('/Users/ganyuanrong/AndroidProject/martial_gp2_sdk_code/demo/build/outputs/bundle/payGooglePlayRelease/demo-payGooglePlay-release', '/Users/ganyuanrong/Downloads/cc/')
+    # jiamiIOSFile()
+    # addLajiFile()
+
+    change_aaa('/Users/ganyuanrong/AndroidProject/martial_gp2_sdk_code/quickgamesdk/src/main/java/com/apter/sdk/http/HttpConstant.java')
 
     print 'end'
 

@@ -74,7 +74,8 @@ class PrpCrypt(object):
             # cryptor = AES.new(self.key, self.mode, self.iv)
             # # 进行AES加密
             # encrypt_aes = cryptor.encrypt(padding_text)
-            encrypt_aes = self.encrypt_for_data(plaintext)
+            padding_text = plaintext.encode("utf-8")
+            encrypt_aes = self.encrypt_for_data(padding_text)
             # 进行BASE64转码
             encrypt_text = (base64.b64encode(encrypt_aes)) #.decode()
             return encrypt_text
@@ -153,3 +154,5 @@ if __name__ == '__main__':
     aes_decode_data = aes_decrypt_a
     aes_decrypt_a = pc.aes_decrypt_base64(aes_decode_data)
     print("aes_decrypt2:", aes_decrypt_a)
+
+    print 'aaddd'.encode("utf-8").encode("utf-8")

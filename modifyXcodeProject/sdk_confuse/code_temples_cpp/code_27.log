@@ -1,0 +1,14 @@
+   
+      // 局部变量声明
+      int ppppp1_ppppp = int1_int;
+      int ppppp2_ppppp = int2_int;
+      int ppppp3_ppppp = ppppp1_ppppp + ppppp2_ppppp;
+      
+      if(ppppp3_ppppp < ppppp2_ppppp){
+         // 调用函数来获取最大值
+         ppppp3_ppppp = fmax(ppppp2_ppppp, ppppp1_ppppp);
+         //return;//ccp_code_27
+      }else{
+         ppppp3_ppppp = fmin(ppppp2_ppppp, ppppp1_ppppp);
+      }
+     

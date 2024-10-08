@@ -1342,60 +1342,72 @@ def changeMethodHeaderValue_no_MMMethodMMM(header_path):
             line = line.replace(define_value_old, define_value)
             print line
 
-def changeImageNameForDefindHeader(imageDir,header_path, is_encode_png):
+def changeImageInResource(imageDir, src_path, is_encode_png):
     if os.path.exists(imageDir):
         list_dirs = os.walk(imageDir)
-        header_data = read_file_data(header_path)
-        isChange = 0
-
         old_new_name_map = {}  #可能有子目录文件相同
 
         for root, dirs, files in list_dirs:
             for file_name in files:
                 if file_name.endswith('.png') or file_name.endswith('.jpg'):
 
-                    w1, w2 = random_2word()
-                    image_name_new_no_extension = w1.lower() + '_' + w2.lower() + '_img'
-
                     image_name_no_extension = os.path.splitext(file_name)[0]
                     file_extension = os.path.splitext(file_name)[1]
 
+                    xad = image_name_no_extension.replace('@2x', '').replace('@3x', '')
+
                     if is_encode_png:
 
-                        if old_new_name_map.has_key(file_name):
-                            image_name_new = old_new_name_map[file_name]
+                        if old_new_name_map.has_key(xad):
+                            image_name_new = old_new_name_map[xad]
                         else:
-                            image_name_new = image_name_new_no_extension + '.asset'
+                            # image_name_new = pc.aes_encrypt_base64(xad)
+                            image_name_new = md5util.md5hex(xad + 'addvaax')
+                            #image_name_new = image_name_new + '.txt'
+                            old_new_name_map[xad] = image_name_new
 
+                        if image_name_no_extension.endswith('@2x'):
+                            image_name_new = image_name_new + '@2x'
+                        elif image_name_no_extension.endswith('@3x'):
+                            image_name_new = image_name_new + '@3x'
+
+                        image_name_new = image_name_new + '.asset'
                         file_old_path = os.path.join(root, file_name)
                         file_new_path = os.path.join(root, image_name_new)
 
                         iamge_content = file_util.read_file_data(file_old_path)
                         aes_encrypt_result = pc.encrypt_for_data(iamge_content)
                         file_util.wite_data_to_file_noencode(file_new_path, aes_encrypt_result)
-                        old_new_name_map[file_name] = image_name_new
+
 
                     else:
+                        print 'xxxpspspappaap'
+                        # if old_new_name_map.has_key(file_name):
+                        #     image_name_new = old_new_name_map[file_name]
+                        # else:
+                        #     image_name_new = image_name_new_no_extension + file_extension
+                        # file_old_path = os.path.join(root, file_name)
+                        # file_new_path = os.path.join(root, image_name_new)
+                        # os.rename(file_old_path, file_new_path)
+                        # old_new_name_map[file_name] = image_name_new
 
-                        if old_new_name_map.has_key(file_name):
-                            image_name_new = old_new_name_map[file_name]
-                        else:
-                            image_name_new = image_name_new_no_extension + file_extension
-                        file_old_path = os.path.join(root, file_name)
-                        file_new_path = os.path.join(root, image_name_new)
-                        os.rename(file_old_path, file_new_path)
-                        old_new_name_map[file_name] = image_name_new
+        # if old_new_name_map:
+        #
+        #     list_dirs = os.walk(src_path)
+        #     for root, dirs, files in list_dirs:
+        #
+        #         for file_name in files:
+        #             if '.framework' in root or '.bundle' in root:
+        #                 continue
+        #             if file_name.endswith('.m') or file_name.endswith('.mm') or file_name.endswith('.h'):
+        #                 file_path = os.path.join(root, file_name)  # 头文件路径
+        #                 file_data = file_util.read_file_data(file_path)
+        #
+        #                 for k, v in old_new_name_map.items():
+        #                     file_data = file_data.replace(k, v)
+        #
+        #                 file_util.wite_data_to_file_noencode(file_path, file_data)
 
-
-                    # @"mmplaygame_apple_signin"
-                    image_str_old = "@\"%s\"" % image_name_no_extension
-                    image_str_new = "@\"%s\"" % image_name_new_no_extension
-                    header_data = header_data.replace(image_str_old, image_str_new)
-                    isChange = 1
-
-
-        if isChange == 1:
-            wite_data_to_file(header_path, header_data)
 
 def add_code(src_dir_path,exclude_dirs,exclude_files):#添加垃圾代码
 
@@ -1613,7 +1625,8 @@ def encryption_string_for_other_sdk(src_dir_path,exclude_dirs, exclude_strings):
 
     if os.path.exists(src_dir_path):
         list_dirs = os.walk(src_dir_path)
-        mPrpCrypt = PrpCrypt('key-2024-0117', 'iv-2024-0117')
+        mPrpCrypt_new = PrpCrypt('koax-2024-0925', 'Oyx-2024-0925')
+        mPrpCrypt_old = PrpCrypt('key-2024-0117', 'iv-2024-0117')
         for root, dirs, files in list_dirs:
 
             has_exclude_dir = 0
@@ -1630,7 +1643,9 @@ def encryption_string_for_other_sdk(src_dir_path,exclude_dirs, exclude_strings):
                 if file_name.endswith('.m') or file_name.endswith('.mm') or file_name.endswith('.h'):
                     file_path = os.path.join(root, file_name)  # 头文件路径
                     file_data = file_util.read_file_data(file_path)
-                    method_tag_results = re.findall(r'@"(.*?)"', file_data)  #中文 ：\u4e00-\u9fa5
+                    #method_tag_results = re.findall(r'@"(.*?)"', file_data)  #中文 ：\u4e00-\u9fa5
+
+                    method_tag_results = re.findall(r'SDK_DEC\(@"(.+?)"\)', file_data)
 
                     if method_tag_results:
                         for xxxd in method_tag_results:
@@ -1638,14 +1653,68 @@ def encryption_string_for_other_sdk(src_dir_path,exclude_dirs, exclude_strings):
                             if len(xxxd) < 1 :#小于3的去掉
                                 continue
 
-                            if xxxd in exclude_strings:
+                            if xxxd in exclude_strings or xxxd is None:
                                 continue
-                            en_result = mPrpCrypt.aes_encrypt_base64(xxxd)
-                            str_new = 'SDK_DEC(@"%s")' % en_result
-                            file_data = file_data.replace('@"%s"' % xxxd, str_new)
+                            # en_result = mPrpCrypt.aes_encrypt_base64(xxxd)
+                            # str_new = 'SDK_DEC(@"%s")' % en_result
+                            # file_data = file_data.replace('@"%s"' % xxxd, str_new)
+                            str_raw = mPrpCrypt_old.aes_decrypt_base64(xxxd)
+                            if str_raw is None:
+                                print 'xxxd is none =' + xxxd
+                            str_en = mPrpCrypt_new.aes_encrypt_base64(str_raw)
+                            file_data = file_data.replace(xxxd, str_en)
 
-                        file_util.wite_data_to_file(file_path, file_data)
+                        file_util.wite_data_to_file_noencode(file_path, file_data)
 
+def encryption_plist_for_other_sdk(src_dir_path,exclude_dirs, exclude_strings):
+
+    if os.path.exists(src_dir_path):
+        list_dirs = os.walk(src_dir_path)
+        mPrpCrypt_new = PrpCrypt('koax-2024-0925', 'Oyx-2024-0925')
+        mPrpCrypt_old = PrpCrypt('key-2024-0117', 'iv-2024-0117')
+        for root, dirs, files in list_dirs:
+
+            has_exclude_dir = 0
+            for exclude_dir in exclude_dirs:
+                if exclude_dir in root:
+                    has_exclude_dir = 1
+
+            if has_exclude_dir == 1:
+                continue
+
+            for file_name in files:
+                if '.framework' in root or '.bundle' in root:
+                    continue
+                if file_name.endswith('.plist'):
+                    file_path = os.path.join(root, file_name)  # 头文件路径
+                    file_data = file_util.read_file_data(file_path)
+                    #method_tag_results = re.findall(r'@"(.*?)"', file_data)  #中文 ：\u4e00-\u9fa5
+
+                    key_results = re.findall(r'<key>(.+?)</key>', file_data)#<key>OMYNXGL7EByxJiCGvz/K907QuwEFkeNBe9hbO8GucLE=</key>
+                    string_results = re.findall(r'<string>(.+?)</string>', file_data)
+
+                    tag_results = []
+                    tag_results.extend(key_results)
+                    tag_results.extend(string_results)
+                    if tag_results:
+                        for xxxd in tag_results:
+                            # xxxd = str(xxxdxxx)
+                            if len(xxxd) < 1 :#小于3的去掉
+                                continue
+
+                            if xxxd in exclude_strings or xxxd is None:
+                                continue
+                            # en_result = mPrpCrypt.aes_encrypt_base64(xxxd)
+                            # str_new = 'SDK_DEC(@"%s")' % en_result
+                            # file_data = file_data.replace('@"%s"' % xxxd, str_new)
+                            str_raw = mPrpCrypt_old.aes_decrypt_base64(xxxd)
+                            if str_raw is None:
+                                print 'xxxd is none =' + xxxd
+                                continue
+                            str_en = mPrpCrypt_new.aes_encrypt_base64(str_raw)
+                            file_data = file_data.replace(xxxd, str_en)
+
+                        file_util.wite_data_to_file_noencode(file_path, file_data)
 def find_sepcil_tag_for_other_sdk_methodppp(src_dir_path):
 
     xxxresult = []
@@ -1729,6 +1798,66 @@ def find_MMMethodMMM_not_defind(src_dir_path, tag_defind_header):
                 bb = mres.replace("_MMMethodMMM", '')
                 print '#define %s          %s' % (mres, bb)
 
+
+def change_method_for_jw(src_dir_path):
+
+    xxxresult = []
+    if os.path.exists(src_dir_path):
+        list_dirs = os.walk(src_dir_path)
+        for root, dirs, files in list_dirs:
+
+            for file_name in files:
+                if '.framework' in root or '.bundle' in root:
+                    continue
+
+                if file_name.endswith('.m') or file_name.endswith('.mm') or file_name.endswith('.h'):
+                    file_path = os.path.join(root, file_name)  # 头文件路径
+                    file_data = file_util.read_file_data(file_path)
+                    tag_results = re.findall(r'\w+_jw_\w+', file_data)
+                    if tag_results:
+                        for xxxd in tag_results:
+                            if xxxd not in xxxresult:
+                                xxxresult.append(xxxd)
+
+                    tag_results = re.findall(r'jw_\w+', file_data)
+                    if tag_results:
+                        for xxxd in tag_results:
+                            if xxxd not in xxxresult:
+                                xxxresult.append(xxxd)
+
+
+    if xxxresult:
+        sign_name_old_new_arr = {}
+        for v in xxxresult:
+            w1 = word_util.random_word_dong()
+            w2 = word_util.random_word_name()
+            new_sign = ''
+            if v.startswith('initWith'):
+                new_sign = 'initWithOpaxmmyUx_' + w1.capitalize() + w2.capitalize()
+            elif v.startswith('init'):
+                new_sign = 'initOpaxmmyUx_' + w1.capitalize() + w2.capitalize()
+            else:
+                new_sign = 'OpaxmmyUx_' + w1.lower() + w2.capitalize()
+
+            sign_name_old_new_arr[v] = new_sign
+
+        if os.path.exists(src_dir_path):
+            list_dirs = os.walk(src_dir_path)
+            for root, dirs, files in list_dirs:
+
+                for file_name in files:
+
+                    if '.framework' in root or '.bundle' in root:
+                        continue
+
+                    if file_name.endswith('.m') or file_name.endswith('.mm') or file_name.endswith('.h'):
+                        file_path = os.path.join(root, file_name)  # 头文件路径
+                        file_data = read_file_data(file_path)
+                        for k,v in sign_name_old_new_arr.items():
+                            file_data = file_data.replace(k, v)
+
+                        file_util.wite_data_to_file_noencode(file_path, file_data)
+
 if __name__ == '__main__':
 
 
@@ -1772,16 +1901,17 @@ if __name__ == '__main__':
 
 
     #start
-    pc = PrpCrypt('lmmpp20240904KEY', 'lmmpp20240904IV')
+    # pc = PrpCrypt('lmmpp20240904KEY', 'lmmpp20240904IV')
+    pc = PrpCrypt('koax-2024-0925', 'Oyx-2024-0925')
 
     # 1.1. 修改已经定义好的defind图片名称
     # path_bundle = '/Users/ganyuanrong/ldyweb/DySdk_iOS_OFS_V2/SDK_MAIN/Resources/KR/SDKResourcesKR.bundle'
     # path_imageNameHeader = '/Users/ganyuanrong/ldyweb/DySdk_iOS_OFS_V2/SDK_MAIN/obfuscation/imageNameHeader.h'
 
     #=======加密图片========
-    path_bundle = '/Users/ganyuanrong/KPlatform/KPlatform_iOS_OFS_V2/SDK_MAIN/Resources/V5/lmmpp20240904res.bundle'
-    path_imageNameHeader = '/Users/ganyuanrong/KPlatform/KPlatform_iOS_OFS_V2/SDK_MAIN/obfuscation/imageNameHeader.h'
-    # changeImageNameForDefindHeader(path_bundle, path_imageNameHeader, True)
+    path_bundle = '/Users/ganyuanrong/iOSProject/SDK-code/Resource'
+    path_imageNameHeader = ''
+    # changeImageInResource(path_bundle, path_imageNameHeader, True)
 
     # 1.2  改变md5:find . -iname "*.png" -exec echo {} \; -exec convert {} {} \;
     # find . -iname "*.png" -exec echo {} \; -exec convert -quality 75% {} {} \;
@@ -1845,23 +1975,17 @@ if __name__ == '__main__':
 
     oc_exclude_files.extend(['AppDelegate.h', 'UnityAppController.h','UnityAppController+Rendering.h'
          ,'UnityViewControllerBase+iOS.h','UnityViewControllerBase+tvOS.h','UnityViewControllerBase.h','UnityView.h','UnityView+iOS.h','UnityView+tvOS.h'])
-    oc_exclude_dirs.extend(['ThirdResources','PulicHeader','AFNetworking', 'Masonry', 'YYModel', 'sdkFrameworks', "Resources",'ThirkLib','ThirdSrc'])
+    oc_exclude_dirs.extend(['ThirdResources','AFNetworking', 'Masonry', 'YYModel', 'sdkFrameworks', "Resources",'ThirkLib','ThirdSrc'])
     oc_exclude_dirs_ref_modify = ['ThirkLib', "YYModel", "AFNetworking", "Resources",'ThirdSrc','archives','/build']
 
     xcode_project_path = '/Users/ganyuanrong/KPlatform/KPlatform_iOS_OFS_V2/SDK_MAIN/KP_SDK.xcodeproj'
     oc_modify_path = '/Users/ganyuanrong/KPlatform/KPlatform_iOS_OFS_V2/SDK_MAIN'
     oc_all_path = '/Users/ganyuanrong/KPlatform/KPlatform_iOS_OFS_V2/'
 
-    # oc_exclude_dirs = ['/Plat','/ThirdSrc']
-    # oc_exclude_dirs = ['/ThirdSrc']
 
-    # xcode_project_path = '/Users/ganyuanrong/ldyweb/DySdk_iOS_OFS_V2/SDK_MAIN/DY_SDK.xcodeproj'
-    # oc_modify_path = '/Users/ganyuanrong/ldyweb/DySdk_iOS_OFS_V2/SDK_MAIN/FLSDK'
-    # oc_all_path = '/Users/ganyuanrong/ldyweb/DySdk_iOS_OFS_V2/SDK_MAIN'
-
-    # xcode_project_path = '/Users/ganyuanrong/iOSProject/SDK-code/GameLoginKit.xcodeproj'
-    # oc_modify_path = '/Users/ganyuanrong/iOSProject/SDK-code/FunctionModule'
-    # oc_all_path = '/Users/ganyuanrong/iOSProject/SDK-code'
+    xcode_project_path = '/Users/ganyuanrong/iOSProject/SDK-code/GameLoginKit.xcodeproj'
+    oc_modify_path = '/Users/ganyuanrong/iOSProject/SDK-code/FunctionModule'
+    oc_all_path = '/Users/ganyuanrong/iOSProject/SDK-code'
     # modify_oc_class_name(oc_modify_path, xcode_project_path, oc_all_path, oc_exclude_dirs_ref_modify)
 
 
@@ -1884,59 +2008,39 @@ if __name__ == '__main__':
     src_path = '/Users/ganyuanrong/ldyweb/DySdk_iOS_OFS_V2/SDK_MAIN'
     src_path = '/Users/ganyuanrong/ldyweb/DySdk_iOS_OBS_APP_CN/SDK_MAIN/FLSDK'
 
-    # src_path = '/Users/ganyuanrong/ldysdk/kofts/frameworks/game_core'
+    src_path = '/Users/ganyuanrong/iOSProject/SDK-code/FunctionModule'
     # src_path = '/Users/ganyuanrong/ldysdk/kofts/frameworks/runtime-src/proj.ios_mac/ios/gamesrc' #
 
     # add_code(src_path, var_exclude_dirs, var_exclude_files)
 
-    # xcode_project_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
-    # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn'
-    # modify_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/FLSDK'
-    #8.指定目录下面的目录加前缀
-    # changeXcodeProjectDir(xcode_project_path, src_path, modify_path, 'OPEN')
-    # 9.修改所有uuid
-    # xcode_project_path = '/Users/ganyuanrong/cpGames/vn_sdk_zkb/Unity-iPhone.xcodeproj'
-    # xcode_project_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
-    # xcode_project_path = '/Users/ganyuanrong/iOSProject/SDK-code/GameLoginKit.xcodeproj'
-    xcode_project_path = '/Users/ganyuanrong/ldyweb/DySdk_iOS_OFS_V2/SDK_MAIN/DY_SDK.xcodeproj'
-    xcode_project_path = '/Users/ganyuanrong/ldysdk/kofts/frameworks/runtime-src/proj.ios_mac/game.xcodeproj'
-    # changeXcodeProjectUUid(xcode_project_path)
-    #11.修改函数顺序
 
+    #========================
+    #========================
+    #========================
 
-    # 12.修改内部属性和内部变量
-    # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK'
-    # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/FLSDK'
-    # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v6_v4/GamaSDK_iOS_Integration/FLSDK'
-    src_path = '/Users/ganyuanrong/KPlatform/KPlatform_iOS/SDK_MAIN/MainModel'
-    src_path = '/Users/ganyuanrong/ldyweb/DySdk_iOS_OFS_V2/SDK_MAIN/FLSDK'
-    src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_en_v4_4/GamaSDK_iOS_Integration/FLSDK'
-    src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v3_111/GamaSDK_iOS_Integration/FLSDK'
-    oc_exclude_files = []
-    oc_exclude_dirs = []
-    oc_exclude_files.extend(
-        ['AppDelegate.h', 'MWSDK.h', 'PayData.h', 'LoginData.h', 'AccountModel.h', 'CreateOrderResp.h','UnityAppController.h','UnityAppController+Rendering.h'
-         ,'UnityViewControllerBase+iOS.h','UnityViewControllerBase+tvOS.h','UnityViewControllerBase.h','UnityView.h','UnityView+iOS.h','UnityView+tvOS.h'])
-    oc_exclude_dirs.extend(['AFNetworking', 'Masonry', 'YYModel', 'Model', 'sdkFrameworks', "Resources",'ThirkLib','ThirdSrc'])
-    # oc_class_parser.parse_oc_property(src_path, oc_exclude_dirs, oc_exclude_files)
+    src_path = '/Users/ganyuanrong/iOSProject/SDK-code/FunctionModule'
+    var_exclude_files = []
+    var_exclude_strings = []
+    # encryption_string_for_other_sdk(src_path, var_exclude_files, var_exclude_strings)
 
-    #================================
-    # src_path = '/Users/ganyuanrong/iOSProject/SDK-code'
-    # bundle_path = '/Users/ganyuanrong/iOSProject/SDK-code/Resource'
-    # xcodeproj_path = '/Users/ganyuanrong/iOSProject/SDK-code/GameLoginKit.xcodeproj'
-    # # oc_class_parser.hand_sdk_bundle_res(xcodeproj_path, src_path, bundle_path, ['ThirdResources'],[])
+    src_path = '/Users/ganyuanrong/iOSProject/SDK-code/Resource'
+    # encryption_plist_for_other_sdk(src_path, var_exclude_files, var_exclude_strings)
+
+    mPrpCrypt_new = PrpCrypt('koax-2024-0925', 'Oyx-2024-0925')
+    # print mPrpCrypt_new.aes_decrypt_base64('zEzBqxyXzykBKoZulrYOtXdtwiIfnaBu+nRScHdXm9s=')
+    # print mPrpCrypt_new.aes_decrypt_base64('ts5UyhT7P0tBH7XVSOA69Wn+lrA+gxD/+c55kyyKoFI=')
+    print 'add=' + mPrpCrypt_new.aes_encrypt_base64('https://api-hwsdk.egame168.com/')
+    print 'firstsunnyltd=' + mPrpCrypt_new.aes_encrypt_base64('https://wden-sdk.firstsunnyltd.com/')
+    # print 'add=' + mPrpCrypt_new.aes_encrypt_base64('0bf52185b3373bc00bd75b7d1b52f10e')
+
+    print mPrpCrypt_new.aes_decrypt_base64('LqmXL1Nf0NyS0zU8P6jjiQ==')
+
+    # print md5util.md5hex('kinesloveule63_momentorium64.png')
     #
-    # name_tra_path = '/Users/ganyuanrong/Downloads/kmm.log'
-    # xx_data = file_util.read_file_data(name_tra_path)
-    # result = re.findall(r'\w+_MMMethodMMM', xx_data)
-    #
-    # has_arr = []
-    # if result and len(result) > 0:
-    #
-    #     for ar in result:
-    #         if ar not in has_arr:
-    #             has_arr.append(ar)
-    #             print '#define %s       %s' % (ar, ar)
+    # print mPrpCrypt_new.aes_encrypt_base64('channelID=default,channelDesc=官网渠道,desc=注意英文等号与逗号作为分割符,')
 
+    # mPrpCrypt_old = PrpCrypt('key-2024-0117', 'iv-2024-0117')
+    # print mPrpCrypt_old.aes_decrypt_base64('M74Zrl/hS0jUoB2HTxVPRG0Pq6nFL35eeBpIQELhLlavp7+4HvXeCRHBe2jlmKOe')
 
+    # change_method_for_jw('/Users/ganyuanrong/iOSProject/SDK-code/FunctionModule')
     print 'end'

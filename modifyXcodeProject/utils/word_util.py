@@ -20,10 +20,10 @@ words_dong_s = []
 def random_word_dong():
     temp_int = random.randint(0, len(words_dong) - 1)
     temp = words_dong[temp_int]
-    while temp in words_dong_s:
-        temp_int = random.randint(0, len(words_dong) - 1)
-        temp = words_dong[temp_int]
-    words_dong_s.append(temp)
+    # while temp in words_dong_s:
+    #     temp_int = random.randint(0, len(words_dong) - 1)
+    #     temp = words_dong[temp_int]
+    # words_dong_s.append(temp)
     return temp
 
 
@@ -31,10 +31,10 @@ words_name_s = []
 def random_word_name():
     temp_int = random.randint(0, len(words_name) - 1)
     temp = words_name[temp_int]
-    while temp in words_name_s:
-        temp_int = random.randint(0, len(words_name) - 1)
-        temp = words_name[temp_int]
-    words_name_s.append(temp)
+    # while temp in words_name_s:
+    #     temp_int = random.randint(0, len(words_name) - 1)
+    #     temp = words_name[temp_int]
+    # words_name_s.append(temp)
     return temp
 
 def random_property():

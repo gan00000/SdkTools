@@ -328,7 +328,7 @@ def insert_methods(file_path_m, sdk_confuse_dir): #类内插入方法
     implementation_content = implementation_content_list[0]
 
     # 找出类名
-    class_def_content = re.findall(r'@implementation \w+\b', file_data_m)
+    class_def_content = re.findall(r'@implementation {1,3}\w+\b', file_data_m)
     if class_def_content and len(class_def_content) > 0:
         class_name = class_def_content[0].replace('@implementation', '').replace(' ', '').strip()
 
@@ -674,10 +674,12 @@ def replace_code_placeholder(code_temple_index, code_temple, condition_var, agai
 
 def parse_property(file_data):
     if file_data:
-        property_result_list = re.findall(r'@property .+;', file_data) #正则匹配出所有属性
+        property_result_list = re.findall(r'@property {1,3}.+;', file_data) #正则匹配出所有属性
         if property_result_list:
             property_list = []
             for property_def in property_result_list:
+                if 'IBOutlet' in property_def:
+                    continue
                 property_name_list = re.findall(r' \*?\w+;', property_def)
                 if property_name_list:
                     # mPropertyInfo = PropertyInfo()
@@ -699,7 +701,7 @@ def parse_oc_property(src_dir_path, exclude_dirs, exclude_files): #解析方法�
 
             has_exclude_dir = 0
             for exclude_dir in exclude_dirs:
-                if exclude_dir in root:
+                if '/' + exclude_dir in root:
                     has_exclude_dir = 1
 
             if has_exclude_dir == 1:
@@ -763,7 +765,8 @@ def parse_oc_property(src_dir_path, exclude_dirs, exclude_files): #解析方法�
                                     classInfo.name = class_name
                                     # classInfo.priPropertyList = property_list
                                     for property in property_list:
-                                        if '_MMMPRO' in property:
+                                        # if '_MMMPRO' in property:
+                                        if '_PRIROPERTY' in property:
                                             # property_list.remove(property)
                                             continue
                                         classInfo.priPropertyList.append(property)
@@ -1242,13 +1245,13 @@ def hand_sdk_bundle_res(xcode_project_path, src_dir_path, bundle_path, exclude_d
                         if '<key>' in line and '</key>' in line:
                             str_keys = re.findall(r'<key>(.+)</key>', line)
                             str_key = str_keys[0]
-                            aa_result = mPrpCrypt.aes_encrypt(str_key)
+                            aa_result = mPrpCrypt.aes_encrypt_base64(str_key)
                             line = line.replace(str_key, aa_result)
                             content = content + line
                         elif '<string>' in line and '</string>' in line:
                             str_keys = re.findall(r'<string>(.+)</string>', line)
                             str_key = str_keys[0]
-                            bb_result = mPrpCrypt.aes_encrypt(str_key)
+                            bb_result = mPrpCrypt.aes_encrypt_base64(str_key)
                             line = line.replace(str_key, bb_result)
                             content = content + line
                         else:
@@ -1302,7 +1305,7 @@ def hand_sdk_bundle_res(xcode_project_path, src_dir_path, bundle_path, exclude_d
                         print '文件无法更改名称：' + file_old_path
                 elif file_name.endswith('.txt'):
                     txt_data = file_util.read_file_data(file_path)
-                    aa_result = mPrpCrypt.aes_encrypt(txt_data)
+                    aa_result = mPrpCrypt.aes_encrypt_base64(txt_data)
                     file_util.wite_data_to_file(file_path, aa_result)
 
         if is_project_content_change == 1:

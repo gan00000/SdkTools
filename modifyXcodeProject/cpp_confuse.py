@@ -4,7 +4,7 @@ import sys
 import uuid
 from threading import Thread
 
-from modifyXcodeProject import oc_class_parser, oc_method_util, cpp_code_util
+from modifyXcodeProject import oc_class_parser, oc_method_util, cpp_code_util, oc_code_util
 from modifyXcodeProject.utils import file_util, word_util, datetime_util
 from modifyXcodeProject.utils.PrpCrypt import PrpCrypt
 
@@ -19,7 +19,7 @@ import chardet
 # 导入 random(随机数) 模块
 import random
 
-def deleteComments(src_dir_path, exclude_dirs, exclude_files):  # 删除注释
+def deleteComments(src_dir_path, exclude_dirs, exclude_files, obs_src):  # 删除注释
 
     if os.path.exists(src_dir_path):
         list_dirs = os.walk(src_dir_path)
@@ -35,6 +35,9 @@ def deleteComments(src_dir_path, exclude_dirs, exclude_files):  # 删除注释
 
             for file_name in files:
                 if file_name in exclude_files:
+                    continue
+
+                if file_name not in obs_src:
                     continue
 
                 if file_name.endswith('.h') or file_name.endswith('.m') or file_name.endswith(
@@ -58,7 +61,7 @@ def deleteComments(src_dir_path, exclude_dirs, exclude_files):  # 删除注释
                     file_util.wite_data_to_file(file_path, file_data_1)
 
 
-def addNoUseMethodForCpp2(src_dir_path, exclude_dirs, exclude_files, is_retry):
+def addNoUseMethodForCpp2(src_dir_path, exclude_dirs, exclude_files, obs_src, is_retry):
     if not os.path.exists(src_dir_path):
         print("src_dir_path not exist")
         return
@@ -73,14 +76,20 @@ def addNoUseMethodForCpp2(src_dir_path, exclude_dirs, exclude_files, is_retry):
         if exclude_dir_flag == 1:
             continue
 
+        if '.framework' in root:
+            continue
+
         for file_name in files:
             if file_name == ".DS_Store":
                 continue
 
-            if file_name in exclude_files:
-                continue
+            # if file_name in exclude_files:
+            #     continue
             # if 'AFNetworking' in root or 'YYModel' in root:
             #     continue
+
+            if file_name not in obs_src:
+                continue
 
             if file_name.endswith('.mm') or file_name.endswith('.cpp'):
                 print '处理中  ' + file_name
@@ -529,7 +538,7 @@ def changeWordTag(src_root, exclude_dirs, exclude_files,repTag, disTag):
                 file_util.wite_data_to_file(file_path, f_data)
 
 
-def addPropertyAndVar(src_dir_path, exclude_dirs, exclude_files, is_retry):
+def addPropertyAndVar(src_dir_path, exclude_dirs, exclude_files, obs_src, is_retry):
     if not os.path.exists(src_dir_path):
         print("src_dir_path not exist")
         return
@@ -552,6 +561,9 @@ def addPropertyAndVar(src_dir_path, exclude_dirs, exclude_files, is_retry):
                 continue
             # if 'AFNetworking' in root or 'YYModel' in root:
             #     continue
+
+            if file_name not in obs_src:
+                continue
 
             if file_name.endswith('.mm') or file_name.endswith('.cpp') or file_name.endswith('.hpp') or file_name.endswith('.h'):
                 print '处理中  ' + file_name
@@ -782,6 +794,65 @@ def unity_addNoUseMethodForCpp2(src_dir_path, exclude_dirs, exclude_files, is_re
 
                     file_util.wite_data_to_file(file_path, file_data)
 
+
+def find_string_tag_cpp_m(src_dir_path,file_name_aar, exclude_strings):
+
+    xxxresult = []
+    if os.path.exists(src_dir_path):
+        list_dirs = os.walk(src_dir_path)
+        for root, dirs, files in list_dirs:
+
+            # has_exclude_dir = 0
+            # for exclude_dir in exclude_dirs:
+            #     if exclude_dir in root:
+            #         has_exclude_dir = 1
+            #
+            # if has_exclude_dir == 1:
+            #     continue
+
+
+            for file_name in files:
+
+                if file_name not in file_name_aar:
+                    continue
+                if file_name.endswith('.m') or file_name.endswith('.mm') or file_name.endswith('.h') or file_name.endswith('.cpp') or file_name.endswith('.hpp'):
+                    file_path = os.path.join(root, file_name)  # 头文件路径
+                    file_data = file_util.read_file_data(file_path)
+                    file_data = oc_code_util.removeAnnotate(file_data)
+                    # file_data = unicode(file_data)
+                    method_tag_results = re.findall(r'"[\.\w]{2,100}"', file_data)  #中文 ：\u4e00-\u9fa5
+                    # method_tag_results = compile_pp.findall(file_data)
+                    # method_tag_results = re.findall(r'@"[\w.#]+"', file_data)
+
+                    if method_tag_results and len(method_tag_results) > 0:
+                        for xxxd in method_tag_results:
+                            xxxd_temp = xxxd.replace('"', '')
+                            if xxxd in exclude_strings or xxxd_temp in exclude_strings:
+                                continue
+                            if '://' in xxxd:
+                                continue
+                            if xxxd.endswith('.h"') or xxxd.endswith('.h'):
+                                continue
+                            if xxxd not in xxxresult:
+                                xxxresult.append(xxxd)
+
+                            rep_new = xxxd.replace('.', '_').replace('"', '')
+                            file_data = file_data.replace(xxxd, 'wwwww_tag_wwwww_' + rep_new)
+                        file_util.wite_data_to_file(file_path, file_data)
+
+    if xxxresult:
+
+        def_arr = []
+        for xssss in xxxresult:
+            rep_new = xssss.replace('.', '_').replace('"', '')
+            xssss_temp = xssss.replace('"', '')
+            aD = ''
+            for ma in xssss_temp:
+                aD = aD + ma + '_UUUnnnRRR_'
+            defineVale = '#define %s        dy_sdk_decrypt("%s")  //%s' % ('wwwww_tag_wwwww_' + rep_new, aD, xssss)
+            print defineVale
+
+
 if __name__ == '__main__':
 
     sdk_confuse_dir = '/Users/ganyuanrong/PycharmProjects/SdkTools/modifyXcodeProject/sdk_confuse/'
@@ -824,21 +895,67 @@ if __name__ == '__main__':
         oc_class_parser.code_temples.append(code_data)
 
 
+    obs_src = ["Reachability33.m",
+               "ApiForCocos2dx.mm",
+               "SkeletonCache.cpp",
+               "GameTcpClient.cpp",
+               "ISRDataHelper.m",
+               "TcpMessage.cpp",
+               "LuaHelper.cpp",
+               "msgmem.cpp",
+               "pisocketex.cpp",
+               "SmartSocket.cpp",
+               "CCGameDownload.cpp",
+               "CCGameEnv.cpp",
+               "Speech.mm",
+               "lua_cocos2dx_gamecore_StillAwakeDq.cpp",
+               "DDYixaiaAppDelegate.mm",
+               "CCGameLib.cpp",
+               "memmonitor.cpp",
+               "system.cpp",
+               "event.cpp",
+               "Webcam.mm",
+               "mutex.cpp",
+               "CCLuaEngineExt.cpp",
+               "mempool.cpp",
+               "ResourcesDecode.cpp",
+               "semaphore.cpp",
+               "thread.cpp",
+               "CCGameDevice-ios.mm",
+               "SBStillAwakeDq.mm",
+               "AudioRecoder.mm",
+               "FmodexManager.cpp",
+               "CCGameMain.cpp",
+               "mempoolex.cpp",
+               "TcpClientBase.cpp",
+               "pisocket.cpp",
+               "md5.cpp",
+               "UtilIDFA.mm",
+               "systemex.cpp",
+               "clmempool.cpp"]
+
     # 处理cpp
 
-    var_exclude_dirs = []
-    var_exclude_files = []
+    var_exclude_dirs = ['/GameFramework/', '/cocos2d-x/']
+    var_exclude_files = ['type','int8','uint8','int16','uint16','int32','uint32','int64','uint64','string','byte','array','_len','fields','iii','iI','cc.Ref','cc','rb','wb','print','.atlas']
     # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/'
     src_path = '/Users/ganyuanrong/Downloads/seashhx/dongnyProject/'
     # src_path = '/Users/ganyuanrong/Downloads/seashhx/main'
     # src_path = '/Users/ganyuanrong/Downloads/seashhx/tools/libfairygui/Classes'
-    # deleteComments(src_path, var_exclude_dirs, var_exclude_files)
+    src_path = '/Users/ganyuanrong/ldysdk/kofts/frameworks'
+    # deleteComments(src_path, var_exclude_dirs, var_exclude_files, obs_src)
 
-    #cpp添加代码
+    # find_string_tag_cpp_m(src_path,obs_src,var_exclude_files)
+
+    # cpp添加代码
     var_exclude_dirs = []
     var_exclude_files = []
     src_path = '/Users/ganyuanrong/Downloads/seashhx/dongnyProject/'
-    # addNoUseMethodForCpp2(src_path,var_exclude_dirs,var_exclude_files, True)
+    src_path = '/Users/ganyuanrong/ldysdk/kofts/frameworks'
+    src_path = '/Users/ganyuanrong/ldysdk/kofts/frameworks/game_core'
+
+    src_path = '/Users/ganyuanrong/ldysdk/kofts/frameworks/runtime-src/Classes/'
+    addNoUseMethodForCpp2(src_path,var_exclude_dirs,var_exclude_files, obs_src, False)
 
     #修改类名
     var_exclude_dirs = ['cocos2d','libsimulator','MWSDK','ThirdSDK']
@@ -864,8 +981,9 @@ if __name__ == '__main__':
 
     # changeWordTag(src_root,var_exclude_dirs, var_exclude_files, 'esqq', 'pactivePlay')
     # changeWordTag(src_root, var_exclude_dirs, var_exclude_files, 'vvgb', 'hilYouFyws')
-
-    # addPropertyAndVar(src_path, var_exclude_dirs, var_exclude_files, False)
+    src_path = '/Users/ganyuanrong/ldysdk/kofts/frameworks'
+    var_exclude_dirs = []
+    # addPropertyAndVar(src_path, var_exclude_dirs, var_exclude_files,obs_src, False)
 
     var_exclude_dirs = []
     var_exclude_files = []
@@ -875,5 +993,5 @@ if __name__ == '__main__':
     # unity_change_struct(src_path, var_exclude_dirs, var_exclude_files, 1)
     src_path = '/Users/ganyuanrong/cpGames/twmxw_iosproj/iospro/Classes/Native'
 
-    unity_addNoUseMethodForCpp2(src_path,var_exclude_dirs,var_exclude_files, True)
+    # unity_addNoUseMethodForCpp2(src_path,var_exclude_dirs,var_exclude_files, True)
 

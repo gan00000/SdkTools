@@ -1347,49 +1347,42 @@ def changeImageNameForDefindHeader(imageDir,header_path, is_encode_png):
         list_dirs = os.walk(imageDir)
         header_data = read_file_data(header_path)
         isChange = 0
-
-        old_new_name_map = {}  #可能有子目录文件相同
-
         for root, dirs, files in list_dirs:
             for file_name in files:
                 if file_name.endswith('.png') or file_name.endswith('.jpg'):
 
                     w1, w2 = random_2word()
-                    image_name_new_no_extension = w1.lower() + '_' + w2.lower() + '_img'
+                    image_name_new_no_extension = w1.lower() + '_' + w2.lower()
 
                     image_name_no_extension = os.path.splitext(file_name)[0]
                     file_extension = os.path.splitext(file_name)[1]
 
                     if is_encode_png:
 
-                        if old_new_name_map.has_key(file_name):
-                            image_name_new = old_new_name_map[file_name]
-                        else:
-                            image_name_new = image_name_new_no_extension + '.asset'
-
+                        image_name_new = image_name_new_no_extension + '.asset'
                         file_old_path = os.path.join(root, file_name)
                         file_new_path = os.path.join(root, image_name_new)
 
                         iamge_content = file_util.read_file_data(file_old_path)
                         aes_encrypt_result = pc.encrypt_for_data(iamge_content)
                         file_util.wite_data_to_file_noencode(file_new_path, aes_encrypt_result)
-                        old_new_name_map[file_name] = image_name_new
+
+                        # 删除文件
+                        # os.remove(file_path)
 
                     else:
-
-                        if old_new_name_map.has_key(file_name):
-                            image_name_new = old_new_name_map[file_name]
-                        else:
-                            image_name_new = image_name_new_no_extension + file_extension
+                        image_name_new = image_name_new_no_extension + file_extension
                         file_old_path = os.path.join(root, file_name)
                         file_new_path = os.path.join(root, image_name_new)
                         os.rename(file_old_path, file_new_path)
-                        old_new_name_map[file_name] = image_name_new
-
 
                     # @"mmplaygame_apple_signin"
                     image_str_old = "@\"%s\"" % image_name_no_extension
                     image_str_new = "@\"%s\"" % image_name_new_no_extension
+                    masx = re.findall(r'%s' % image_str_old, header_data)
+                    if masx is None:
+                        print 'xxxxxxxx==== image not defind image_str_old = %s, image_str_new = %s' % (image_str_old, image_str_new)
+
                     header_data = header_data.replace(image_str_old, image_str_new)
                     isChange = 1
 
@@ -1771,172 +1764,72 @@ if __name__ == '__main__':
         oc_class_parser.code_temples.append(code_data)
 
 
+    des_key = ""
+    des_iv = ""
+    project_path = ""
+    project_obs_src_path = ""
+    project_dir_path = ""
+    res_bundle_path = ""
     #start
-    pc = PrpCrypt('lmmpp20240904KEY', 'lmmpp20240904IV')
+    pc = PrpCrypt(des_key, des_iv)
 
     # 1.1. 修改已经定义好的defind图片名称
     # path_bundle = '/Users/ganyuanrong/ldyweb/DySdk_iOS_OFS_V2/SDK_MAIN/Resources/KR/SDKResourcesKR.bundle'
     # path_imageNameHeader = '/Users/ganyuanrong/ldyweb/DySdk_iOS_OFS_V2/SDK_MAIN/obfuscation/imageNameHeader.h'
 
     #=======加密图片========
-    path_bundle = '/Users/ganyuanrong/KPlatform/KPlatform_iOS_OFS_V2/SDK_MAIN/Resources/V5/lmmpp20240904res.bundle'
-    path_imageNameHeader = '/Users/ganyuanrong/KPlatform/KPlatform_iOS_OFS_V2/SDK_MAIN/obfuscation/imageNameHeader.h'
-    # changeImageNameForDefindHeader(path_bundle, path_imageNameHeader, True)
+    # path_bundle = '/Users/ganyuanrong/Downloads/mwsdk_ios_vn_v4/GamaSDK_iOS_Integration/Resources/VN/SDKResourcesVN.bundle'
+    # path_bundle = '/Users/ganyuanrong/ldyweb/DySdk_iOS_OBS_APP_CN/SDK_MAIN/Resources/MZAPP/MZAPPRES.bundle'
+    # path_imageNameHeader = '/Users/ganyuanrong/Downloads/mwsdk_ios_vn_v4/GamaSDK_iOS_Integration/obfuscation/imageNameHeader.h'
+    path_imageNameHeader = os.path.join(project_dir_path, 'obfuscation/imageNameHeader.h') #'/Users/ganyuanrong/ldyweb/DySdk_iOS_OBS_APP_CN/SDK_MAIN/obfuscation/imageNameHeader.h'
+    changeImageNameForDefindHeader(res_bundle_path, path_imageNameHeader, True)
 
     # 1.2  改变md5:find . -iname "*.png" -exec echo {} \; -exec convert {} {} \;
     # find . -iname "*.png" -exec echo {} \; -exec convert -quality 75% {} {} \;
 
     #2. ======修改已经定义好的defind中的方法名称=========
-    method_header_path = '/Users/ganyuanrong/KPlatform/KPlatform_iOS_OFS_V2/SDK_MAIN/obfuscation/codeObfuscationForMethodName.h'
+    method_header_path = '/Users/ganyuanrong/Downloads/mwsdk_ios_vn_v4/GamaSDK_iOS_Integration/obfuscation/codeObfuscationForMethodName.h'
     # changeMethodHeaderValue(method_header_path)
 
     # 3.修改变量名称 proNameHeader.h
-    proNameHeader_path = '/Users/ganyuanrong/KPlatform/KPlatform_iOS_OFS_V2/SDK_MAIN/obfuscation/proNameHeader.h'
+    proNameHeader_path = '/Users/ganyuanrong/Downloads/mwsdk_ios_vn_v4/GamaSDK_iOS_Integration/obfuscation/proNameHeader.h'
     # change_pro_name_proheader(proNameHeader_path)
 
-
-    #查找方法
-    var_exclude_dirs = ['/Plat', '/Base']
-    var_exclude_change_dirs = []
-    var_exclude_files = []
-    # 找出所有方法名字并修改
-    # var_exclude_dirs = ['AFNetworking', 'YYModel', 'Plat','sdkFrameworks']
-    # var_exclude_change_dirs = ['AFNetworking', 'YYModel','sdkFrameworks','ThirdSDK']
-    # var_exclude_files = ['AppDelegate.m', 'MWSDK.m', 'PayData.m', 'LoginData.m', 'AccountModel.m', 'CreateOrderResp.m','USDefault.m','UIAlertController+Sdk.m','DisplayManager.mm']
-    var_exclude_name = ['dismiss', 'didBecomeActive', 'willResignActive', 'didEnterBackground', 'willEnterForeground',
-                        'willTerminate',
-                        'loadView', 'target', 'handleAuthrization', 'error', 'delegate', 'name', 'selector',
-                        'didFinishLaunchingWithOptions', 'application',
-                        'options', 'annotation', 'sourceApplication', 'openURL', 'dealloc', 'show', 'load', 'init',
-                        'drawRect', 'initialize', 'encode',
-                        'decode', 'length', 'share', 'setData', 'viewWillAppear', 'viewDidLoad', 'shouldAutorotate',
-                        'viewDidDisappear', 'sharedInstance',
-                        'forKey', 'objectForKey', 'setObject', 'length', 'presentingViewController', 'action',
-                        'completion', 'onFrameResolved', 'keyboardDidShow', 'keyboardWillHide'
-        , 'touchesBegan', 'touchesEnded', 'touchesCancelled', 'touchesMoved', 'withEvent', 'layoutSubviews',
-                        'initWithFrame', 'didRotate']
-    # find_class_method('/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK', var_exclude_dirs, var_exclude_change_dirs, var_exclude_files, var_exclude_name)
-    var_exclude_dirs = ['/GameFramework', 'platform/ios', '/ui/UIEditBox', '/libsimulator/', '/UIEditBox/iOS', 'audio/apple']
-    # find_class_method('/Users/ganyuanrong/ldysdk/kofts/frameworks', var_exclude_dirs, var_exclude_change_dirs, var_exclude_files, var_exclude_name)
-
-
-    # 4.删除注释
+    # 4. ======删除注释
     var_exclude_dirs = ['AFNetworking', 'YYModel', 'ThirdSrc','ThirdResources']
     var_exclude_files = []
-    # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/'
-    # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_kr_majia/GamaSDK_iOS_Integration/FLSDK'
-    src_path = '/Users/ganyuanrong/ldyweb/DySdk_iOS_OBS_APP_CN/SDK_MAIN/FLSDK'
+    src_path = '/Users/ganyuanrong/Downloads/mwsdk_ios_vn_v4/GamaSDK_iOS_Integration/FLSDK'
     # deleteComments(src_path, var_exclude_dirs, var_exclude_files)
 
-    #用于查找字符使用def宏定义替换
-    var_exclude_dirs = ['AFNetworking', 'YYModel', 'ThirdSrc', 'ThirdResources','Common']
-    exclude_strings = ['OK','com',"%2ld",'YES','POST','UTF-8','SELF MATCHES %@','UIInputWindowController','<UIInputSetHostView','<UIInputSetContainerView',']','\\n\\n','\\n','\n','','%@','%d', '%ld', '%@-%@', 'true', 'false', 'txt', 'bundle', '.', 'plist', '#', 'USD','yyyy-MM-dd','%02x', '-', '%@(%d)', '+', '_', 'lproj', 'json', '%s', '?']
-    # find_string_tag('/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK', var_exclude_dirs, exclude_strings)
 
-    #5. 加密字符串，上面查找
-    # changeStringHeaderValue('/Users/ganyuanrong/KPlatform/KPlatform_iOS_OFS_V2/SDK_MAIN/obfuscation/MWStringHeaders.h')
+    #5. ====== 加密字符串，上面查找
+    string_path = '/Users/ganyuanrong/Downloads/mwsdk_ios_vn_v4/GamaSDK_iOS_Integration/obfuscation/MWStringHeaders.h'
+    # changeStringHeaderValue(string_path)
 
-    # 6.修改类名
-    # oc_exclude_files.extend(
-    #     ['AppDelegate.h', 'MWSDK.h', 'PayData.h', 'LoginData.h', 'UnityAppController.h','UnityAppController+Rendering.h'
-    #      ,'UnityViewControllerBase+iOS.h','UnityViewControllerBase+tvOS.h','UnityViewControllerBase.h','UnityView.h','UnityView+iOS.h','UnityView+tvOS.h'])
+    # oc_class_parser.parse('/Users/ganyuanrong/Desktop/AdDelegate.m')
+    #6.添加垃圾代码
+    var_exclude_dirs = ['AFNetworking', 'YYModel', 'ThirdSrc', 'ThirdResources']
+    var_exclude_files = []
+    src_path = '/Users/ganyuanrong/Downloads/mwsdk_ios_vn_v4/GamaSDK_iOS_Integration/FLSDK'
+
+    # add_code(src_path, var_exclude_dirs, var_exclude_files)
+
+
+    # 7.修改类名
     oc_exclude_dirs.extend(['AFNetworking', 'Masonry', 'YYModel', 'sdkFrameworks', "Resources",'ThirkLib','ThirdSrc'])
     oc_exclude_dirs_ref_modify = ['ThirkLib', "AFNetworking", "Resources",'ThirdSrc']
 
-    oc_exclude_files.extend(['AppDelegate.h', 'UnityAppController.h','UnityAppController+Rendering.h'
+    oc_exclude_files.extend(
+        ['AppDelegate.h', 'UnityAppController.h','UnityAppController+Rendering.h'
          ,'UnityViewControllerBase+iOS.h','UnityViewControllerBase+tvOS.h','UnityViewControllerBase.h','UnityView.h','UnityView+iOS.h','UnityView+tvOS.h'])
     oc_exclude_dirs.extend(['ThirdResources','PulicHeader','AFNetworking', 'Masonry', 'YYModel', 'sdkFrameworks', "Resources",'ThirkLib','ThirdSrc'])
     oc_exclude_dirs_ref_modify = ['ThirkLib', "YYModel", "AFNetworking", "Resources",'ThirdSrc','archives','/build']
 
-    xcode_project_path = '/Users/ganyuanrong/KPlatform/KPlatform_iOS_OFS_V2/SDK_MAIN/KP_SDK.xcodeproj'
-    oc_modify_path = '/Users/ganyuanrong/KPlatform/KPlatform_iOS_OFS_V2/SDK_MAIN'
-    oc_all_path = '/Users/ganyuanrong/KPlatform/KPlatform_iOS_OFS_V2/'
+    xcode_project_path = '/Users/ganyuanrong/Downloads/mwsdk_ios_vn_v4/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
+    oc_modify_path = '/Users/ganyuanrong/Downloads/mwsdk_ios_vn_v4/GamaSDK_iOS_Integration/FLSDK'
+    oc_all_path = '/Users/ganyuanrong/Downloads/mwsdk_ios_vn_v4/GamaSDK_iOS_Integration/'
 
-    # oc_exclude_dirs = ['/Plat','/ThirdSrc']
-    # oc_exclude_dirs = ['/ThirdSrc']
-
-    # xcode_project_path = '/Users/ganyuanrong/ldyweb/DySdk_iOS_OFS_V2/SDK_MAIN/DY_SDK.xcodeproj'
-    # oc_modify_path = '/Users/ganyuanrong/ldyweb/DySdk_iOS_OFS_V2/SDK_MAIN/FLSDK'
-    # oc_all_path = '/Users/ganyuanrong/ldyweb/DySdk_iOS_OFS_V2/SDK_MAIN'
-
-    # xcode_project_path = '/Users/ganyuanrong/iOSProject/SDK-code/GameLoginKit.xcodeproj'
-    # oc_modify_path = '/Users/ganyuanrong/iOSProject/SDK-code/FunctionModule'
-    # oc_all_path = '/Users/ganyuanrong/iOSProject/SDK-code'
+    oc_exclude_dirs = ['/ThirdSrc']
     # modify_oc_class_name(oc_modify_path, xcode_project_path, oc_all_path, oc_exclude_dirs_ref_modify)
-
-
-    # oc_class_parser.parse('/Users/ganyuanrong/Desktop/AdDelegate.m')
-    #7.添加垃圾代码
-    var_exclude_dirs = ['AFNetworking', 'YYModel', 'ThirdSrc', 'ThirdResources']
-    var_exclude_files = []
-    # # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK/'
-    # src_path = '/Users/ganyuanrong/iOSProject/mwsdk_cfuse_v41/GamaSDK_iOS_Integration/FLSDK/'
-    # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/FLSDK'
-    # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v55/GamaSDK_iOS_Integration/FLSDK'
-    src_path = '/Users/ganyuanrong/iOSProject/DySdk_iOS_OFS_V1/SDK_MAIN/FLSDK/'
-    src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/FLSDK'
-
-    src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v6_v4/GamaSDK_iOS_Integration/FLSDK'
-    # src_path = '/Users/ganyuanrong/ldysdk/kofts/frameworks/runtime-src/Classes'
-
-    src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v6_v4/GamaSDK_iOS_Integration/FLSDK'
-
-    src_path = '/Users/ganyuanrong/ldyweb/DySdk_iOS_OFS_V2/SDK_MAIN'
-    src_path = '/Users/ganyuanrong/ldyweb/DySdk_iOS_OBS_APP_CN/SDK_MAIN/FLSDK'
-
-    # src_path = '/Users/ganyuanrong/ldysdk/kofts/frameworks/game_core'
-    # src_path = '/Users/ganyuanrong/ldysdk/kofts/frameworks/runtime-src/proj.ios_mac/ios/gamesrc' #
-
-    # add_code(src_path, var_exclude_dirs, var_exclude_files)
-
-    # xcode_project_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
-    # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn'
-    # modify_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_vn/GamaSDK_iOS_Integration/FLSDK'
-    #8.指定目录下面的目录加前缀
-    # changeXcodeProjectDir(xcode_project_path, src_path, modify_path, 'OPEN')
-    # 9.修改所有uuid
-    # xcode_project_path = '/Users/ganyuanrong/cpGames/vn_sdk_zkb/Unity-iPhone.xcodeproj'
-    # xcode_project_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/MW_SDK.xcodeproj'
-    # xcode_project_path = '/Users/ganyuanrong/iOSProject/SDK-code/GameLoginKit.xcodeproj'
-    xcode_project_path = '/Users/ganyuanrong/ldyweb/DySdk_iOS_OFS_V2/SDK_MAIN/DY_SDK.xcodeproj'
-    xcode_project_path = '/Users/ganyuanrong/ldysdk/kofts/frameworks/runtime-src/proj.ios_mac/game.xcodeproj'
-    # changeXcodeProjectUUid(xcode_project_path)
-    #11.修改函数顺序
-
-
-    # 12.修改内部属性和内部变量
-    # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK'
-    # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_tw5_v3/GamaSDK_iOS_Integration/FLSDK'
-    # src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v6_v4/GamaSDK_iOS_Integration/FLSDK'
-    src_path = '/Users/ganyuanrong/KPlatform/KPlatform_iOS/SDK_MAIN/MainModel'
-    src_path = '/Users/ganyuanrong/ldyweb/DySdk_iOS_OFS_V2/SDK_MAIN/FLSDK'
-    src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_en_v4_4/GamaSDK_iOS_Integration/FLSDK'
-    src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v3_111/GamaSDK_iOS_Integration/FLSDK'
-    oc_exclude_files = []
-    oc_exclude_dirs = []
-    oc_exclude_files.extend(
-        ['AppDelegate.h', 'MWSDK.h', 'PayData.h', 'LoginData.h', 'AccountModel.h', 'CreateOrderResp.h','UnityAppController.h','UnityAppController+Rendering.h'
-         ,'UnityViewControllerBase+iOS.h','UnityViewControllerBase+tvOS.h','UnityViewControllerBase.h','UnityView.h','UnityView+iOS.h','UnityView+tvOS.h'])
-    oc_exclude_dirs.extend(['AFNetworking', 'Masonry', 'YYModel', 'Model', 'sdkFrameworks', "Resources",'ThirkLib','ThirdSrc'])
-    # oc_class_parser.parse_oc_property(src_path, oc_exclude_dirs, oc_exclude_files)
-
-    #================================
-    # src_path = '/Users/ganyuanrong/iOSProject/SDK-code'
-    # bundle_path = '/Users/ganyuanrong/iOSProject/SDK-code/Resource'
-    # xcodeproj_path = '/Users/ganyuanrong/iOSProject/SDK-code/GameLoginKit.xcodeproj'
-    # # oc_class_parser.hand_sdk_bundle_res(xcodeproj_path, src_path, bundle_path, ['ThirdResources'],[])
-    #
-    # name_tra_path = '/Users/ganyuanrong/Downloads/kmm.log'
-    # xx_data = file_util.read_file_data(name_tra_path)
-    # result = re.findall(r'\w+_MMMethodMMM', xx_data)
-    #
-    # has_arr = []
-    # if result and len(result) > 0:
-    #
-    #     for ar in result:
-    #         if ar not in has_arr:
-    #             has_arr.append(ar)
-    #             print '#define %s       %s' % (ar, ar)
-
 
     print 'end'
