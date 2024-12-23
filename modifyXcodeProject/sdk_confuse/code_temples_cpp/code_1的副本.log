@@ -6,5 +6,7 @@
             ppppp1_ppppp = ppppp1_ppppp + int3_int;
             ppppp2_ppppp = bool2_bool;
         }
+
+        CodeTemplate1_CodeTemplate
         
         

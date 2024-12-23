@@ -104,7 +104,7 @@ def makedir(dir):
 
 if __name__ == '__main__':
     # / Users / gan / CocosProjects / Game / Phone316Game / androidciphercode
-    makedir(os.path.join('/Users/gan/CocosProjects/Game/Phone316Game /', 'androidciphercode','base'))
+    # makedir(os.path.join('/Users/gan/CocosProjects/Game/Phone316Game /', 'androidciphercode','base'))
     # a = sys.argv
     # if len(a) >= 2:
     #
@@ -122,3 +122,4 @@ if __name__ == '__main__':
     #         makedir(os.path.join(scriptDir, 'ciphercode'))
     #     else:
     #         print '出错。。。'
+    print md5hex('kplat20240717-zh-Hant')

@@ -384,8 +384,7 @@ def remove_unuse_resource(src_path, res_path):
             del_res_tag(src_path, 'string', xml_tag_name)
 
     for xml_tag_name in color_aar:
-        if 'manageriseiedd_acceptencyyzjf' == xml_tag_name:
-            pass
+
         is_use = check_res_tag_use(src_path, 'color', xml_tag_name)
         if is_use is False:
             print 'no user res tag:' + xml_tag_name
@@ -804,7 +803,7 @@ if __name__ == '__main__':
     # remove_unuse_resource(src_path, res_path)
 
     # 1.修改res下面的文件名字
-    # change_res_file_name(src_path, src_path, "aptsdk_")
+    # change_res_file_name(src_path, src_path, "kkayumm_")
 
     #2.修改资源 id值
     # change_id_tag_file_name(src_path, res_path)
@@ -837,7 +836,7 @@ if __name__ == '__main__':
     # jiamiIOSFile()
     # addLajiFile()
 
-    change_aaa('/Users/ganyuanrong/AndroidProject/martial_gp2_sdk_code/quickgamesdk/src/main/java/com/apter/sdk/http/HttpConstant.java')
+    # change_aaa('/Users/ganyuanrong/AndroidProject/martial_gp2_sdk_code/quickgamesdk/src/main/java/com/apter/sdk/http/HttpConstant.java')
 
     print 'end'
 

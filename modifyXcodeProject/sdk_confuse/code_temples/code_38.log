@@ -1,0 +1,13 @@
+            NSMutableArray *ppppp1_ppppp = [NSMutableArray array];  //temple38
+            [ppppp1_ppppp addObject:@"ppppp2_ppppp"];
+            if (ppppp1_ppppp.count numcop1_numcop int1_int){
+                __asm__("NOP");
+            }else{
+                char ppppp3_ppppp[] = {char_value_char};
+                if(ppppp3_ppppp[0] numcop1_numcop int1_int){
+                    __asm__("NOP");
+                }else{
+                    __asm__("NOP");
+                }
+            }
+            

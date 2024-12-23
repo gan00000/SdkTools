@@ -638,6 +638,19 @@ def replace_code_placeholder(code_temple_index, code_temple, condition_var, agai
                 val1 = '@"' + w1 + '_' + w2 + '", '
             arr_content = arr_content + val1
         code_temple = code_temple.replace('array_value_array', arr_content)
+    if 'char_value_char' in code_temple:
+        arr_count = random.randint(1, 15)
+        arr_content = ''
+        for i in range(arr_count):
+            val1 = ''
+            vv = random.randint(-120, 120)
+            v = str(vv)
+            if i == arr_count - 1:
+                val1 = v
+            else:
+                val1 = v + ','
+            arr_content = arr_content + val1
+        code_temple = code_temple.replace('char_value_char', arr_content)
 
     temple_list = re.findall(r'temple_code\d+_temple', code_temple)  # 需要插入代码块 temple_code1_temple
     for codetemp in temple_list:

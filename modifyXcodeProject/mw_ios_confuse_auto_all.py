@@ -1,4 +1,5 @@
 #coding=utf-8
+import glob
 import imp
 import shutil
 import string
@@ -126,6 +127,7 @@ def modify_oc_class_name(oc_path, xcode_project_path, oc_all_path, oc_exclude_di
     if os.path.exists(oc_path):
         list_dirs = os.walk(oc_path)
         old_map_new_content = ''
+        class_dic = {}
         for root, dirs, files in list_dirs:
             for file_name in files:
 
@@ -180,6 +182,11 @@ def modify_oc_class_name(oc_path, xcode_project_path, oc_all_path, oc_exclude_di
                         elif file_name_no_extension.endswith('Cell'):
                             new_word = new_word + 'Cell'
 
+                        has_same_class = 0
+                        if class_dic.has_key(file_name_no_extension):#已存在一样的类进行过修改
+                            new_word = class_dic[file_name_no_extension]
+                            has_same_class = 1
+
                         if '+' in file_name:  # 分类
                             fia = file_name_no_extension.split('+')
                             file_new_name = fia[0] + "+" + new_word + file_extension
@@ -187,6 +194,7 @@ def modify_oc_class_name(oc_path, xcode_project_path, oc_all_path, oc_exclude_di
                         else:
                             file_new_name = new_word + file_extension
                             header_file_new_name = new_word + '.h'
+
 
                         file_old_path = os.path.join(root, file_name)
                         file_new_path = os.path.join(root, file_new_name)
@@ -231,6 +239,10 @@ def modify_oc_class_name(oc_path, xcode_project_path, oc_all_path, oc_exclude_di
 
                         handle_file_count = handle_file_count + 1
                         print '处理完成' + file_name
+                        # 保存映射关系
+                        if has_same_class == 0:
+                            class_dic[file_name_no_extension] = file_new_name_no_extension
+                        # 记录映射关系
                         old_map_new_content = old_map_new_content + file_name_no_extension + ' -------> ' + file_new_name_no_extension + '\n'
 
         wite_data_to_file(project_content_path, project_content)
@@ -450,7 +462,7 @@ def changeImageNameForDefindHeader(bundle_path,header_path, is_encode_png):
                         file_util.wite_data_to_file_noencode(file_new_path, aes_encrypt_result)
 
                         # 删除文件
-                        # os.remove(file_path)
+                        os.remove(file_old_path)
 
                     else:
                         image_name_new = image_name_new_no_extension + file_extension
@@ -471,6 +483,8 @@ def changeImageNameForDefindHeader(bundle_path,header_path, is_encode_png):
 
         if isChange == 1:
             wite_data_to_file(header_path, header_data)
+
+        return destination_bundle
 
 def add_code(src_dir_path,exclude_dirs,exclude_files):#添加垃圾代码
 
@@ -617,23 +631,70 @@ if __name__ == '__main__':
         oc_class_parser.code_temples.append(code_data)
 
 
-    des_key = "KxnKoaixNNm77aa"
-    des_iv = "Jkakixxdh66att"
-    xcode_project_path = "/Users/ganyuanrong/iOSProject/flsdk_ios_v3_111/GamaSDK_iOS_Integration/MW_SDK.xcodeproj"
-    project_obs_src_path = "/Users/ganyuanrong/iOSProject/flsdk_ios_v3_111/GamaSDK_iOS_Integration/FLSDK"
-    project_all_src_path = "/Users/ganyuanrong/iOSProject/flsdk_ios_v3_111/GamaSDK_iOS_Integration/"
-    project_dir_path = "/Users/ganyuanrong/iOSProject/flsdk_ios_v3_111/GamaSDK_iOS_Integration/"
-    res_bundle_path = "/Users/ganyuanrong/iOSProject/flsdk_ios_v3_111/GamaSDK_iOS_Integration/Resources/V3/KxnKoaixNNm77aaRes.bundle"
-    #start
+    des_key = "TVXQAhiP9tahMPx"
+    des_iv = "HDgn0LhLdOZBWkT"
+    sdk_verson = 'TH' #设置版本
+    need_sync_source = 1    #是否同步源码，复制
+
+    xcode_project_path = "/Users/ganyuanrong/iOSProject/flsdk_ios_p_majia/GamaSDK_iOS_Integration/MW_SDK.xcodeproj"
+    project_obs_src_path = "/Users/ganyuanrong/iOSProject/flsdk_ios_p_majia/GamaSDK_iOS_Integration/FLSDK"
+    project_all_src_path = "/Users/ganyuanrong/iOSProject/flsdk_ios_p_majia/GamaSDK_iOS_Integration/"
+    project_dir_path = "/Users/ganyuanrong/iOSProject/flsdk_ios_p_majia/GamaSDK_iOS_Integration/"
+    # res_bundle_path = "/Users/ganyuanrong/iOSProject/flsdk_ios_p_majia/GamaSDK_iOS_Integration/Resources/TH/SDKResourcesTH.bundle"
+    res_bundle_path = "/Users/ganyuanrong/iOSProject/flsdk_ios_p_majia/GamaSDK_iOS_Integration/Resources/%s/SDKResources%s.bundle"
+    res_bundle_path = res_bundle_path % (sdk_verson, sdk_verson)
+
+
+    # 定义源目录和目标目录
+    source_dir = '/Users/ganyuanrong/iOSProject/flsdk_ios/'  # 替换为你的源目录
+    destination_dir = '/Users/ganyuanrong/iOSProject/flsdk_ios_p_majia/'  # 替换为你的目标目录
+
+
+    # start
     pc = PrpCrypt(des_key, des_iv)
 
-    # 1.1. 修改已经定义好的defind图片名称
+    # 复制整个目录，包括所有子目录和文件
+    if need_sync_source == 1:
+        file_util.copy_all_to_destination(source_dir, destination_dir)
+
+
+        # 1.1. 修改已经定义好的defind图片名称
     # path_bundle = '/Users/ganyuanrong/ldyweb/DySdk_iOS_OFS_V2/SDK_MAIN/Resources/KR/SDKResourcesKR.bundle'
     # path_imageNameHeader = '/Users/ganyuanrong/ldyweb/DySdk_iOS_OFS_V2/SDK_MAIN/obfuscation/imageNameHeader.h'
 
     #=======加密图片========
     path_imageNameHeader = os.path.join(project_dir_path, 'obfuscation/imageNameHeader.h')
-    changeImageNameForDefindHeader(res_bundle_path, path_imageNameHeader, True)
+    new_bundle_path = changeImageNameForDefindHeader(res_bundle_path, path_imageNameHeader, True)
+    if new_bundle_path:
+        if os.path.exists(new_bundle_path):
+
+            # 获取所有后缀为.txt的文件
+            txt_files = glob.glob(os.path.join(new_bundle_path, '*.txt'))
+            # 删除每个.txt文件
+            for file22 in txt_files:
+                try:
+                    os.remove(file22)
+                except Exception as e:
+                    print e
+
+            list_dirs = os.walk(new_bundle_path)
+            for root, dirs, files in list_dirs:
+
+                for file_name in files:
+
+                    if file_name.endswith('.json'):
+
+                        file_name_no_extension = os.path.splitext(file_name)[0]
+                        file_extension = os.path.splitext(file_name)[1]
+                        file_path = os.path.join(root, file_name)
+                        json_md5_name = md5util.md5hex(des_key + '-' + file_name_no_extension) + '.txt'
+                        json_des_content = pc.aes_encrypt_base64(file_util.read_file_data(file_path))
+                        file_util.wite_data_to_file_noencode(os.path.join(root, json_md5_name), json_des_content)
+                        # 删除文件
+                        try:
+                            os.remove(file_path)
+                        except e:
+                            print e
 
     #2. ======修改已经定义好的defind中的方法名称=========
     method_header_path = os.path.join(project_dir_path, 'obfuscation/codeObfuscationForMethodName.h') #'/Users/ganyuanrong/Downloads/mwsdk_ios_vn_v4/GamaSDK_iOS_Integration/obfuscation/codeObfuscationForMethodName.h'
@@ -675,7 +736,7 @@ if __name__ == '__main__':
     oc_exclude_dirs.extend(
         ['ThirdResources', 'PulicHeader', 'AFNetworking', 'Masonry', 'YYModel', 'sdkFrameworks', "Resources",
          'ThirkLib', 'ThirdSrc'])
-    oc_exclude_dirs_ref_modify = ['ThirkLib', "YYModel", "AFNetworking", "Resources", 'ThirdSrc', 'archives', '/build']
+    oc_exclude_dirs_ref_modify = ['ThirkLib', "YYModel", "AFNetworking", "/Resources", 'ThirdSrc', 'archives', '/build']
 
 
     oc_exclude_dirs = ['/ThirdSrc']

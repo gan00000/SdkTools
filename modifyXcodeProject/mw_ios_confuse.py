@@ -1911,7 +1911,7 @@ if __name__ == '__main__':
     src_path = '/Users/ganyuanrong/KPlatform/KPlatform_iOS/SDK_MAIN/MainModel'
     src_path = '/Users/ganyuanrong/ldyweb/DySdk_iOS_OFS_V2/SDK_MAIN/FLSDK'
     src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_en_v4_4/GamaSDK_iOS_Integration/FLSDK'
-    src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios_v3_111/GamaSDK_iOS_Integration/FLSDK'
+    src_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK'
     oc_exclude_files = []
     oc_exclude_dirs = []
     oc_exclude_files.extend(
@@ -1938,5 +1938,24 @@ if __name__ == '__main__':
     #             has_arr.append(ar)
     #             print '#define %s       %s' % (ar, ar)
 
+    # text_lines = file_util.read_file_data_for_line('/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/obfuscation/imageNameHeader.h')
+    # src_dir_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/Resources'
+    # aa = []
+    # for line in text_lines:
+    #     result = re.findall(r'#define {1,5}(\w+) +@"(\w+)"', line)
+    #     if result and len(result) == 1:
+    #         raw_file_name = result[0][0]
+    #         aa_file_name = result[0][1]
+    #         if os.path.exists(src_dir_path):
+    #             list_dirs = os.walk(src_dir_path)
+    #             for root, dirs, files in list_dirs:
+    #                 for file_name in files:
+    #                     file_path = os.path.join(root, file_name)
+    #                     if file_name == aa_file_name + '.png' and '.bundle' in file_path:
+    #                         file_path_raw = os.path.join(root, raw_file_name  + '.png')
+    #                         os.rename(file_path, file_path_raw)
+    #                         if raw_file_name not in aa:
+    #                             aa.append(raw_file_name)
+    #                             print '#define %s    @"%s"' % (raw_file_name, raw_file_name)
 
     print 'end'

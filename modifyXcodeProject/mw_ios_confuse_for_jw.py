@@ -2033,7 +2033,7 @@ if __name__ == '__main__':
     print 'firstsunnyltd=' + mPrpCrypt_new.aes_encrypt_base64('https://wden-sdk.firstsunnyltd.com/')
     # print 'add=' + mPrpCrypt_new.aes_encrypt_base64('0bf52185b3373bc00bd75b7d1b52f10e')
 
-    print mPrpCrypt_new.aes_decrypt_base64('LqmXL1Nf0NyS0zU8P6jjiQ==')
+    print mPrpCrypt_new.aes_decrypt_base64('N+lEwaD2i+GgWR6fhF9jiB0jkqhBb+5C1DMalijR5Ak+ujMnRajMbFoo9fquw8XI')
 
     # print md5util.md5hex('kinesloveule63_momentorium64.png')
     #

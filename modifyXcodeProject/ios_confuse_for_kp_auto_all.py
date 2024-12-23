@@ -1,4 +1,5 @@
 #coding=utf-8
+import glob
 import imp
 import shutil
 import string
@@ -450,7 +451,7 @@ def changeImageNameForDefindHeader(bundle_path,header_path, is_encode_png):
                         file_util.wite_data_to_file_noencode(file_new_path, aes_encrypt_result)
 
                         # 删除文件
-                        # os.remove(file_path)
+                        os.remove(file_old_path)
 
                     else:
                         image_name_new = image_name_new_no_extension + file_extension
@@ -471,6 +472,32 @@ def changeImageNameForDefindHeader(bundle_path,header_path, is_encode_png):
 
         if isChange == 1:
             wite_data_to_file(header_path, header_data)
+
+        if destination_bundle:
+            if os.path.exists(destination_bundle):
+
+                # 获取所有后缀为.txt的文件
+                txt_files = glob.glob(os.path.join(destination_bundle, '*.txt'))
+                # 删除每个.txt文件
+                for file22 in txt_files:
+                    try:
+                        os.remove(file22)
+                    except Exception as e:
+                        print e
+
+                list_dirs = os.walk(destination_bundle)
+                for root, dirs, files in list_dirs:
+
+                    for file_name in files:
+
+                        if file_name.endswith('.json'):
+                            file_name_no_extension = os.path.splitext(file_name)[0]
+                            file_extension = os.path.splitext(file_name)[1]
+                            file_path = os.path.join(root, file_name)
+                            json_md5_name = md5util.md5hex(mmm_key + '-' + file_name_no_extension) + '.txt'
+                            json_des_content = pc.aes_encrypt_base64(file_util.read_file_data(file_path))
+                            file_util.wite_data_to_file_noencode(os.path.join(root, json_md5_name), json_des_content)
+                            os.remove(file_path)
 
 def add_code(src_dir_path,exclude_dirs,exclude_files):#添加垃圾代码
 
@@ -617,8 +644,11 @@ if __name__ == '__main__':
         oc_class_parser.code_temples.append(code_data)
 
 
-    des_key = "Opxyu20241008KEY"
-    des_iv = "Opxyu20241008IV"
+    # des_key = "Gj7hTileRLg6dKEY"
+    # des_iv = "Gj7hTileRLg6dIV"
+    mmm_key = 'nBJWQliGOAFcX'
+    des_key = mmm_key + "KEY"
+    des_iv = mmm_key + "IV"
     xcode_project_path = "/Users/ganyuanrong/KPlatform/KPlatform_iOS_OFS_common/SDK_MAIN/KP_SDK.xcodeproj"
     project_obs_src_path = "/Users/ganyuanrong/KPlatform/KPlatform_iOS_OFS_common/SDK_MAIN/MainModel"
     project_all_src_path = "/Users/ganyuanrong/KPlatform/KPlatform_iOS_OFS_common/SDK_MAIN/"
@@ -675,6 +705,7 @@ if __name__ == '__main__':
          'UnityView.h', 'UnityView+iOS.h', 'UnityView+tvOS.h'])
 
     oc_exclude_dirs.extend(['ThirdResources', 'PulicHeader'])
+    # oc_exclude_dirs.extend(['/Plat']) #马甲包不需要
 
     oc_exclude_dirs_ref_modify = ['ThirkLib', "YYModel", "AFNetworking", "Resources", 'ThirdSrc', 'archives', '/build']
 
