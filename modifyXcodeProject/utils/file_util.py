@@ -66,7 +66,7 @@ def copy_all_to_destination(source_dir, destination_dir):
         try:
             if os.path.isdir(source_path):
                 # 复制目录
-                shutil.copytree(source_path, destination_path)
+                shutil.copytree(source_path, destination_path, symlinks=True)
                 # print(f'Copied directory: {source_path} to {destination_path}')
             else:
                 # 复制文件
