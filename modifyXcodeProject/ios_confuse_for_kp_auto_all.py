@@ -646,7 +646,7 @@ if __name__ == '__main__':
 
     # des_key = "Gj7hTileRLg6dKEY"
     # des_iv = "Gj7hTileRLg6dIV"
-    mmm_key = 'nBJWQliGOAFcX'
+    mmm_key = 'ySxHIenPhWfkp'
     des_key = mmm_key + "KEY"
     des_iv = mmm_key + "IV"
     xcode_project_path = "/Users/ganyuanrong/KPlatform/KPlatform_iOS_OFS_common/SDK_MAIN/KP_SDK.xcodeproj"

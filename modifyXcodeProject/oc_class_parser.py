@@ -421,7 +421,7 @@ def code_temp_call_method(mehtod, method_assess): #调用插入的函数
             if mehtod.methodIsPrivate == '+':
                 call_content = '\n\t' + mehtod.methodReturnType + ' ' + param_name + ' = [%s %s];\n' % (mehtod.class_name, mehtod.method_call)
         if len(call_content) > 0:
-            call_content = call_content + '\tif(%s){}\n' % param_name
+            call_content = call_content + '\tif(%s){ __asm__("NOP"); }\n' % param_name
     if len(call_content) > 0:
         call_content = replace_code_placeholder(-1, call_content, '')
     return call_content
@@ -446,14 +446,14 @@ def addCodeToSrcCode(code_method_temp_content, code_temple, insert_line_content,
                     aa_temple = 'temple_code%s_temple' % str(indexa)
                     call_property = 'self.%s = %s;\n\tif(%s){ \n%s\n }' % (property.propertyName, str(random.randint(1, 9999)), if_code, aa_temple)
                 else:
-                    call_property = 'self.%s = %s;\n\tif(%s){}' % (property.propertyName, str(random.randint(1, 9999)), if_code)
+                    call_property = 'self.%s = %s;\n\tif(%s){ __asm__("NOP"); }' % (property.propertyName, str(random.randint(1, 9999)), if_code)
             else:
                 abc = random.randint(1, 3)
                 if abc == 2:  # temple_code1_temple
                     aa_temple = 'temple_code%s_temple' % str(indexa)
                     call_property = '\tif(self.%s){\n%s\n}' % (property.propertyName, aa_temple)
                 else:
-                    call_property = '\tif(self.%s){}' % property.propertyName
+                    call_property = '\tif(self.%s){ __asm__("NOP");  }' % property.propertyName
 
             call_property_content = call_property_content + '\n\t' + call_property
 

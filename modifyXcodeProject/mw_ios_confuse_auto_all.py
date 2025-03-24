@@ -631,10 +631,11 @@ if __name__ == '__main__':
         oc_class_parser.code_temples.append(code_data)
 
 
-    des_key = "TVXQAhiP9tahMPx"
-    des_iv = "HDgn0LhLdOZBWkT"
-    sdk_verson = 'TH' #设置版本
+    des_key = "BJmDHJDsBZK4kUG"
+    des_iv = "Q7mWYiOtmAC4Fh7"
+    sdk_verson = 'VN' #设置版本
     need_sync_source = 1    #是否同步源码，复制
+    is_obs_jiekou = 0 #是否混淆对外接口, 0不混淆，1混淆
 
     xcode_project_path = "/Users/ganyuanrong/iOSProject/flsdk_ios_p_majia/GamaSDK_iOS_Integration/MW_SDK.xcodeproj"
     project_obs_src_path = "/Users/ganyuanrong/iOSProject/flsdk_ios_p_majia/GamaSDK_iOS_Integration/FLSDK"
@@ -726,20 +727,19 @@ if __name__ == '__main__':
 
 
     # 7.修改类名
-    oc_exclude_dirs.extend(['AFNetworking', 'Masonry', 'YYModel', 'sdkFrameworks', "Resources", 'ThirkLib', 'ThirdSrc'])
-    oc_exclude_dirs_ref_modify = ['ThirkLib', "AFNetworking", "Resources", 'ThirdSrc']
+    oc_exclude_dirs = []
+    oc_exclude_dirs.extend(['/AFNetworking', '/Masonry', '/YYModel', '/sdkFrameworks', "/Resources", '/ThirkLib', '/ThirdSrc'])
 
     oc_exclude_files.extend(
         ['AppDelegate.h', 'UnityAppController.h', 'UnityAppController+Rendering.h'
             , 'UnityViewControllerBase+iOS.h', 'UnityViewControllerBase+tvOS.h', 'UnityViewControllerBase.h',
          'UnityView.h', 'UnityView+iOS.h', 'UnityView+tvOS.h'])
-    oc_exclude_dirs.extend(
-        ['ThirdResources', 'PulicHeader', 'AFNetworking', 'Masonry', 'YYModel', 'sdkFrameworks', "Resources",
-         'ThirkLib', 'ThirdSrc'])
-    oc_exclude_dirs_ref_modify = ['ThirkLib', "YYModel", "AFNetworking", "/Resources", 'ThirdSrc', 'archives', '/build']
+    oc_exclude_dirs.extend(['/ThirdResources', '/PulicHeader'])
+    oc_exclude_dirs_ref_modify = ['/ThirkLib', "/YYModel", "/AFNetworking", "/Resources", '/ThirdSrc', '/archives', '/build']
 
+    if is_obs_jiekou == 0:
+        oc_exclude_dirs.extend(['/Plat'])
 
-    oc_exclude_dirs = ['/ThirdSrc']
     oc_exclude_files_ref_modify = ['MWStringHeaders.h', 'codeObfuscationForMethodName.h']
     modify_oc_class_name(project_obs_src_path, xcode_project_path, project_all_src_path, oc_exclude_dirs, oc_exclude_files,
                          oc_exclude_dirs_ref_modify, oc_exclude_files_ref_modify)

@@ -136,3 +136,9 @@ def generateIntArr(count):
         intArr.append(str(a_value))
 
     return intArr
+
+
+def capitalize_first_char(s):
+    if s:
+        return s[0].upper() + s[1:]
+    return s
