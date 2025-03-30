@@ -1122,11 +1122,15 @@ def find_string_tag(src_dir_path,exclude_dirs, exclude_strings):
                     if method_tag_results:
                         for xxxd in method_tag_results:
 
-                            if len(xxxd) <= 2:#小于3的去掉
+                            if len(xxxd) <= 6:#小于3的去掉
                                 continue
 
                             if xxxd in exclude_strings:
                                 continue
+
+                            if 'wwwww_tag_wwwww' in xxxd:
+                                continue
+
                             if '://' in xxxd:
                                 continue
                             if xxxd not in xxxresult:
@@ -1139,7 +1143,7 @@ def find_string_tag(src_dir_path,exclude_dirs, exclude_strings):
 
             xssss_vale = xssss[2 : len(xssss)-1]
 
-            if len(xssss_vale) <= 2:  # 小于3的去掉
+            if len(xssss_vale) <= 6:  # 小于3的去掉
                 continue
             if xssss_vale in exclude_strings:
                 continue
@@ -1555,6 +1559,47 @@ def change_pro_name_proheader(arc_path):
                 new_defind = str_line.replace(rrr, new_property)
                 print new_defind
 
+def find_pro_name_to_header(src_dir_path):
+
+    xxxresult = []
+    if os.path.exists(src_dir_path):
+        list_dirs = os.walk(src_dir_path)
+        for root, dirs, files in list_dirs:
+
+            for file_name in files:
+                if '.framework' in root or '.bundle' in root:
+                    continue
+
+                if file_name.endswith('.m') or file_name.endswith('.mm') or file_name.endswith('.h'):
+                    file_path = os.path.join(root, file_name)  # 头文件路径
+                    file_data = file_util.read_file_data(file_path)
+                    # tag_results = re.findall(r'@selector\((.+?)\)', file_data)
+
+                    tag_results = re.findall(r'@property.+? \*?(\w+_PRIROPERTY);', file_data)
+
+                    if tag_results:
+                        for xxxd in tag_results:
+                            if xxxd not in xxxresult:
+                                xxxresult.append(xxxd)
+
+    for xpro in xxxresult:##define name_tf_PRIROPERTY    alwaysiveMissionacity
+
+        set_xpro = 'set'+ word_util.capitalize_first_char(xpro)
+        get_xpro = 'get' + word_util.capitalize_first_char(xpro)
+
+        w1 = word_util.random_word_dong()
+        w2 = word_util.random_word_name()
+
+        new_pro = w1+w2.capitalize()
+        new_set_property = 'set' + word_util.capitalize_first_char(new_pro)
+        new_get_property = 'get' + word_util.capitalize_first_char(new_pro)
+
+        print '#define %s    %s' % (xpro, new_pro)
+        print '#define %s    %s' % ('_'+xpro, '_'+new_pro)
+
+        print '#define %s    %s' % (set_xpro, new_set_property)
+        print '#define %s    %s' % (get_xpro, new_get_property)
+
 
 def find_sepcil_tag_for_other_sdk(src_dir_path, tag_patter):
 
@@ -1829,9 +1874,10 @@ if __name__ == '__main__':
     # deleteComments(src_path, var_exclude_dirs, var_exclude_files)
 
     #用于查找字符使用def宏定义替换
-    var_exclude_dirs = ['AFNetworking', 'YYModel', 'ThirdSrc', 'ThirdResources','Common']
-    exclude_strings = ['OK','com',"%2ld",'YES','POST','UTF-8','SELF MATCHES %@','UIInputWindowController','<UIInputSetHostView','<UIInputSetContainerView',']','\\n\\n','\\n','\n','','%@','%d', '%ld', '%@-%@', 'true', 'false', 'txt', 'bundle', '.', 'plist', '#', 'USD','yyyy-MM-dd','%02x', '-', '%@(%d)', '+', '_', 'lproj', 'json', '%s', '?']
+    var_exclude_dirs = ['AFNetworking', 'YYModel', 'ThirdSrc', 'ThirdResources']
+    exclude_strings = ["text/json","-%s-:%@","CFBundleURLSchemes","%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x","%02x:%02x:%02x:%02x:%02x:%02x","CFBundleDisplayName","CFBundleVersion","CFBundleShortVersionString","CFBundleIdentifier","CFBundleName","00000000-","yyyy-MM-dd HH:mm:ss SS","kCFLocaleLanguageCodeKey","kCFLocaleCountryCodeKey","CFBundleURLName","CFBundleURLTypes","image/jpeg","application/x-www-form-urlencoded","Content-Type","text/javascript","application/json","text/html","text/plain","^.+@\\w+\\..+$", "#%@","%ldS", '%lds','OK','com',"%2ld",'YES','POST','UTF-8','SELF MATCHES %@','UIInputWindowController','<UIInputSetHostView','<UIInputSetContainerView',']','\\n\\n','\\n','\n','','%@','%d', '%ld', '%@-%@', 'true', 'false', 'txt', 'bundle', '.', 'plist', '#', 'USD','yyyy-MM-dd','%02x', '-', '%@(%d)', '+', '_', 'lproj', 'json', '%s', '?']
     # find_string_tag('/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK', var_exclude_dirs, exclude_strings)
+    # find_pro_name_to_header('/Users/ganyuanrong/KPlatform/KPlatform_iOS/SDK_MAIN/MainModel')
 
     #5. 加密字符串，上面查找
     # changeStringHeaderValue('/Users/ganyuanrong/KPlatform/KPlatform_iOS_OFS_V2/SDK_MAIN/obfuscation/MWStringHeaders.h')

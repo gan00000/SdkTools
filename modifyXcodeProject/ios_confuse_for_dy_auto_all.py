@@ -582,20 +582,37 @@ def change_pro_name_proheader(arc_path):
             if result:
 
                 rrr = result[0]
-                new_defind = ''
-                if rrr.startswith('_') and '' != pre_pro:
-                    new_property = new_property = '_' + pre_pro
-                elif rrr.startswith('set') and '' != pre_pro:
-                    new_property = new_property = 'set' + pre_pro.capitalize()
-                elif rrr.startswith('get') and '' != pre_pro:
-                    new_property = new_property = 'get' + pre_pro.capitalize()
+                if rrr.lower() in pre_pro.lower():
+                    pass
                 else:
                     new_property = word_util.random_property()
+                    #define  payStatusBlock_PRIROPERTY      officerature153Capitalate154
+                    new_defind = str_line.replace(rrr, new_property)
+                    content = content + new_defind + '\n'
+                    mdefind = '#define _%s      _%s' %(rrr, new_property)
+                    content = content + mdefind + '\n'
+                    set_defind = '#define %s      %s' % ('set' + rrr.capitalize(), 'set' + new_property.capitalize())
+                    content = content + set_defind + '\n'
+                    get_defind = '#define %s      %s' % ('get' + rrr.capitalize(), 'get' + new_property.capitalize())
+                    content = content + get_defind + '\n'
+
                     pre_pro = new_property
 
-                new_defind = str_line.replace(rrr, new_property)
-                print new_defind
-                content = content + new_defind + '\n'
+
+                # new_defind = ''
+                # if rrr.startswith('_') and '' != pre_pro:
+                #     new_property = new_property = '_' + pre_pro
+                # elif rrr.startswith('set') and '' != pre_pro:
+                #     new_property = new_property = 'set' + pre_pro.capitalize()
+                # elif rrr.startswith('get') and '' != pre_pro:
+                #     new_property = new_property = 'get' + pre_pro.capitalize()
+                # else:
+                #     new_property = word_util.random_property()
+                #     pre_pro = new_property
+
+                # new_defind = str_line.replace(rrr, new_property)
+                # print new_defind
+                # content = content + new_defind + '\n'
             else:
                 content = content + str_line + '\n'
         file_util.wite_data_to_file_noencode(arc_path, content)
@@ -644,16 +661,19 @@ if __name__ == '__main__':
         oc_class_parser.code_temples.append(code_data)
 
 
-    # des_key = "Gj7hTileRLg6dKEY"
-    # des_iv = "Gj7hTileRLg6dIV"
-    mmm_key = 'Pp2rEYaVZIc02Um'
+    mmm_key = 'TN8GVO3dXolhkeQ'
+    des_iv = 'sfb1FovZBBW3uB5'
     des_key = mmm_key       #mmm_key + "KEY"
-    des_iv = 'pf7OablEB8rcFrs'       #mmm_key + "IV"
-    xcode_project_path = "/Users/ganyuanrong/KPlatform/KPlatform_iOS_OFS_common/SDK_MAIN/KP_SDK.xcodeproj"
-    project_obs_src_path = "/Users/ganyuanrong/KPlatform/KPlatform_iOS_OFS_common/SDK_MAIN/MainModel"
-    project_all_src_path = "/Users/ganyuanrong/KPlatform/KPlatform_iOS_OFS_common/SDK_MAIN/"
-    project_dir_path = "/Users/ganyuanrong/KPlatform/KPlatform_iOS_OFS_common/SDK_MAIN/"
-    res_bundle_path = "/Users/ganyuanrong/KPlatform/KPlatform_iOS_OFS_common/SDK_MAIN/Resources/V5/kplat20240717res.bundle"
+    is_manzhan_app = True
+
+    xcode_project_path = "/Users/ganyuanrong/ldyweb/DySdk_iOS_OFS_V1/SDK_MAIN/DY_SDK.xcodeproj"
+    project_obs_src_path = "/Users/ganyuanrong/ldyweb/DySdk_iOS_OFS_V1/SDK_MAIN/FLSDK"
+    project_all_src_path = "/Users/ganyuanrong/ldyweb/DySdk_iOS_OFS_V1/SDK_MAIN/"
+    project_dir_path = "/Users/ganyuanrong/ldyweb/DySdk_iOS_OFS_V1/SDK_MAIN/"
+    if is_manzhan_app:
+        res_bundle_path = "/Users/ganyuanrong/ldyweb/DySdk_iOS_OFS_V1/SDK_MAIN/Resources/MZAPP/MZAPPRES.bundle"
+    else:
+        res_bundle_path = "/Users/ganyuanrong/ldyweb/DySdk_iOS_OFS_V1/SDK_MAIN/Resources/KR/SDKResourcesKR.bundle"
     #start
     pc = PrpCrypt(des_key, des_iv)
 
@@ -705,7 +725,7 @@ if __name__ == '__main__':
          'UnityView.h', 'UnityView+iOS.h', 'UnityView+tvOS.h'])
 
     oc_exclude_dirs.extend(['ThirdResources', 'PulicHeader'])
-    # oc_exclude_dirs.extend(['/Plat']) #马甲包不需要
+    oc_exclude_dirs.extend(['/Plat']) #马甲包不需要
 
     oc_exclude_dirs_ref_modify = ['ThirkLib', "YYModel", "AFNetworking", "Resources", 'ThirdSrc', 'archives', '/build']
 
