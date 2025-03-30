@@ -588,7 +588,7 @@ def change_pro_name_proheader(arc_path):
                 else:
                     new_property = word_util.random_property()
                     #define  payStatusBlock_PRIROPERTY      officerature153Capitalate154
-                    new_defind = str_line.replace(defind_value, new_property)
+                    new_defind = '#define %s      %s' %(defind_name, new_property)  #str_line.replace(defind_value, new_property)
                     content = content + new_defind + '\n'
                     mdefind = '#define _%s      _%s' %(defind_name, new_property)
                     content = content + mdefind + '\n'
