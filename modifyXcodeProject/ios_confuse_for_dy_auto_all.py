@@ -578,25 +578,26 @@ def change_pro_name_proheader(arc_path):
         pre_pro = ''
         for str_line in str_lines:
             str_line = str_line.replace('\n','')
-            result = re.findall(r'#define +\w+(?:_MMMPRO|_PRIROPERTY|_IMPLVAR) +(\w+)', str_line)
+            result = re.findall(r'#define +(\w+_MMMPRO|\w+_PRIROPERTY|\w+_IMPLVAR) +(\w+)', str_line)
             if result:
 
-                rrr = result[0]
-                if rrr.lower() in pre_pro.lower():
+                defind_name = result[0][0]
+                defind_value = result[0][1]
+                if pre_pro != '' and pre_pro.lower() in defind_name.lower():
                     pass
                 else:
                     new_property = word_util.random_property()
                     #define  payStatusBlock_PRIROPERTY      officerature153Capitalate154
-                    new_defind = str_line.replace(rrr, new_property)
+                    new_defind = str_line.replace(defind_value, new_property)
                     content = content + new_defind + '\n'
-                    mdefind = '#define _%s      _%s' %(rrr, new_property)
+                    mdefind = '#define _%s      _%s' %(defind_name, new_property)
                     content = content + mdefind + '\n'
-                    set_defind = '#define %s      %s' % ('set' + rrr.capitalize(), 'set' + new_property.capitalize())
+                    set_defind = '#define %s      %s' % ('set' + word_util.capitalize_first_char(defind_name), 'set' + word_util.capitalize_first_char(new_property))
                     content = content + set_defind + '\n'
-                    get_defind = '#define %s      %s' % ('get' + rrr.capitalize(), 'get' + new_property.capitalize())
+                    get_defind = '#define %s      %s' %  ('get' + word_util.capitalize_first_char(defind_name), 'get' + word_util.capitalize_first_char(new_property))
                     content = content + get_defind + '\n'
 
-                    pre_pro = new_property
+                    pre_pro = defind_name
 
 
                 # new_defind = ''
