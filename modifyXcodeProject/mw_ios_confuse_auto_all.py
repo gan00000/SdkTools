@@ -565,24 +565,27 @@ def change_pro_name_proheader(arc_path):
         pre_pro = ''
         for str_line in str_lines:
             str_line = str_line.replace('\n','')
-            result = re.findall(r'#define +\w+(?:_MMMPRO|_PRIROPERTY|_IMPLVAR) +(\w+)', str_line)
+            result = re.findall(r'#define +(\w+_MMMPRO|\w+_PRIROPERTY|\w+_IMPLVAR) +(\w+)', str_line)
             if result:
 
-                rrr = result[0]
-                new_defind = ''
-                if rrr.startswith('_') and '' != pre_pro:
-                    new_property = new_property = '_' + pre_pro
-                elif rrr.startswith('set') and '' != pre_pro:
-                    new_property = new_property = 'set' + pre_pro.capitalize()
-                elif rrr.startswith('get') and '' != pre_pro:
-                    new_property = new_property = 'get' + pre_pro.capitalize()
+                defind_name = result[0][0]
+                defind_value = result[0][1]
+                if pre_pro != '' and pre_pro.lower() in defind_name.lower():
+                    pass
                 else:
                     new_property = word_util.random_property()
-                    pre_pro = new_property
+                    #define  payStatusBlock_PRIROPERTY      officerature153Capitalate154
+                    new_defind = '#define %s      %s' %(defind_name, new_property)  #str_line.replace(defind_value, new_property)
+                    content = content + new_defind + '\n'
+                    mdefind = '#define _%s      _%s' %(defind_name, new_property)
+                    content = content + mdefind + '\n'
+                    set_defind = '#define %s      %s' % ('set' + word_util.capitalize_first_char(defind_name), 'set' + word_util.capitalize_first_char(new_property))
+                    content = content + set_defind + '\n'
+                    get_defind = '#define %s      %s' %  ('get' + word_util.capitalize_first_char(defind_name), 'get' + word_util.capitalize_first_char(new_property))
+                    content = content + get_defind + '\n'
 
-                new_defind = str_line.replace(rrr, new_property)
-                print new_defind
-                content = content + new_defind + '\n'
+                    pre_pro = defind_name
+
             else:
                 content = content + str_line + '\n'
         file_util.wite_data_to_file_noencode(arc_path, content)
@@ -631,9 +634,9 @@ if __name__ == '__main__':
         oc_class_parser.code_temples.append(code_data)
 
 
-    des_key = "BJmDHJDsBZK4kUG"
-    des_iv = "Q7mWYiOtmAC4Fh7"
-    sdk_verson = 'VN' #设置版本
+    des_key = "P6i7V0zHtd9f3q2p"
+    des_iv = "7P9EbitplDxLWWYx"
+    sdk_verson = 'V5' #设置版本
     need_sync_source = 1    #是否同步源码，复制
     is_obs_jiekou = 0 #是否混淆对外接口, 0不混淆，1混淆
 

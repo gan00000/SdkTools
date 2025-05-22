@@ -4,6 +4,7 @@ import string
 import sys
 import uuid
 
+from modifyXcodeProject import cpp_code_util
 from modifyXcodeProject.model import PropertyInfo
 from modifyXcodeProject.model.MethodInfo import MethodInfo
 from modifyXcodeProject.utils import file_util, word_util
@@ -33,26 +34,26 @@ numbers_params_type = ['float', 'int', 'long', 'NSInteger', 'CGFloat']
 
 #找出方法名字，修改方法名
 def create_operation_expression(rightVar):
-    value1 = random.randint(1, 999)
-    content = str(value1)
-    operation_count = random.randint(1, 5)
-    # if (operation_count == 0):
-    #     return content
-    for c in range(operation_count):
-        operation_type = operation_arr[random.randint(0, len(operation_arr) -1)]
-        content = content + ' ' + operation_type + ' ' + str(random.randint(1, 999))
-    operation_type = operation_arr[random.randint(0, len(operation_arr) - 2)]
-    content = rightVar + ' ' + operation_type + ' ' + content
-    return content
+    # value1 = random.randint(1, 999)
+    # content = str(value1)
+    # operation_count = random.randint(1, 5)
+    # # if (operation_count == 0):
+    # #     return content
+    # for c in range(operation_count):
+    #     operation_type = operation_arr[random.randint(0, len(operation_arr) -1)]
+    #     content = content + ' ' + operation_type + ' ' + str(random.randint(1, 999))
+    # operation_type = operation_arr[random.randint(0, len(operation_arr) - 2)]
+    # content = rightVar + ' ' + operation_type + ' ' + content
+    return cpp_code_util.create_operation_expression(rightVar)
 
 def create_case_expression(leftVar, rightVar):
     case_count = random.randint(1, 16)
     content = ''
     case_value_aar = []
     for c in range(case_count):
-        case_value = random.randint(-100, 999)
+        case_value = random.randint(-20, 20)
         while case_value in case_value_aar:
-            case_value = random.randint(-100, 999)
+            case_value = random.randint(-20, 20)
         # print case_value
         ex = create_operation_expression(rightVar)
         if ex:
@@ -171,7 +172,7 @@ def createMehtodTemp(method_access, ref_class_list):#ref_class_list为该类中�
             w_inedx = random.randint(0, len(string.letters) - 1)
             waa = string.letters[w_inedx] + '_' + str(w_inedx)
             if method_return_type in numbers_params_type or method_return_type == 'BOOL':
-                return_content = '\n\t%s %s = %s;\n' % (method_return_type, waa, str(random.randint(0, 99999)))
+                return_content = '\n\t%s %s = %s;\n' % (method_return_type, waa, str(random.randint(0, 999)))
                 return_content = return_content + '\treturn ' + waa + ';\n'
 
             elif method_return_type == 'NSString *':

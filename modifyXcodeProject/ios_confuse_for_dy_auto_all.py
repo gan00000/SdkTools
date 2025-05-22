@@ -599,21 +599,6 @@ def change_pro_name_proheader(arc_path):
 
                     pre_pro = defind_name
 
-
-                # new_defind = ''
-                # if rrr.startswith('_') and '' != pre_pro:
-                #     new_property = new_property = '_' + pre_pro
-                # elif rrr.startswith('set') and '' != pre_pro:
-                #     new_property = new_property = 'set' + pre_pro.capitalize()
-                # elif rrr.startswith('get') and '' != pre_pro:
-                #     new_property = new_property = 'get' + pre_pro.capitalize()
-                # else:
-                #     new_property = word_util.random_property()
-                #     pre_pro = new_property
-
-                # new_defind = str_line.replace(rrr, new_property)
-                # print new_defind
-                # content = content + new_defind + '\n'
             else:
                 content = content + str_line + '\n'
         file_util.wite_data_to_file_noencode(arc_path, content)

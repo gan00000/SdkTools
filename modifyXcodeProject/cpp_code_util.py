@@ -29,7 +29,7 @@ cpp_base_type = ['int', 'bool', 'void', 'int32_t', 'int64_t','double','float']
 
 #找出方法名字，修改方法名
 def create_operation_expression(rightVar):
-    value1 = random.randint(1, 50)
+    value1 = random.randint(1, 20)
     content = str(value1)
     operation_count = random.randint(1, 5)
     # if (operation_count == 0):
@@ -37,9 +37,9 @@ def create_operation_expression(rightVar):
     for c in range(operation_count):
         operation_type = operation_arr[random.randint(0, len(operation_arr) -1)]
         if operation_type == '*':
-            content = content + ' ' + operation_type + ' ' + str(random.randint(-50, 50))
+            content = content + ' ' + operation_type + ' ' + str(round(random.uniform(0, 2), 1))
         else:
-            content = content + ' ' + operation_type + ' ' + str(random.randint(1, 999))
+            content = content + ' ' + operation_type + ' ' + str(random.randint(1, 30))
     operation_type = operation_arr[random.randint(0, len(operation_arr) - 2)]
     content = rightVar + ' ' + operation_type + ' ' + content
     return content
@@ -55,10 +55,10 @@ def create_operation_expression_compare2(rightVar, m_value):
     # left_s = create_operation_expression(rightVar)
     bijiao_s = operation_bijiao_arr[random.randint(0, len(operation_bijiao_arr) - 1)] #比较符号
     if bijiao_s == '>' or bijiao_s == '==' or bijiao_s == '>=':
-        right_value = m_value + random.randint(1, 9999)
+        right_value = m_value + random.randint(1, 99)
         content = rightVar + ' ' + bijiao_s + ' ' + str(right_value)
     elif bijiao_s == '<' or bijiao_s == '<=':
-        right_value = m_value - random.randint(1, 9999)
+        right_value = m_value - random.randint(1, 99)
         content = rightVar + ' ' + bijiao_s + ' ' + str(right_value)
     elif bijiao_s == '!=' or bijiao_s == '<=':
         right_value = m_value
@@ -76,7 +76,7 @@ def cpp_code_auto_create1():
     var_arr.append(var1)
 
     type_var = numbers_params_type[random.randint(0, len(numbers_params_type) - 1)]
-    rig_value = random.randint(1, 9999)
+    rig_value = random.randint(1, 50)
     content = '%s %s = %s;  //commontemple ififif 111\n' % (type_var, var1, str(rig_value))
     if_count = random.randint(1, 12)
     for i in range(if_count):
@@ -85,7 +85,7 @@ def cpp_code_auto_create1():
         var3 = lett + '_' + var3
 
         type_var2 = numbers_params_type[random.randint(0, len(numbers_params_type) - 1)]
-        content = content + '\n%s %s = %s;' % (type_var2, var3, str(random.randint(1, 999)))
+        content = content + '\n%s %s = %s;' % (type_var2, var3, str(random.randint(1, 20)))
         content = content + '\nif(%s){\n' % (create_operation_expression_compare(var1))
         # var2 = word_util.random_1words_not_same_inarr(var_arr)
         content2 = '\t%s = %s;' % (var3, create_operation_expression(var1))
@@ -111,7 +111,7 @@ def cpp_code_auto_create2():
 
     var_arr.append(var1)
     type_var1 = numbers_params_type[random.randint(0, len(numbers_params_type) - 1)]
-    rig_value = random.randint(1, 9999)
+    rig_value = random.randint(1, 30)
     content = '%s %s = %s;  //commontemple ififif 222\n' % (type_var1, var1, str(rig_value))
     # content = content + '\nif(%s){\n' % (create_operation_expression_compare(var1))
     # var2 = word_util.random_1words_not_same_inarr(var_arr)
@@ -173,8 +173,8 @@ def cpp_switch_code():
 
     type_var1 = 'int'#numbers_params_type[random.randint(0, len(numbers_params_type) - 1)]
     type_var2 = numbers_params_type[random.randint(0, len(numbers_params_type) - 1)]
-    content = '%s %s = %s;\n' % (type_var1, var1, str(random.randint(1, 999)))
-    content = content + '%s %s = %s;\n' % (type_var2, var2, str(random.randint(1, 999)))
+    content = '%s %s = %s;\n' % (type_var1, var1, str(random.randint(1, 99)))
+    content = content + '%s %s = %s;\n' % (type_var2, var2, str(random.randint(1, 99)))
     switch_content = 'switch (ppppp1_ppppp) {\n' \
     '   case_content_case' \
     '   default:\n' \
