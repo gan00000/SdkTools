@@ -634,11 +634,11 @@ if __name__ == '__main__':
         oc_class_parser.code_temples.append(code_data)
 
 
-    des_key = "P6i7V0zHtd9f3q2p"
-    des_iv = "7P9EbitplDxLWWYx"
+    des_key = "binSIcWVUH1RoIIb"
+    des_iv = "brSlz3avQI19iHSp"
     sdk_verson = 'V5' #设置版本
     need_sync_source = 1    #是否同步源码，复制
-    is_obs_jiekou = 0 #是否混淆对外接口, 0不混淆，1混淆
+    is_obs_jiekou = 1 #是否混淆对外接口, 0不混淆，1混淆
 
     xcode_project_path = "/Users/ganyuanrong/iOSProject/flsdk_ios_p_majia/GamaSDK_iOS_Integration/MW_SDK.xcodeproj"
     project_obs_src_path = "/Users/ganyuanrong/iOSProject/flsdk_ios_p_majia/GamaSDK_iOS_Integration/FLSDK"

@@ -647,19 +647,17 @@ if __name__ == '__main__':
         oc_class_parser.code_temples.append(code_data)
 
 
-    mmm_key = 'WH5aovgW1CIviiUC'
-    des_iv = 'Ja1XSzqQuK3b5lfZ'
+    # des_key = "Gj7hTileRLg6dKEY"
+    # des_iv = "Gj7hTileRLg6dIV"
+    mmm_key = 'hASuzDaQwPGyOOpL'
     des_key = mmm_key       #mmm_key + "KEY"
-    is_manzhan_app = False
-
-    xcode_project_path = "/Users/ganyuanrong/ldyweb/DySdk_iOS_OFS_V1/SDK_MAIN/DY_SDK.xcodeproj"
-    project_obs_src_path = "/Users/ganyuanrong/ldyweb/DySdk_iOS_OFS_V1/SDK_MAIN/FLSDK"
-    project_all_src_path = "/Users/ganyuanrong/ldyweb/DySdk_iOS_OFS_V1/SDK_MAIN/"
-    project_dir_path = "/Users/ganyuanrong/ldyweb/DySdk_iOS_OFS_V1/SDK_MAIN/"
-    if is_manzhan_app:
-        res_bundle_path = "/Users/ganyuanrong/ldyweb/DySdk_iOS_OFS_V1/SDK_MAIN/Resources/MZAPP/MZAPPRES.bundle"
-    else:
-        res_bundle_path = "/Users/ganyuanrong/ldyweb/DySdk_iOS_OFS_V1/SDK_MAIN/Resources/KR/SDKResourcesKR.bundle"
+    des_iv = 'YhxPIvv6s2iWCKXm'       #mmm_key + "IV"
+    ofs_Plat = False
+    xcode_project_path = "/Users/ganyuanrong/D2Plat/D2Patform_ios_jiami/SDK_MAIN/KP_SDK.xcodeproj"
+    project_obs_src_path = "/Users/ganyuanrong/D2Plat/D2Patform_ios_jiami/SDK_MAIN/MainModel"
+    project_all_src_path = "/Users/ganyuanrong/D2Plat/D2Patform_ios_jiami/SDK_MAIN/"
+    project_dir_path = "/Users/ganyuanrong/D2Plat/D2Patform_ios_jiami/SDK_MAIN/"
+    res_bundle_path = "/Users/ganyuanrong/D2Plat/D2Patform_ios_jiami/SDK_MAIN/Resources/V5/kplat20240717res.bundle"
     #start
     pc = PrpCrypt(des_key, des_iv)
 
@@ -711,7 +709,9 @@ if __name__ == '__main__':
          'UnityView.h', 'UnityView+iOS.h', 'UnityView+tvOS.h'])
 
     oc_exclude_dirs.extend(['ThirdResources', 'PulicHeader'])
-    oc_exclude_dirs.extend(['/Plat']) #马甲包不需要
+
+    if ofs_Plat == False:
+        oc_exclude_dirs.extend(['/Plat']) #马甲包不需要
 
     oc_exclude_dirs_ref_modify = ['ThirkLib', "YYModel", "AFNetworking", "Resources", 'ThirdSrc', 'archives', '/build']
 
