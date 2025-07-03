@@ -1,6 +1,7 @@
 #coding=utf-8
 import base64
 import imp
+import shutil
 import string
 import sys
 import uuid
@@ -775,6 +776,13 @@ def change_aaa(arc_path):
                 content_a = content_a + str_line
         file_util.wite_data_to_file(arc_path, content_a)
 
+
+def copy_source(src_path, des_path, delete_exist_dir = False):
+
+    if delete_exist_dir and os.path.exists(des_path):
+        shutil.rmtree(des_path)
+    file_util.copy_all_to_destination(src_path, des_path)
+
 if __name__ == '__main__':
 
     sdk_confuse_dir = '/Users/ganyuanrong/PycharmProjects/SdkTools/modifyXcodeProject/sdk_confuse/'
@@ -787,23 +795,34 @@ if __name__ == '__main__':
     word_util.words_dong = words_dong
     word_util.genest_word = genest_word
 
-    # src_path = '/Users/ganyuanrong/AndroidProject/martial_gp2_sdk_code/quickgamesdk/src/main'
-    # res_path = '/Users/ganyuanrong/AndroidProject/martial_gp2_sdk_code/quickgamesdk/src/main/res'
 
     src_path = '/Users/ganyuanrong/AndroidProject/DYSDK/SDKModuleOBS1/src'
     res_path = '/Users/ganyuanrong/AndroidProject/DYSDK/SDKModuleOBS1/src'
-    # src_path = '/Users/ganyuanrong/AndroidProject/martial_gp2_sdk_code/quickgamesdk/src'
-    # res_path = '/Users/ganyuanrong/AndroidProject/martial_gp2_sdk_code/quickgamesdk/src'
+    game_code = 'wdhd'
+    productFlavor = 'DySdkTW'
+
 
     exclude_string = ['reg_is_need_vfcode','sdk_supported_languages','dy_topon_test','dy_admob_app_id','dy_ad_placement_ids','dy_topon_appkey','dy_topon_appid','dy_adjust_token','sdk_game_code','sdk_app_key','sdk_more_language','sdk_af_dev_key','sdk_default_server_language',
                       'default_web_client_id','sdk_inner_version','scheme','facebook_app_id','facebook_client_token',
-                      'facebook_authorities','fb_login_protocol_scheme','facebook_app_name','line_channelId','channel_platform','sdk_name']
+                      'facebook_authorities','fb_login_protocol_scheme','facebook_app_name','line_channelId','channel_platform','sdk_name','sdk_server_languages_map','sdk_isapp'
+                      ,'dy_adjust_token']
+
+    #copy main
+    copy_source('/Users/ganyuanrong/AndroidProject/DYSDK/SDKModule/src/main', src_path + '/main', True)
+
+    # copy productFlavor
+    productFlavorPath = src_path + '/' + productFlavor + '_' + game_code
+    copy_source('/Users/ganyuanrong/AndroidProject/DYSDK/SDKModule/src/' + productFlavor, productFlavorPath, True)
+
+    # 复制gamecode配置到productFlavor
+    game_config_dir = '/Users/ganyuanrong/AndroidProject/DYSDK/sdk_config/%s/' % game_code
+    copy_source(game_config_dir, productFlavorPath)
 
     # 0.移除不用的资源
     # remove_unuse_resource(src_path, res_path)
 
     # 1.修改res下面的文件名字
-    change_res_file_name(src_path, src_path, "yyass_")
+    change_res_file_name(src_path, src_path, "cacvl_")
 
     #2.修改资源 id值
     change_id_tag_file_name(src_path, res_path)
@@ -813,30 +832,6 @@ if __name__ == '__main__':
 
     # find_R_in_code(src_path)
 
-    # alla = []
-    # for i in range(10000):
-    #     msg = ''
-    #     letter_count = random.randint(3, 8)
-    #     for m in range(letter_count):
-    #         lett = string.letters[random.randint(0, len(string.letters) - 1)]
-    #         msg = msg + lett
-    #     # msg = 'tw' + msg.lower()
-    #     msg = msg.lower()
-    #
-    #     addd = string.letters[random.randint(0, len(string.letters) - 1)]
-    #     number = random.randint(0, 99999)
-    #     # for i in range(number):
-    #     #     msg = msg + '0'
-    #     msg = msg + str(number) + addd
-    #     if msg not in alla:
-    #         alla.append(msg)
-    #         print msg
-
-    # check_md5('/Users/ganyuanrong/AndroidProject/martial_gp2_sdk_code/demo/build/outputs/bundle/payGooglePlayRelease/demo-payGooglePlay-release', '/Users/ganyuanrong/Downloads/cc/')
-    # jiamiIOSFile()
-    # addLajiFile()
-
-    # change_aaa('/Users/ganyuanrong/AndroidProject/martial_gp2_sdk_code/quickgamesdk/src/main/java/com/apter/sdk/http/HttpConstant.java')
 
     print 'end'
 

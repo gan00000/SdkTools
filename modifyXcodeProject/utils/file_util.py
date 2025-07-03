@@ -66,8 +66,14 @@ def copy_all_to_destination(source_dir, destination_dir):
         try:
             if os.path.isdir(source_path):
                 # 复制目录
-                shutil.copytree(source_path, destination_path, symlinks=True)
-                # print(f'Copied directory: {source_path} to {destination_path}')
+                # shutil.copytree(source_path, destination_path, symlinks=True)
+                # 处理目录递归复制
+                if os.path.exists(destination_path):
+                    # 目标子目录已存在，递归调用自身处理
+                    copy_all_to_destination(source_path, destination_path)
+                else:
+                    # 目标子目录不存在，直接复制
+                    shutil.copytree(source_path, destination_path, symlinks=True)
             else:
                 # 复制文件
                 shutil.copy2(source_path, destination_path)
@@ -92,3 +98,41 @@ def delete_contents(directory):
                 print( 'Error deleting ')
     else:
         print 'Directory does not exist'
+
+
+def copy_file(source_path, target_path, overwrite=True):
+    """
+    复制单个文件，支持覆盖已存在的目标文件
+    :param source_path: 源文件路径
+    :param target_path: 目标文件路径
+    :param overwrite: 是否覆盖已存在的文件
+    :param verbose: 是否显示详细信息
+    :return: 复制成功返回True，失败返回False
+    """
+    try:
+        # 检查源文件是否存在
+        if not os.path.isfile(source_path):
+            print("不存在或不是文件:" + source_path)
+            return False
+
+        # 确保目标目录存在
+        target_dir = os.path.dirname(target_path)
+        os.makedirs(target_dir, exist_ok=True)
+
+        # 检查目标文件是否存在
+        if os.path.exists(target_path):
+            if overwrite:
+                print("覆盖已存在的文件: " + target_path)
+            else:
+                print("跳过已存在的文件: " + overwrite)
+                return True
+
+        # 复制文件
+        shutil.copy2(source_path, target_path)  # copy2保留更多元数据
+        # print("已复制: {source_path} -> {target_path}")
+        print("已复制: %s -> %s" % source_path, target_path)
+        return True
+
+    except Exception as e:
+        print("复制文件时出错" + e)
+        return False
