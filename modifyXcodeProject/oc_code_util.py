@@ -90,7 +90,7 @@ def replace_string_tag(base_dir, regexes):
 
 if __name__ == "__main__":
 
-    oc_path = '/Users/ganyuanrong/iOSProject/flsdk_ios/GamaSDK_iOS_Integration/FLSDK'
+    oc_path = '/Users/ganyuanrong/ldyweb/DySdk_iOS/SDK_MAIN/FLSDK'
     results = scan_directory_for_oc_regexes(oc_path)
     replace_string_tag(oc_path, results)
     for regexes in results:

@@ -355,37 +355,48 @@ jisuan_type = ['*', '/', '+', '-']
 cpp_base_type = ['int', 'bool', 'void', 'int32_t', 'int64_t', 'double']
 
 def changeStringHeaderValue(header_path):
-    global f_obj, text_lines, line
-    f_obj = open(header_path, "r")
-    text_lines = f_obj.readlines()
-    content = ''
-    for line in text_lines:
-        line = line.decode('utf-8')
+
+    string_content = file_util.read_file_data(header_path)
+    defind_lines = re.findall(r'#define +wwwww_tag_wwwww.+\n', string_content)
+    # global f_obj, text_lines, line
+    # f_obj = open(header_path, "r")
+    # text_lines = f_obj.readlines()
+    # content = ''
+    for line in defind_lines:
+        # line = line.decode('utf-8')
+
         if 'wwwww_tag_wwwww' in line:
-            str_result = re.findall('//@"(.+)"', line)  # @"[\\w.]+"
+            str_result = re.findall(r'//@"(.+)"', line)  # @"[\\w.]+"
             if str_result:
                 str_result_1 = str_result[0]
+                if '\\\\' in str_result_1: #带\\的字符不加密，不然解密后会不一样，斜杠个数不一样
+                    print str_result_1
+                    continue
                 # str_result_1 = str_result_1[4: len(str_result_1) - 1]
                 aes_encrypt_result = pc.aes_encrypt_base64(str_result_1)
                 defineVale = 'Decrypt_AllStringContent(@"%s")' % (aes_encrypt_result)
 
                 if 'Decrypt_AllStringContent' in line:
-                    line = re.sub('Decrypt_AllStringContent\\(@".+"\\)', defineVale, line)
-                    if line.endswith('\n'):
-                        line = line.replace('\n', '')
-                    print line
-                    content = content + line + '\n'
+                    line_new = re.sub(r'Decrypt_AllStringContent\(@".+"\)', defineVale, line)
+                    # if line.endswith('\n'):
+                    #     line = line.replace('\n', '')
+                    print line_new
+                    # content = content + line + '\n'
                 else:
-                    line = re.sub('  @".+?" ', "  " + defineVale + "     ", line)
-                    if line.endswith('\n'):
-                        line = line.replace('\n', '')
-                    print line
-                    content = content + line + '\n'
+                    line_new = re.sub(r'  @".+?" ', "  " + defineVale + "     ", line)
+                    # if line.endswith('\n'):
+                    #     line = line.replace('\n', '')
+                    print line_new
+                    # content = content + line + '\n'
+                string_content = string_content.replace(line, line_new)
             else:
-                content = content + line
+                # content = content + line
+                print '...'
         else:
-            content = content + line
-    file_util.wite_data_to_file_noencode(header_path, content)
+            # content = content + line
+            print '...'
+    print 'write....'
+    file_util.wite_data_to_file_noencode(header_path, string_content)
 
 
 def changeMethodHeaderValue(header_path):
@@ -420,7 +431,7 @@ def changeMethodHeaderValue(header_path):
         file_util.wite_data_to_file_noencode(header_path, content)
 
 
-def changeImageNameForDefindHeader(bundle_path,header_path, is_encode_png):
+def changeImageNameForDefindHeader(bundle_path, header_path, is_encode_png):
     if os.path.exists(bundle_path):
 
         time_s = datetime_util.get_current_time_2()
@@ -649,9 +660,9 @@ if __name__ == '__main__':
 
     # des_key = "Gj7hTileRLg6dKEY"
     # des_iv = "Gj7hTileRLg6dIV"
-    mmm_key = 'tvonyCEcvflbJNPz'
+    mmm_key = 'NLi7AsfYjUfAbANQ'
     des_key = mmm_key       #mmm_key + "KEY"
-    des_iv = 'r1qvWdZKtj1EBY6A'       #mmm_key + "IV"
+    des_iv = 'rAj_51LQr@J0lpfH'       #mmm_key + "IV"
     ofs_Plat = True
     xcode_project_path = "/Users/ganyuanrong/KPlatform/KPlatform_iOS_OFS_common/SDK_MAIN/KP_SDK.xcodeproj"
     project_obs_src_path = "/Users/ganyuanrong/KPlatform/KPlatform_iOS_OFS_common/SDK_MAIN/MainModel"

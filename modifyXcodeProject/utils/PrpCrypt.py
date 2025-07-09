@@ -145,14 +145,15 @@ class PrpCrypt(object):
 
 
 if __name__ == '__main__':
-    pc = PrpCrypt('mplaywlzhsKEY','mplaywlzhsIV')  # 初始化密钥
+    pc = PrpCrypt('uk983aL85matMcQB', '7kjNmYB3HAcOW3VK')  # 初始化密钥
     # data = input("请输入待加密数据：")#
-    data = 'userId'
+    data = 'YcFnCpC3G3LPJ1BYpxgOfw=='
 
-    aes_decrypt_a = pc.aes_encrypt_base64(data)
-    print("aes_encrypt2:", aes_decrypt_a)
-    aes_decode_data = aes_decrypt_a
-    aes_decrypt_a = pc.aes_decrypt_base64(aes_decode_data)
-    print("aes_decrypt2:", aes_decrypt_a)
+    # aes_decrypt_a = pc.aes_encrypt_base64(data)
+    # print("aes_encrypt2:", aes_decrypt_a)
+    # aes_decode_data = aes_decrypt_a
+    aes_decrypt_a = pc.aes_decrypt_base64(data)
+    print("aes_decrypt2:" + aes_decrypt_a)
 
-    print 'aaddd'.encode("utf-8").encode("utf-8")
+    print aes_decrypt_a.replace('\\\\', '\\')
+    # print 'aaddd'.encode("utf-8").encode("utf-8")

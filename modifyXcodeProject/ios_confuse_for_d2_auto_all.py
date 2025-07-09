@@ -361,7 +361,7 @@ def changeStringHeaderValue(header_path):
     content = ''
     for line in text_lines:
         line = line.decode('utf-8')
-        if 'wwwww_tag_wwwww' in line:
+        if 'wwwww_tag_wwwww' in line and '\\\\' not in line:# 带\\的字符不加密，不然解密后会不一样，斜杠个数不一样:
             str_result = re.findall('//@"(.+)"', line)  # @"[\\w.]+"
             if str_result:
                 str_result_1 = str_result[0]

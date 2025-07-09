@@ -790,10 +790,10 @@ if __name__ == '__main__':
     # src_path = '/Users/ganyuanrong/AndroidProject/martial_gp2_sdk_code/quickgamesdk/src/main'
     # res_path = '/Users/ganyuanrong/AndroidProject/martial_gp2_sdk_code/quickgamesdk/src/main/res'
 
-    # src_path = '/Users/ganyuanrong/AndroidProject/DYSDK/SDKModuleOBS1/src'
-    # res_path = '/Users/ganyuanrong/AndroidProject/DYSDK/SDKModuleOBS1/src'
-    src_path = '/Users/ganyuanrong/AndroidProject/martial_gp2_sdk_code/quickgamesdk/src'
-    res_path = '/Users/ganyuanrong/AndroidProject/martial_gp2_sdk_code/quickgamesdk/src'
+    src_path = '/Users/ganyuanrong/AndroidProject/DYSDK/SDKModuleOBS1/src'
+    res_path = '/Users/ganyuanrong/AndroidProject/DYSDK/SDKModuleOBS1/src'
+    # src_path = '/Users/ganyuanrong/AndroidProject/martial_gp2_sdk_code/quickgamesdk/src'
+    # res_path = '/Users/ganyuanrong/AndroidProject/martial_gp2_sdk_code/quickgamesdk/src'
 
     exclude_string = ['reg_is_need_vfcode','sdk_supported_languages','dy_topon_test','dy_admob_app_id','dy_ad_placement_ids','dy_topon_appkey','dy_topon_appid','dy_adjust_token','sdk_game_code','sdk_app_key','sdk_more_language','sdk_af_dev_key','sdk_default_server_language',
                       'default_web_client_id','sdk_inner_version','scheme','facebook_app_id','facebook_client_token',
@@ -803,10 +803,10 @@ if __name__ == '__main__':
     # remove_unuse_resource(src_path, res_path)
 
     # 1.修改res下面的文件名字
-    # change_res_file_name(src_path, src_path, "kkayumm_")
+    change_res_file_name(src_path, src_path, "yyass_")
 
     #2.修改资源 id值
-    # change_id_tag_file_name(src_path, res_path)
+    change_id_tag_file_name(src_path, res_path)
 
     # 3.添加无效string tag
     # insert_res_string(res_path)
