@@ -560,8 +560,11 @@ def replace_code_placeholder(code_temple_index, code_temple, condition_var, agai
 
     code_temple_params_list = re.findall(r'ppppp\w+_ppppp', code_temple)  # ppppp\w+_ppppp代表字符
     for code_temple_param in code_temple_params_list:
-        w1, w2 = word_util.random_2words_not_same_inarr(word_aar)
-        code_temple = code_temple.replace(code_temple_param, w1 + w2.capitalize())
+        if ('@"' + code_temple_param) in code_temple: #是字符，不是变量
+            code_temple = code_temple.replace(code_temple_param, oc_code_util.get_random_char())
+        else:#变量
+            w1, w2 = word_util.random_2words_not_same_inarr(word_aar)
+            code_temple = code_temple.replace(code_temple_param, w1 + w2.capitalize())
     code_mumber_temple_params_list = re.findall(r'iiiii\w+_iiiii', code_temple)  # iiiii\w+_iiiii的范围可以是负数
     for code_mumber_temple_params in code_mumber_temple_params_list:
         numbera = random.randint(-1000, 10000)
@@ -612,7 +615,14 @@ def replace_code_placeholder(code_temple_index, code_temple, condition_var, agai
         value_int_arr = word_util.generateIntArr(dic_count)
         dic_content = ''
         for i in range(dic_count):
-            w1, w2 = word_util.random_2words_not_same_inarr(word_aar)
+            # w1, w2 = word_util.random_2words_not_same_inarr(word_aar)
+            w1 = oc_code_util.get_random_char()
+            w2 = oc_code_util.get_random_char()
+            w3 = oc_code_util.get_random_char()
+
+            random_x = random.randint(1, 4)
+            if random_x != 2:
+                w1 = w1+w3
 
             value_type = random.randint(1, 3)
             if i == dic_count - 1:
@@ -631,11 +641,23 @@ def replace_code_placeholder(code_temple_index, code_temple, condition_var, agai
         arr_count = random.randint(1, 15)
         arr_content = ''
         for i in range(arr_count):
-            w1, w2 = word_util.random_2words_not_same_inarr(word_aar)
-            if i == arr_count - 1:
-                val1 = '@"' + w1 + '_' + w2 + '" '
+            # w1, w2 = word_util.random_2words_not_same_inarr(word_aar)
+            w1 = oc_code_util.get_random_char()
+            w2 = oc_code_util.get_random_char()
+
+            mxx = random.randint(1, 5)
+            mmdd = w1
+            if mxx == 2:
+                mmdd = w1
+            elif mxx == 3:
+                mmdd = w1 + w2
             else:
-                val1 = '@"' + w1 + '_' + w2 + '", '
+                mmdd = w1 + '_' + w2
+
+            if i == arr_count - 1:
+                val1 = '@"' + mmdd + '" '
+            else:
+                val1 = '@"' + mmdd + '", '
             arr_content = arr_content + val1
         code_temple = code_temple.replace('array_value_array', arr_content)
     if 'char_value_char' in code_temple:
@@ -1680,6 +1702,79 @@ def method_use_rep(file_data, methodNameArr, instance):
             #
             #         file_data = file_data.replace(method_call, method_call_temp)
     return file_data
+
+def change_static_filed(code_path):
+    file_count = 0
+    if os.path.exists(code_path):
+        list_dirs = os.walk(code_path)
+        for root, dirs, files in list_dirs:
+            for file_name in files:
+
+                if file_name == ".DS_Store":
+                    continue
+
+                file_count = file_count + 1
+
+                # if file_name in oc_exclude_files_ref_modify:
+                #     continue
+                #
+                # exclude_dir_flag = 0
+                # for exclude_dir in oc_exclude_dirs_ref_modify:
+                #     if exclude_dir in root:
+                #         exclude_dir_flag = 1
+                # if exclude_dir_flag == 1:
+                #     continue
+
+                if file_name.endswith('.m') or file_name.endswith('.mm') \
+                        or file_name.endswith('.h') or file_name.endswith('.pch'):
+                    file_path = os.path.join(root, file_name)  # 文件路径
+                    content = file_util.read_file_data(file_path)
+                    static_defs = re.findall(r'static .+;', content)
+                    is_change = 0
+                    if static_defs:
+                        for defs in static_defs:
+
+                            if 'onceToken' in defs or 'token' in defs or 'instance' in defs or 'manager' in defs \
+                                    or 'dispatch_once_t' in defs or '_PRIROPERTY' in defs or '_IMPLVAR' in defs:
+                                continue
+
+                            if '<' in defs and '>' in defs:
+                                aaad = defs.split('>')[1]
+                                aaad = aaad.replace(" ", "") #替换 样式为 static NSArray<UIViewController *> *presentViewControllers;
+                                vara = re.findall(r'\*\w+', aaad)[0]
+                                vara = vara.replace("*", "")
+                            else:
+                                defs = defs.replace("*", "")
+                                adxx = defs.split(' ')
+                                vara = adxx[2]
+                                if vara == '':
+                                    vara = adxx[3]
+                                if vara == '':
+                                    vara = adxx[4]
+
+                            vara = vara.replace(" ", "").replace(";", "").replace("=", "")
+                            if '[' in vara and ']' in vara:
+                                vara = vara.split('[')[0]
+                            new_vara = vara + '_IMPLVAR'
+                            content = re.sub(r'\b%s\b' % vara, new_vara, content)
+                            # content = content.replace(vara, new_vara)
+                            w11 = word_util.get_random_letter_word()
+                            print '#define %s      %s' % (new_vara, w11)
+                            is_change = 1
+                    if is_change == 1:
+                        file_util.wite_data_to_file(file_path, content)
+
+
+
+
+
+
+
+if __name__ == '__main__':
+
+    patha = '/Users/ganyuanrong/ldyweb/DySdk_iOS/SDK_MAIN/FLSDK'
+    change_static_filed(patha)
+    pass
 
 
 

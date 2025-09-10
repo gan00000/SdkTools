@@ -142,3 +142,15 @@ def capitalize_first_char(s):
     if s:
         return s[0].upper() + s[1:]
     return s
+
+
+def get_random_letter_word():
+    try:
+        # sts = string.ascii_letters # + string.digits
+        int_random = random.randint(6, 10)
+        ret = ''.join(random.sample(string.ascii_letters, int_random))
+        # random_char = random.choice(sts)
+        return ret
+    except Exception, e:
+        print(e)
+    return ''

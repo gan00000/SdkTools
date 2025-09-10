@@ -634,31 +634,39 @@ if __name__ == '__main__':
         oc_class_parser.code_temples.append(code_data)
 
 
-    des_key = "binSIcWVUH1RoIIb"
-    des_iv = "brSlz3avQI19iHSp"
-    sdk_verson = 'V5' #设置版本
+    des_key = "docpoFEHZRRAQzSm"
+    des_iv = "gUfXSLurM5F05Bfp"
+    sdk_verson = 'KR' #设置版本
     need_sync_source = 1    #是否同步源码，复制
-    is_obs_jiekou = 1 #是否混淆对外接口, 0不混淆，1混淆
+    is_obs_jiekou = 0 #是否混淆对外接口, 0不混淆，1混淆
 
-    xcode_project_path = "/Users/ganyuanrong/iOSProject/flsdk_ios_p_majia/GamaSDK_iOS_Integration/MW_SDK.xcodeproj"
-    project_obs_src_path = "/Users/ganyuanrong/iOSProject/flsdk_ios_p_majia/GamaSDK_iOS_Integration/FLSDK"
-    project_all_src_path = "/Users/ganyuanrong/iOSProject/flsdk_ios_p_majia/GamaSDK_iOS_Integration/"
-    project_dir_path = "/Users/ganyuanrong/iOSProject/flsdk_ios_p_majia/GamaSDK_iOS_Integration/"
+    xcode_project_ws_path = "/Users/ganyuanrong/iOSProject/mw_sdk_ios_ofs"
+    xcode_project_path = xcode_project_ws_path + "/GamaSDK_iOS_Integration/MW_SDK.xcodeproj"
+    project_obs_src_path = xcode_project_ws_path + "/GamaSDK_iOS_Integration/FLSDK"
+    project_all_src_path = xcode_project_ws_path + "/GamaSDK_iOS_Integration/"
+    project_dir_path = xcode_project_ws_path + "/GamaSDK_iOS_Integration/"
     # res_bundle_path = "/Users/ganyuanrong/iOSProject/flsdk_ios_p_majia/GamaSDK_iOS_Integration/Resources/TH/SDKResourcesTH.bundle"
-    res_bundle_path = "/Users/ganyuanrong/iOSProject/flsdk_ios_p_majia/GamaSDK_iOS_Integration/Resources/%s/SDKResources%s.bundle"
+    res_bundle_path = xcode_project_ws_path + "/GamaSDK_iOS_Integration/Resources/%s/SDKResources%s.bundle"
     res_bundle_path = res_bundle_path % (sdk_verson, sdk_verson)
 
 
     # 定义源目录和目标目录
     source_dir = '/Users/ganyuanrong/iOSProject/flsdk_ios/'  # 替换为你的源目录
-    destination_dir = '/Users/ganyuanrong/iOSProject/flsdk_ios_p_majia/'  # 替换为你的目标目录
+    destination_dir = xcode_project_ws_path  # 替换为你的目标目录
 
-
+    GamaSDK_iOS_Integration_path = os.path.join(destination_dir, "GamaSDK_iOS_Integration")
     # start
     pc = PrpCrypt(des_key, des_iv)
 
     # 复制整个目录，包括所有子目录和文件
     if need_sync_source == 1:
+        # 检查目录是否存在，避免重复删除或删除不存在的目录
+        if os.path.exists(GamaSDK_iOS_Integration_path):
+            # 使用 shutil.rmtree() 删除目录及其所有内容
+            shutil.rmtree(GamaSDK_iOS_Integration_path)
+            print("目录 {} 已被清空".format(GamaSDK_iOS_Integration_path))
+        else:
+            print("目录 {} 不存在".format(GamaSDK_iOS_Integration_path))
         file_util.copy_all_to_destination(source_dir, destination_dir)
 
 

@@ -88,13 +88,27 @@ def replace_string_tag(base_dir, regexes):
                     content = content.replace(xv, md5_rep)
                 file_util.wite_data_to_file_noencode(path, content)
 
+def get_random_char():
+    try:
+        sts = string.ascii_letters + string.digits
+        int_random = random.randint(0, len(sts) - 1)
+        # ret = ''.join(random.sample(string.ascii_letters + string.digits, int_random))
+        random_char = random.choice(sts)
+    except Exception, e:
+        print(e)
+    return random_char
+
+
 if __name__ == "__main__":
 
-    oc_path = '/Users/ganyuanrong/ldyweb/DySdk_iOS/SDK_MAIN/FLSDK'
-    results = scan_directory_for_oc_regexes(oc_path)
-    replace_string_tag(oc_path, results)
-    for regexes in results:
-        md5_str = md5util.md5hex(regexes)
-        md5_rep = "wwwww_tag_wwwww_" + md5_str
+    # oc_path = '/Users/ganyuanrong/ldyweb/DySdk_iOS/SDK_MAIN/FLSDK'
+    # results = scan_directory_for_oc_regexes(oc_path)
+    # replace_string_tag(oc_path, results)
+    # for regexes in results:
+    #     md5_str = md5util.md5hex(regexes)
+    #     md5_rep = "wwwww_tag_wwwww_" + md5_str
+    #
+    #     print '#define %s        %s  //%s' % (md5_rep, regexes, regexes)
 
-        print '#define %s        %s  //%s' % (md5_rep, regexes, regexes)
+    for i in range(500):
+        print get_random_char()

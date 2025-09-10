@@ -647,10 +647,11 @@ if __name__ == '__main__':
         oc_class_parser.code_temples.append(code_data)
 
 
-    mmm_key = 'WH5aovgW1CIviiUC'
-    des_iv = 'Ja1XSzqQuK3b5lfZ'
+    mmm_key = 'uhOubkZxYWCjAbVx'
+    des_iv = 'TR9mjP4v8Li33EyO'
     des_key = mmm_key       #mmm_key + "KEY"
     is_manzhan_app = False
+    ofs_Plat = False
 
     xcode_project_path = "/Users/ganyuanrong/ldyweb/DySdk_iOS_OFS_V1/SDK_MAIN/DY_SDK.xcodeproj"
     project_obs_src_path = "/Users/ganyuanrong/ldyweb/DySdk_iOS_OFS_V1/SDK_MAIN/FLSDK"
@@ -711,7 +712,8 @@ if __name__ == '__main__':
          'UnityView.h', 'UnityView+iOS.h', 'UnityView+tvOS.h'])
 
     oc_exclude_dirs.extend(['ThirdResources', 'PulicHeader'])
-    oc_exclude_dirs.extend(['/Plat']) #马甲包不需要
+    if not ofs_Plat:
+        oc_exclude_dirs.extend(['/Plat']) #马甲包不需要
 
     oc_exclude_dirs_ref_modify = ['ThirkLib', "YYModel", "AFNetworking", "Resources", 'ThirdSrc', 'archives', '/build']
 
